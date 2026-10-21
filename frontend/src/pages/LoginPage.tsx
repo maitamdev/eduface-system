@@ -98,6 +98,9 @@ export const LoginPage: React.FC = () => {
         {import.meta.env.DEV && <Link to="/design-preview" className="login-preview-link">{t("Xem thử giao diện", "Explore the demo")}<ArrowUpRight size={14} /></Link>}
       </div><p className="login-account-help">{t("Chưa có tài khoản? Liên hệ quản trị viên trường hoặc đơn vị của bạn.", "Need an account? Contact your school or organization administrator.")}</p></section>
     </main>
-    <p className="login-bottom-note">EduFace · {t("Hệ thống quản lý điểm danh", "Attendance management system")}</p>
+    <p className="login-bottom-note">
+      <span>EduFace · {t("Hệ thống quản lý điểm danh AI", "AI Attendance Management System")}</span>
+      <span>Design and coding by <a href="https://github.com/maitamdev" target="_blank" rel="noreferrer">maitamdev</a></span>
+    </p>
   </div>;
 };

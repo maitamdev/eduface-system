@@ -222,7 +222,9 @@ button:disabled { cursor: wait; opacity: .6; }
 .login-error { display: flex; gap: 8px; align-items: flex-start; color: #a74740; background: #fff3f1; padding: 12px; font-size: 11px; margin-top: 20px; }
 .login-error svg { flex-shrink: 0; }
 .dark .login-error { background: #3a2826; color: #e9a49f; }
-.login-bottom-note { color: var(--ui-muted); font-size: 10px; padding: 17px 35px; border-top: 1px solid var(--ui-border); }
+.login-bottom-note { color: var(--ui-muted); font-size: 10px; padding: 17px 35px; border-top: 1px solid var(--ui-border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.login-bottom-note a, .workspace-footer a { color: var(--ui-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.workspace-footer { width: 100%; max-width: 1440px; margin: 0 auto; padding: 16px 32px 24px; border-top: 1px solid var(--ui-border); color: var(--ui-muted); font-size: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 
 .product-page { display: flex; flex-direction: column; gap: 28px; }
 .product-page-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }

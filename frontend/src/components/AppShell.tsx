@@ -137,6 +137,10 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
         </div>
       </header>
       <main id="main-content" tabIndex={-1} className="workspace-main">{children}</main>
+      <footer className="workspace-footer">
+        <span>EduFace · {t("Hệ thống quản lý điểm danh nhận diện khuôn mặt AI", "AI Facial Recognition Attendance System")}</span>
+        <span>Design and coding by <a href="https://github.com/maitamdev" target="_blank" rel="noreferrer">maitamdev</a></span>
+      </footer>
     </div>
   </div>;
 };
