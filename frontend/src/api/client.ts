@@ -4,7 +4,7 @@
  */
 
 const RAW_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-export const API_BASE_URL = RAW_BASE_URL.replace(/\/+$/, "");
+export const API_BASE_URL = RAW_BASE_URL.replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_API_KEY = import.meta.env.VITE_API_KEY || "";
 
 const TOKEN_STORAGE_KEY = "aura_attend_jwt_token";
