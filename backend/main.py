@@ -162,6 +162,8 @@ def _resolve_cors_origins() -> list:
         "https://ai-attendance-system-mauve.vercel.app",
         "https://eduface-system.vercel.app",
         "https://face-dhv-edu.vercel.app",
+        "https://dhv-edu.tech",
+        "https://www.dhv-edu.tech",
     ]
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
     extra = [o.strip() for o in env_origins.split(",") if o.strip()]
@@ -186,7 +188,7 @@ allow_origins = _resolve_cors_origins()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allow_origins,
-    allow_origin_regex=r"^https://.*\.vercel\.app$",
+    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*(vercel\.app|dhv-edu\.tech)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
