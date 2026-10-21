@@ -104,6 +104,7 @@ export interface UserOut {
   is_active: boolean;
   created_at: string;
   person_id?: string | null;
+  google_email?: string | null;
   microsoft_oid?: string | null;
 }
 
@@ -300,6 +301,29 @@ export function getSocketAuthentication() {
 }
 
 export const authApi = {
+  googleConfig: async () => {
+    const envClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || "").trim();
+    try {
+      const cfg = await apiFetch<{ enabled: boolean; client_id: string }>("/api/auth/google/config");
+      if (cfg.enabled && cfg.client_id) return cfg;
+    } catch {
+      // ignore if backend not updated yet
+    }
+    return { enabled: envClientId.length >= 15, client_id: envClientId };
+  },
+  googleExchange: async (accessToken: string) => {
+    const response = await apiFetch<TokenResponse>("/api/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ access_token: accessToken }),
+    });
+    setStoredToken(response.access_token);
+    return response;
+  },
+  linkGoogle: (userId: string, email: string | null) =>
+    apiFetch<{ linked: boolean; google_email: string | null }>(
+      `/api/auth/users/${encodeURIComponent(userId)}/google`,
+      { method: "PUT", body: JSON.stringify({ email }) }
+    ),
   microsoftConfig: () => apiFetch<{ enabled: boolean; client_id: string; tenant_id: string }>("/api/auth/microsoft/config"),
   microsoftChallenge: () => apiFetch<{ challenge_id: string; nonce: string }>("/api/auth/microsoft/challenge", { method: "POST" }),
   microsoftExchange: async (challengeId: string, idToken: string) => {

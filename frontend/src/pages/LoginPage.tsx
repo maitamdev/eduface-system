@@ -1,14 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ScanFace, LockKeyhole, User, Eye, EyeOff, Loader2, Globe, Sun, Moon, Wifi, WifiOff, AlertCircle, ArrowRight, ArrowUpRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
 import { healthApi, authApi } from "@/api/client";
-import { microsoftClient, handleMicrosoftRedirect, safeReturnPath, MICROSOFT_PENDING, type MicrosoftConfiguration } from "@/auth/microsoft";
+import { requestGoogleAccessToken, type GoogleConfiguration } from "@/auth/google";
+import { safeReturnPath } from "@/auth/microsoft";
+
+const GoogleMark: React.FC = () => (
+  <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true" className="shrink-0">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+  </svg>
+);
 
 export const LoginPage: React.FC = () => {
-  const { login, loginMicrosoft, isAuthenticated, user } = useAuth();
+  const { login, loginGoogle, isAuthenticated, user } = useAuth();
   const { lang, toggleLang, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -19,66 +29,50 @@ export const LoginPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [backendState, setBackendState] = useState<"checking" | "online" | "offline">("checking");
-  const [microsoft, setMicrosoft] = useState<MicrosoftConfiguration | null>(null);
-  const [microsoftLoading, setMicrosoftLoading] = useState(false);
+  const [google, setGoogle] = useState<GoogleConfiguration | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
-  const [returnPath, setReturnPath] = useState(() => safeReturnPath((location.state as { from?: { pathname?: string } } | null)?.from?.pathname));
-  const completed = useRef(false);
-  const completeMicrosoft = useRef(loginMicrosoft);
-  completeMicrosoft.current = loginMicrosoft;
+  const returnPath = safeReturnPath((location.state as { from?: { pathname?: string } } | null)?.from?.pathname);
 
   useEffect(() => {
     if (isAuthenticated) navigate(user?.role === "student" ? "/student" : returnPath, { replace: true });
   }, [isAuthenticated, user?.role, navigate, returnPath]);
+
   useEffect(() => {
     let active = true;
     healthApi.check().then(() => { if (active) setBackendState("online"); }).catch(() => { if (active) setBackendState("offline"); });
-    void authApi.microsoftConfig().then(async (config) => {
-      if (!active) return;
-      setMicrosoft(config);
-      if (!config.enabled) return;
-      const result = await handleMicrosoftRedirect(config);
-      if (!result || !active || completed.current) return;
-      completed.current = true; setMicrosoftLoading(true);
-      const pending = JSON.parse(sessionStorage.getItem(MICROSOFT_PENDING) || "null");
-      sessionStorage.removeItem(MICROSOFT_PENDING);
-      if (!pending || pending.challengeId !== result.state) throw new Error("Yêu cầu đăng nhập đã hết hạn. Vui lòng thử lại. / Sign-in request expired. Please try again.");
-      setReturnPath(safeReturnPath(pending.returnPath));
-      await completeMicrosoft.current(pending.challengeId, result.idToken);
-    }).catch((err: unknown) => {
-      if (!active) return;
-      const pending = sessionStorage.getItem(MICROSOFT_PENDING);
-      sessionStorage.removeItem(MICROSOFT_PENDING);
-      if (pending || completed.current) setError(err instanceof Error ? err.message : "Microsoft sign-in failed.");
-      setMicrosoft((previous) => previous || { enabled: false, client_id: "", tenant_id: "" });
-    }).finally(() => { if (active) setMicrosoftLoading(false); });
+    void authApi.googleConfig().then((config) => {
+      if (active) setGoogle(config);
+    }).catch(() => {
+      if (active) setGoogle({ enabled: false, client_id: "" });
+    });
     return () => { active = false; };
   }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (submitting || microsoftLoading) return;
+    if (submitting || googleLoading) return;
     if (!username.trim() || !password.trim()) { setError(t("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.", "Please enter both username and password.")); return; }
     setError(null); setSubmitting(true);
     try { await login(username.trim(), password); }
     catch (err) { setError(err instanceof Error ? err.message : t("Sai thông tin đăng nhập hoặc không kết nối được máy chủ.", "Invalid credentials or server unreachable.")); }
     finally { setSubmitting(false); }
   };
-  const handleMicrosoft = async () => {
-    if (!microsoft?.enabled || microsoftLoading || submitting) return;
-    setMicrosoftLoading(true); setError(null);
+
+  const handleGoogle = async () => {
+    if (!google?.enabled || googleLoading || submitting) return;
+    setGoogleLoading(true); setError(null);
     try {
-      const client = await microsoftClient(microsoft);
-      const challenge = await authApi.microsoftChallenge();
-      sessionStorage.setItem(MICROSOFT_PENDING, JSON.stringify({ challengeId: challenge.challenge_id, returnPath }));
-      await client.loginRedirect({ scopes: ["openid", "profile"], nonce: challenge.nonce, state: challenge.challenge_id, prompt: "select_account", redirectStartPage: `${window.location.origin}/login` });
+      const accessToken = await requestGoogleAccessToken(google.client_id);
+      await loginGoogle(accessToken);
     } catch (err) {
-      sessionStorage.removeItem(MICROSOFT_PENDING);
-      setError(err instanceof Error ? err.message : t("Không thể đăng nhập Microsoft.", "Microsoft sign-in failed."));
-      setMicrosoftLoading(false);
+      setError(err instanceof Error ? err.message : t("Không thể đăng nhập bằng Google.", "Google sign-in failed."));
+    } finally {
+      setGoogleLoading(false);
     }
   };
-  const busy = submitting || microsoftLoading;
+
+  const busy = submitting || googleLoading;
   return <div className="login-page">
     <header className="login-header">
       <Link to="/login" className="brand-lockup" aria-label="EduFace"><span className="brand-symbol"><ScanFace size={25} strokeWidth={1.7} /></span><span className="brand-wordmark">Edu<span>Face</span></span></Link>
@@ -86,13 +80,13 @@ export const LoginPage: React.FC = () => {
     </header>
     <main className="login-split">
       <section className={`login-visual ${imageFailed ? "image-unavailable" : ""}`} aria-label={t("Giới thiệu EduFace", "About EduFace")}>
-        {!imageFailed && <img src="/images/eduface-campus.png" width="1152" height="1536" fetchPriority="high" alt={t("Sinh viên bước vào lớp học trong khuôn viên đại học", "Students entering a university classroom")} onError={() => setImageFailed(true)} />}
+        {!imageFailed && <img src="/images/eduface-campus.png" width="1152" height="1536" alt={t("Sinh viên bước vào lớp học trong khuôn viên đại học", "Students entering a university classroom")} onError={() => setImageFailed(true)} />}
         <div className="login-visual-caption"><p className="login-visual-label">EDUFACE / CAMPUS</p><h2>{t("Bắt đầu từ\nsự có mặt.", "It starts with\nshowing up.")}</h2><p>{t("Điểm danh, quản lý lớp và theo dõi chuyên cần trong cùng một không gian.", "Attendance, classes and participation. Together in one workspace.")}</p><span>{t("Ảnh minh họa được tạo bằng AI", "AI-generated illustration")}</span></div>
       </section>
       <section className="login-form-panel" aria-labelledby="login-heading"><div className="login-form-wrap">
         <p className="login-form-eyebrow">{t("CỔNG ĐIỂM DANH", "ATTENDANCE PORTAL")}</p><h1 id="login-heading">{t("Chào mừng trở lại", "Welcome back")}</h1><p className="login-intro">{t("Đăng nhập để tiếp tục với EduFace.", "Sign in to continue to EduFace.")}</p>
-        <button className="microsoft-signin" type="button" disabled={!microsoft?.enabled || busy} onClick={handleMicrosoft} aria-describedby="microsoft-login-hint"><span className="microsoft-mark" aria-hidden="true"><i /><i /><i /><i /></span>{microsoftLoading ? t("Đang đăng nhập…", "Signing in…") : t("Tiếp tục với Microsoft", "Continue with Microsoft")}</button>
-        <p id="microsoft-login-hint" className="microsoft-login-hint">{microsoft?.enabled ? t("Dùng tài khoản trường học hoặc công ty của bạn.", "Use your school or work account.") : microsoft ? t("Microsoft chưa được quản trị viên cấu hình.", "Microsoft sign-in has not been configured by your administrator.") : t("Đang kiểm tra đăng nhập Microsoft…", "Checking Microsoft sign-in…")}</p>
+        <button className="microsoft-signin" type="button" disabled={!google?.enabled || busy} onClick={handleGoogle} aria-describedby="google-login-hint"><GoogleMark />{googleLoading ? t("Đang đăng nhập…", "Signing in…") : t("Tiếp tục với Google", "Continue with Google")}</button>
+        <p id="google-login-hint" className="microsoft-login-hint">{google?.enabled ? t("Dùng tài khoản Google (@gmail.com hoặc @dhv.edu.vn) của bạn.", "Use your Google account (@gmail.com or @dhv.edu.vn).") : google ? t("Google chưa được cấu hình (thêm GOOGLE_CLIENT_ID).", "Google sign-in has not been configured yet.") : t("Đang kiểm tra đăng nhập Google…", "Checking Google sign-in…")}</p>
         <div className="login-method-divider"><span>{t("hoặc dùng tài khoản EduFace", "or use your EduFace account")}</span></div>
         {error && <div className="login-error" role="alert"><AlertCircle size={17} /><span>{error}</span></div>}
         <form onSubmit={handleSubmit} className="login-form">

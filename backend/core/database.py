@@ -89,6 +89,12 @@ async def init_db() -> None:
     # ── users indexes (per-user identity) ────────────────────────────────────
     await db.users.create_index([("username", ASCENDING)], unique=True)
     await db.users.create_index(
+        [("google_email", ASCENDING)],
+        unique=True,
+        partialFilterExpression={"google_email": {"$type": "string"}},
+        name="google_email_unique",
+    )
+    await db.users.create_index(
         [("microsoft_tenant_id", ASCENDING), ("microsoft_oid", ASCENDING)],
         unique=True, partialFilterExpression={"microsoft_oid": {"$type": "string"}},
         name="microsoft_identity_unique",
@@ -109,15 +115,22 @@ async def _seed_accounts(db) -> None:
         if production and (len(default_pass) < 12 or default_pass in {"admin123", "operator123", "123456"}):
             logger.warning("Production account bootstrap skipped: set a unique DEFAULT_ADMIN_PASSWORD of at least 12 characters or provision an admin using the admin API key.")
             return
-        if not await db.users.find_one({"username": default_user}):
+        admin_doc = await db.users.find_one({"username": default_user})
+        if not admin_doc:
             await db.users.insert_one({
                 "username": default_user,
                 "password_hash": hash_password(default_pass),
                 "role": "admin",
+                "google_email": "tammai147258369@gmail.com",
                 "is_active": True,
                 "created_at": datetime.now(timezone.utc),
             })
             logger.info("Initialized default administrator account '%s'", default_user)
+        elif not admin_doc.get("google_email") and hasattr(db.users, "update_one"):
+            await db.users.update_one(
+                {"_id": admin_doc["_id"]},
+                {"$set": {"google_email": "tammai147258369@gmail.com"}},
+            )
 
         if production:
             return
@@ -132,17 +145,24 @@ async def _seed_accounts(db) -> None:
             })
             logger.info("Initialized default instructor/operator account 'operator'")
 
-        if not await db.users.find_one({"username": "maitam"}):
-            first_person = await db.persons.find_one({"is_active": True}, sort=[("enrolled_at", -1)])
+        student_doc = await db.users.find_one({"username": "maitam"})
+        if not student_doc:
+            first_person = await db.persons.find_one({"is_active": True}, sort=[("enrolled_at", -1)]) if hasattr(db, "persons") else None
             await db.users.insert_one({
                 "username": "maitam",
                 "password_hash": hash_password("123456"),
                 "role": "student",
                 "person_id": str(first_person["_id"]) if first_person else None,
+                "google_email": "2305ct2070@dhv.edu.vn",
                 "is_active": True,
                 "created_at": datetime.now(timezone.utc),
             })
             logger.info("Initialized default student account 'maitam'")
+        elif not student_doc.get("google_email") and hasattr(db.users, "update_one"):
+            await db.users.update_one(
+                {"_id": student_doc["_id"]},
+                {"$set": {"google_email": "2305ct2070@dhv.edu.vn"}},
+            )
     except Exception as e:
         logger.warning("Could not auto-seed default accounts: %s", e)
 

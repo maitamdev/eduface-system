@@ -22,23 +22,23 @@ export const SystemAdminPage: React.FC = () => {
   const [role, setRole] = useState<"operator" | "admin" | "student">("operator");
   const [personId, setPersonId] = useState("");
   const [creating, setCreating] = useState(false);
-  const [microsoftTarget, setMicrosoftTarget] = useState<UserOut | null>(null);
-  const [objectId, setObjectId] = useState("");
+  const [googleTarget, setGoogleTarget] = useState<UserOut | null>(null);
+  const [googleEmail, setGoogleEmail] = useState("");
   const [linking, setLinking] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
-  const microsoftLoader = useCallback(() => authApi.microsoftConfig(), []);
-  const microsoft = useResource(microsoftLoader, null);
-  const linkMicrosoft = async (event: React.FormEvent) => {
+
+  const linkGoogle = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!microsoftTarget || linking) return;
+    if (!googleTarget || linking) return;
     setLinking(true); setLinkError(null);
     try {
-      const result = await authApi.linkMicrosoft(microsoftTarget.id, objectId.trim() || null);
-      users.setData((previous) => previous.map((user) => user.id === microsoftTarget.id ? { ...user, microsoft_oid: result.object_id } : user));
-      setMicrosoftTarget(null);
-      toast.success(t("Đã cập nhật liên kết Microsoft.", "Microsoft account link updated."));
+      const result = await authApi.linkGoogle(googleTarget.id, googleEmail.trim() || null);
+      users.setData((previous) => previous.map((user) => user.id === googleTarget.id ? { ...user, google_email: result.google_email } : user));
+      setGoogleTarget(null);
+      toast.success(t("Đã cập nhật liên kết Google.", "Google account link updated."));
     } catch (err) { setLinkError(errorMessage(err)); } finally { setLinking(false); }
   };
+
   const create = async (event: React.FormEvent) => {
     event.preventDefault();
     if (creating) return;
@@ -62,11 +62,9 @@ export const SystemAdminPage: React.FC = () => {
     </form></Section><Section title={t("Tài khoản hệ thống", "System accounts")}><ErrorNotice message={users.error} retry={users.reload} /><Table label={t("Danh sách tài khoản", "Accounts")}><thead><tr><th>{t("Tài khoản", "Username")}</th><th>{t("Vai trò", "Role")}</th><th>{t("Ngày tạo", "Created")}</th><th>{t("Trạng thái", "Status")}</th></tr></thead><tbody>{users.data.map((user) => <tr key={user.id}><td className="cell-strong">{user.username}</td><td>{user.role}</td><td>{dateTime(user.created_at, lang)}</td><td className={user.is_active ? "attendance-status" : "muted"}>{user.is_active ? t("Hoạt động", "Active") : t("Đã khóa", "Disabled")}</td></tr>)}</tbody></Table>{!users.data.length && <EmptyState loading={users.loading}>{users.error ? t("Chưa tải được tài khoản.", "Accounts unavailable.") : t("Chưa có tài khoản.", "No accounts.")}</EmptyState>}</Section></div>
     <Section title={t("Chẩn đoán cấu hình", "Configuration diagnostics")}><ErrorNotice message={config.error} retry={config.reload} />{config.data ? <><dl className="config-grid"><div><dt>MongoDB</dt><dd>{config.data.MONGODB_URL}</dd></div><div><dt>{t("Cơ sở dữ liệu", "Database")}</dt><dd>{config.data.MONGODB_DB_NAME}</dd></div><div><dt>{t("Ngưỡng nhận diện", "Recognition threshold")}</dt><dd>{config.data.MIN_CONFIDENCE}</dd></div><div><dt>{t("Ngưỡng phát hiện trùng", "Duplicate threshold")}</dt><dd>{config.data.DUPLICATE_THRESHOLD}</dd></div></dl>{config.data.issues.length > 0 && <ul className="diagnostic-issues">{config.data.issues.map((issue) => <li key={issue}>{issue}</li>)}</ul>}</> : <EmptyState loading={config.loading}>{t("Chưa có thông tin cấu hình.", "Configuration unavailable.")}</EmptyState>}</Section>
     <Section title={t("Dữ liệu nhận diện khuôn mặt", "Face recognition data")}><ErrorNotice message={encodings.error} retry={encodings.reload} />{encodings.data ? <><p className="section-note">{t(`${encodings.data.persons_with_encodings} hồ sơ có vector · ${encodings.data.persons_missing_encodings} hồ sơ thiếu vector`, `${encodings.data.persons_with_encodings} profiles with vectors · ${encodings.data.persons_missing_encodings} missing vectors`)}</p>{encodings.data.missing.length ? <Table label={t("Hồ sơ cần kiểm tra", "Profiles to inspect")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>{t("Ngày đăng ký", "Enrolled")}</th><th>{t("Cần xử lý", "Action needed")}</th></tr></thead><tbody>{encodings.data.missing.map((person) => <tr key={person.person_id}><td className="cell-strong">{person.name}</td><td>{dateTime(person.enrolled_at, lang)}</td><td>{t("Kiểm tra và đăng ký lại khuôn mặt", "Review and re-enroll facial data")}</td></tr>)}</tbody></Table> : <p className="attendance-status">{t("Không có hồ sơ thiếu vector nhận diện.", "No profiles missing face vectors.")}</p>}</> : <EmptyState loading={encodings.loading}>{t("Chưa tải được trạng thái dữ liệu.", "Data status unavailable.")}</EmptyState>}</Section>
-    <Section title={t("Đăng nhập Microsoft", "Microsoft sign-in")} description={t("Liên kết tài khoản EduFace với Object ID trong Microsoft Entra. Vai trò và hồ sơ sinh viên được giữ nguyên.", "Link EduFace accounts to their Microsoft Entra Object IDs. Roles and student profiles stay the same.")}>
-      <ErrorNotice message={microsoft.error} retry={microsoft.reload} />
-      {!microsoft.data?.enabled && <p className="section-note">{t("Chưa bật Microsoft. Cấu hình MICROSOFT_CLIENT_ID và MICROSOFT_TENANT_ID ở backend trước khi liên kết.", "Microsoft is not enabled. Configure MICROSOFT_CLIENT_ID and MICROSOFT_TENANT_ID on the backend before linking accounts.")}</p>}
-      <Table label={t("Liên kết tài khoản Microsoft", "Microsoft account links")}><thead><tr><th>{t("Tài khoản EduFace", "EduFace account")}</th><th>Microsoft Object ID</th><th>{t("Thao tác", "Actions")}</th></tr></thead><tbody>{users.data.map((user) => <tr key={user.id}><td className="cell-strong">{user.username}</td><td>{user.microsoft_oid || t("Chưa liên kết", "Not linked")}</td><td><button className="text-button" disabled={!microsoft.data?.enabled} onClick={() => { setMicrosoftTarget(user); setObjectId(user.microsoft_oid || ""); setLinkError(null); }}>{user.microsoft_oid ? t("Chỉnh liên kết", "Edit link") : t("Liên kết", "Link account")}</button></td></tr>)}</tbody></Table>
+    <Section title={t("Đăng nhập Google", "Google sign-in")} description={t("Liên kết tài khoản EduFace với địa chỉ email Google (@gmail.com hoặc @dhv.edu.vn). Vai trò và hồ sơ sinh viên được giữ nguyên.", "Link EduFace accounts to their Google email addresses (@gmail.com or @dhv.edu.vn). Roles and student profiles stay the same.")}>
+      <Table label={t("Liên kết tài khoản Google", "Google account links")}><thead><tr><th>{t("Tài khoản EduFace", "EduFace account")}</th><th>{t("Vai trò", "Role")}</th><th>Google Email</th><th>{t("Thao tác", "Actions")}</th></tr></thead><tbody>{users.data.map((user) => <tr key={user.id}><td className="cell-strong">{user.username}</td><td>{user.role}</td><td>{user.google_email || t("Chưa liên kết", "Not linked")}</td><td><button className="text-button" onClick={() => { setGoogleTarget(user); setGoogleEmail(user.google_email || ""); setLinkError(null); }}>{user.google_email ? t("Đổi email", "Edit email") : t("Liên kết email", "Link email")}</button></td></tr>)}</tbody></Table>
     </Section>
-    {microsoftTarget && <Dialog title={t(`Microsoft · ${microsoftTarget.username}`, `Microsoft · ${microsoftTarget.username}`)} busy={linking} onClose={() => setMicrosoftTarget(null)}><form className="stack-form" onSubmit={linkMicrosoft}><p className="muted">{t("Lấy Object ID của đúng người dùng từ Microsoft Entra → Users. Không dùng email hoặc Client ID. Để trống để gỡ liên kết.", "Copy this user's Object ID from Microsoft Entra → Users. Do not use an email or Client ID. Leave blank to unlink.")}</p><Field id="microsoft-object-id" label="Microsoft Entra Object ID"><input id="microsoft-object-id" value={objectId} onChange={(event) => setObjectId(event.target.value)} placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" /></Field><ErrorNotice message={linkError} /><div className="dialog-actions"><button type="button" className="secondary-button" disabled={linking} onClick={() => setMicrosoftTarget(null)}>{t("Hủy", "Cancel")}</button><button type="submit" className="primary-button" disabled={linking}>{linking ? t("Đang lưu…", "Saving…") : t("Lưu liên kết", "Save link")}</button></div></form></Dialog>}
+    {googleTarget && <Dialog title={t(`Liên kết Google · ${googleTarget.username}`, `Google Link · ${googleTarget.username}`)} busy={linking} onClose={() => setGoogleTarget(null)}><form className="stack-form" onSubmit={linkGoogle}><p className="muted">{t("Nhập địa chỉ email Google (@gmail.com hoặc @dhv.edu.vn) để cho phép người dùng này đăng nhập nhanh bằng nút Google. Để trống để gỡ liên kết.", "Enter a Google email address (@gmail.com or @dhv.edu.vn) to allow this user to sign in with Google. Leave blank to unlink.")}</p><Field id="google-email-input" label="Google Email"><input id="google-email-input" type="email" value={googleEmail} onChange={(event) => setGoogleEmail(event.target.value)} placeholder="tenban@gmail.com / mssv@dhv.edu.vn" /></Field><ErrorNotice message={linkError} /><div className="dialog-actions"><button type="button" className="secondary-button" disabled={linking} onClick={() => setGoogleTarget(null)}>{t("Hủy", "Cancel")}</button><button type="submit" className="primary-button" disabled={linking}>{linking ? t("Đang lưu…", "Saving…") : t("Lưu liên kết", "Save link")}</button></div></form></Dialog>}
   </div>;
 };

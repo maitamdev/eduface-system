@@ -123,6 +123,7 @@ async def get_current_profile(
                 is_active=doc.get("is_active", True),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
                 person_id=doc.get("person_id"),
+                google_email=doc.get("google_email"),
                 microsoft_oid=doc.get("microsoft_oid"),
             )
 
@@ -150,6 +151,7 @@ async def list_users(
                 is_active=doc.get("is_active", True),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
                 person_id=doc.get("person_id"),
+                google_email=doc.get("google_email"),
                 microsoft_oid=doc.get("microsoft_oid"),
             )
         )

@@ -43,7 +43,7 @@ from slowapi.errors import RateLimitExceeded
 from core.database import init_db
 from core.rate_limit import limiter
 from core.logging_context import RequestIDMiddleware, install_request_id_filter
-from routers import persons, sessions, attendance, reports, dashboard, auth, microsoft_auth
+from routers import persons, sessions, attendance, reports, dashboard, auth, microsoft_auth, google_auth
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -195,6 +195,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router,        prefix="/api/auth",       tags=["Authentication"])
+app.include_router(google_auth.router, prefix="/api/auth",       tags=["Google sign-in"])
 app.include_router(microsoft_auth.router, prefix="/api/auth", tags=["Microsoft sign-in"])
 app.include_router(dashboard.router,  prefix="/api/dashboard",  tags=["Dashboard"])
 app.include_router(persons.router,    prefix="/api/persons",    tags=["Persons"])

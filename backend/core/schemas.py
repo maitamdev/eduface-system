@@ -126,12 +126,13 @@ class UserCreate(BaseModel):
 
 
 class UserOut(BaseModel):
-    id:         str
-    username:   str
-    role:       str
-    is_active:  bool
-    created_at: datetime
-    person_id:  Optional[str] = None
+    id:           str
+    username:     str
+    role:         str
+    is_active:    bool
+    created_at:   datetime
+    person_id:    Optional[str] = None
+    google_email: Optional[str] = None
     microsoft_oid: Optional[str] = None
 
     model_config = {"from_attributes": True}
