@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "Jashan Randhawa", email = "jashanrandhawa76@gmail.com" }
+    { name = "Mai Tam (maitamdev)", email = "maitamit062005@gmail.com" }
 ]
 keywords = ["face-recognition", "embeddings", "cosine-similarity", "biometrics", "vector-search"]
 classifiers = [
@@ -24,6 +24,6 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Jashan-randhawa/AI-Attendance-System"
-Repository = "https://github.com/Jashan-randhawa/AI-Attendance-System"
-Issues = "https://github.com/Jashan-randhawa/AI-Attendance-System/issues"
+Homepage = "https://github.com/maitamdev/eduface-system"
+Repository = "https://github.com/maitamdev/eduface-system"
+Issues = "https://github.com/maitamdev/eduface-system/issues"

@@ -4,11 +4,11 @@
 
 | Package / Component | Version | Supported |
 | ------------------- | ------- | --------- |
-| `@jashan-randhawa/face-matching-core` | `^1.0.0` | :white_check_mark: |
-| `@jashan-randhawa/attendance-contracts` | `^1.0.0` | :white_check_mark: |
-| `@jashan-randhawa/smartattend-client` | `^1.0.0` | :white_check_mark: |
-| `@jashan-randhawa/face-quality-gates` | `^1.0.0` | :white_check_mark: |
-| `@jashan-randhawa/attendance-domain-core` | `^1.0.0` | :white_check_mark: |
+| `@maitamdev/face-matching-core` | `^1.0.0` | :white_check_mark: |
+| `@maitamdev/attendance-contracts` | `^1.0.0` | :white_check_mark: |
+| `@maitamdev/smartattend-client` | `^1.0.0` | :white_check_mark: |
+| `@maitamdev/face-quality-gates` | `^1.0.0` | :white_check_mark: |
+| `@maitamdev/attendance-domain-core` | `^1.0.0` | :white_check_mark: |
 | `smartattend-face-matching` (Python) | `^1.0.0` | :white_check_mark: |
 
 ---
@@ -25,7 +25,7 @@ Face images, feature vectors, and embeddings constitute sensitive biometric data
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability or unauthorized credential leak, please report it privately:
-1. Open a Private Security Advisory at [https://github.com/Jashan-randhawa/AI-Attendance-System/security/advisories/new](https://github.com/Jashan-randhawa/AI-Attendance-System/security/advisories/new).
-2. Or contact the maintainer directly at `jashanrandhawa76@gmail.com`.
+1. Open a Private Security Advisory at [https://github.com/maitamdev/eduface-system/security/advisories/new](https://github.com/maitamdev/eduface-system/security/advisories/new).
+2. Or contact the maintainer directly at `maitamit062005@gmail.com`.
 
 We acknowledge reports within 48 hours and coordinate prompt remediation releases.

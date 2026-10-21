@@ -23,5 +23,5 @@
 - **Package Tests**: `npm test` (all passed)
 
 ---
-- [GitHub Repository](https://github.com/Jashan-randhawa/AI-Attendance-System)
-- [Issue Tracker](https://github.com/Jashan-randhawa/AI-Attendance-System/issues)
+- [GitHub Repository](https://github.com/maitamdev/eduface-system)
+- [Issue Tracker](https://github.com/maitamdev/eduface-system/issues)

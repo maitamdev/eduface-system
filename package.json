@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "description": "SmartAttend Biometric Attendance System Monorepo and Modular Packages",
-  "author": "Jashan Randhawa",
+  "author": "Mai Tam (maitamdev)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jashan-randhawa/AI-Attendance-System.git"
+    "url": "git+https://github.com/maitamdev/eduface-system.git"
   },
   "workspaces": [
     "packages/*"

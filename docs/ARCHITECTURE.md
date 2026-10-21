@@ -1,6 +1,6 @@
 # SmartAttend Monorepo & Modular Packages Architecture
 
-SmartAttend is an AI-powered biometric attendance tracking ecosystem. This repository contains the full-stack FastAPI backend and React 18 frontend, alongside a suite of decoupled, standalone libraries published under the `@jashan-randhawa` scope.
+SmartAttend is an AI-powered biometric attendance tracking ecosystem. This repository contains the full-stack FastAPI backend and React 18 frontend, alongside a suite of decoupled, standalone libraries published under the `@maitamdev` scope.
 
 ---
 
@@ -8,11 +8,11 @@ SmartAttend is an AI-powered biometric attendance tracking ecosystem. This repos
 
 | Package | Language | Directory | Description |
 | ------- | -------- | --------- | ----------- |
-| `@jashan-randhawa/face-matching-core` | TypeScript / JS | `packages/face-matching-core` | Provider-neutral vector normalization, cosine similarity, and top-K candidate matching |
-| `@jashan-randhawa/attendance-contracts` | TypeScript / JS | `packages/attendance-contracts` | Shared domain entity schemas and API contracts matching FastAPI Pydantic models |
-| `@jashan-randhawa/smartattend-client` | TypeScript / JS | `packages/smartattend-client` | Production-ready typed client SDK for browser, Node.js, and mobile clients |
-| `@jashan-randhawa/face-quality-gates` | TypeScript / JS | `packages/face-quality-gates` | Biometric face image quality rules, pose limits, edge margins, and diagnostics |
-| `@jashan-randhawa/attendance-domain-core` | TypeScript / JS | `packages/attendance-domain-core` | Database-neutral attendance marking idempotency rules and duplicate classification |
+| `@maitamdev/face-matching-core` | TypeScript / JS | `packages/face-matching-core` | Provider-neutral vector normalization, cosine similarity, and top-K candidate matching |
+| `@maitamdev/attendance-contracts` | TypeScript / JS | `packages/attendance-contracts` | Shared domain entity schemas and API contracts matching FastAPI Pydantic models |
+| `@maitamdev/smartattend-client` | TypeScript / JS | `packages/smartattend-client` | Production-ready typed client SDK for browser, Node.js, and mobile clients |
+| `@maitamdev/face-quality-gates` | TypeScript / JS | `packages/face-quality-gates` | Biometric face image quality rules, pose limits, edge margins, and diagnostics |
+| `@maitamdev/attendance-domain-core` | TypeScript / JS | `packages/attendance-domain-core` | Database-neutral attendance marking idempotency rules and duplicate classification |
 | `smartattend-face-matching` | Python | `packages/python/face-matching-core` | Python vector normalization and cosine similarity matching engine |
 
 ---
@@ -29,11 +29,11 @@ AI-Attendance-System/
 │       ├── packages-ci.yml         # Automated typechecking, unit tests & tarball smoke tests
 │       └── publish-packages.yml    # Automatic publishing to GitHub Packages registry
 ├── packages/
-│   ├── face-matching-core/         # @jashan-randhawa/face-matching-core
-│   ├── attendance-contracts/       # @jashan-randhawa/attendance-contracts
-│   ├── smartattend-client/         # @jashan-randhawa/smartattend-client
-│   ├── face-quality-gates/         # @jashan-randhawa/face-quality-gates
-│   ├── attendance-domain-core/     # @jashan-randhawa/attendance-domain-core
+│   ├── face-matching-core/         # @maitamdev/face-matching-core
+│   ├── attendance-contracts/       # @maitamdev/attendance-contracts
+│   ├── smartattend-client/         # @maitamdev/smartattend-client
+│   ├── face-quality-gates/         # @maitamdev/face-quality-gates
+│   ├── attendance-domain-core/     # @maitamdev/attendance-domain-core
 │   └── python/
 │       └── face-matching-core/     # smartattend-face-matching (Python wheel/sdist)
 ├── examples/

@@ -20,7 +20,7 @@ Ensure your system meets the following software requirements:
 ## 📥 1. Clone the Repository & Monorepo Setup
 
 ```bash
-git clone https://github.com/Jashan-randhawa/AI-Attendance-System.git
+git clone https://github.com/maitamdev/eduface-system.git
 cd AI-Attendance-System
 
 # Install root npm workspace dependencies:
@@ -31,7 +31,7 @@ npm install
 
 ## 📦 2. Test Reusable Modular Packages
 
-SmartAttend uses npm workspaces to manage decoupled packages (`@jashan-randhawa/*`). You can verify all unit tests and run example scripts immediately:
+SmartAttend uses npm workspaces to manage decoupled packages (`@maitamdev/*`). You can verify all unit tests and run example scripts immediately:
 
 ```bash
 # Run unit tests across all 5 TypeScript packages:

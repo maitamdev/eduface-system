@@ -1,4 +1,4 @@
-# @jashan-randhawa/face-matching-core
+# @maitamdev/face-matching-core
 
 > Provider-neutral face embedding normalization, cosine similarity calculation, and top-K candidate matching engine.
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-`@jashan-randhawa/face-matching-core` extracts the vector mathematics used in facial recognition pipelines (such as InsightFace or FaceNet) into a clean, zero-dependency library.
+`@maitamdev/face-matching-core` extracts the vector mathematics used in facial recognition pipelines (such as InsightFace or FaceNet) into a clean, zero-dependency library.
 
 Features:
 - Fast, numerically stable cosine similarity with division-by-zero protection
@@ -22,12 +22,12 @@ Features:
 
 ```bash
 # Via GitHub Packages
-npm install @jashan-randhawa/face-matching-core
+npm install @maitamdev/face-matching-core
 ```
 
-Ensure your `.npmrc` has the `@jashan-randhawa` registry configured:
+Ensure your `.npmrc` has the `@maitamdev` registry configured:
 ```ini
-@jashan-randhawa:registry=https://npm.pkg.github.com
+@maitamdev:registry=https://npm.pkg.github.com
 ```
 
 ---
@@ -37,7 +37,7 @@ Ensure your `.npmrc` has the `@jashan-randhawa` registry configured:
 ### Basic Cosine Similarity
 
 ```ts
-import { cosineSimilarity, normalizeEmbedding } from "@jashan-randhawa/face-matching-core";
+import { cosineSimilarity, normalizeEmbedding } from "@maitamdev/face-matching-core";
 
 const embeddingA = [0.12, -0.45, 0.88, ...];
 const embeddingB = [0.10, -0.42, 0.85, ...];
@@ -49,7 +49,7 @@ console.log(`Similarity: ${(similarity * 100).toFixed(1)}%`);
 ### Matching Against a Candidate Gallery
 
 ```ts
-import { findBestMatch, MatchCandidate } from "@jashan-randhawa/face-matching-core";
+import { findBestMatch, MatchCandidate } from "@maitamdev/face-matching-core";
 
 const enrolledCandidates: MatchCandidate[] = [
   {
@@ -96,4 +96,4 @@ Returns descending ranked candidate list with `candidateId`, `score`, and `rank`
 
 ## License
 
-MIT © [Jashan Randhawa](https://github.com/Jashan-randhawa)
+MIT © [Mai Tam (maitamdev)](https://github.com/maitamdev)

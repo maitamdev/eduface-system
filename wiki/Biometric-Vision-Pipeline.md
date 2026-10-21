@@ -11,7 +11,7 @@ flowchart TD
     Frame["Input Camera Frame / Upload"] --> Validate["Safety Validation\n(Size <= 10MB, Dims <= 6000x6000px)"]
     Validate --> CLAHE["CLAHE Contrast Equalization\n(LAB color space on L-channel)"]
     CLAHE --> Detect["InsightFace Detection\n(RetinaFace / buffalo_sc)"]
-    Detect --> Filter{"Quality Gate\n(@jashan-randhawa/face-quality-gates)"}
+    Detect --> Filter{"Quality Gate\n(@maitamdev/face-quality-gates)"}
 
     Filter -- "Fails Thresholds" --> Reject["400 Bad Request\n(Blurry, Off-Angle, Margin Cutoff)"]
 
@@ -28,7 +28,7 @@ flowchart TD
 
 ## 2. Face Quality Acceptance Gates
 
-Photos submitted to `/api/persons/enroll` or evaluated on client devices via `@jashan-randhawa/face-quality-gates` must satisfy five mathematical criteria:
+Photos submitted to `/api/persons/enroll` or evaluated on client devices via `@maitamdev/face-quality-gates` must satisfy five mathematical criteria:
 
 1. **Detection Confidence (`det_score >= 0.60`)**:
    - Ensures the bounding region is unambiguously a human face.

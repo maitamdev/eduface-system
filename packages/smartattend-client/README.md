@@ -1,4 +1,4 @@
-# @jashan-randhawa/smartattend-client
+# @maitamdev/smartattend-client
 
 > Production-ready typed client SDK for the Smart Attendance FastAPI backend, supporting Node.js, browsers, and mobile runtimes.
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-`@jashan-randhawa/smartattend-client` provides a robust, strongly-typed HTTP client for consuming the Smart Attendance API across web applications, administrative dashboards, kiosk devices, and background scripts.
+`@maitamdev/smartattend-client` provides a robust, strongly-typed HTTP client for consuming the Smart Attendance API across web applications, administrative dashboards, kiosk devices, and background scripts.
 
 Features:
 - Unified modules: `auth`, `persons`, `sessions`, `attendance`, `dashboard`, `reports`, and `diagnostics`
@@ -21,12 +21,12 @@ Features:
 
 ```bash
 # Via GitHub Packages
-npm install @jashan-randhawa/smartattend-client
+npm install @maitamdev/smartattend-client
 ```
 
-Ensure your `.npmrc` is configured for the `@jashan-randhawa` scope:
+Ensure your `.npmrc` is configured for the `@maitamdev` scope:
 ```ini
-@jashan-randhawa:registry=https://npm.pkg.github.com
+@maitamdev:registry=https://npm.pkg.github.com
 ```
 
 ---
@@ -34,7 +34,7 @@ Ensure your `.npmrc` is configured for the `@jashan-randhawa` scope:
 ## Quick Start
 
 ```ts
-import { SmartAttendClient } from "@jashan-randhawa/smartattend-client";
+import { SmartAttendClient } from "@maitamdev/smartattend-client";
 
 const client = new SmartAttendClient({
   baseUrl: "https://api.smartattend.example.com",
@@ -80,4 +80,4 @@ console.log(`Marked ${attendanceReport.new_records} attendees.`);
 
 ## License
 
-MIT © [Jashan Randhawa](https://github.com/Jashan-randhawa)
+MIT © [Mai Tam (maitamdev)](https://github.com/maitamdev)

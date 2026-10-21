@@ -49,4 +49,4 @@ if result.matched:
 
 ## License
 
-MIT © [Jashan Randhawa](https://github.com/Jashan-randhawa)
+MIT © [Mai Tam (maitamdev)](https://github.com/maitamdev)

@@ -1,4 +1,4 @@
-# @jashan-randhawa/attendance-domain-core
+# @maitamdev/attendance-domain-core
 
 > Database-neutral attendance marking idempotency rules, session status validation, and duplicate event classification.
 
@@ -21,12 +21,12 @@ Features:
 
 ```bash
 # Via GitHub Packages
-npm install @jashan-randhawa/attendance-domain-core
+npm install @maitamdev/attendance-domain-core
 ```
 
-Ensure your `.npmrc` is configured for the `@jashan-randhawa` scope:
+Ensure your `.npmrc` is configured for the `@maitamdev` scope:
 ```ini
-@jashan-randhawa:registry=https://npm.pkg.github.com
+@maitamdev:registry=https://npm.pkg.github.com
 ```
 
 ---
@@ -37,7 +37,7 @@ Ensure your `.npmrc` is configured for the `@jashan-randhawa` scope:
 import {
   shouldMarkAttendance,
   classifyDuplicate
-} from "@jashan-randhawa/attendance-domain-core";
+} from "@maitamdev/attendance-domain-core";
 
 const existingRecords = [
   { person_id: "usr_1", session_id: "sess_A", marked_at: "2026-09-28T09:00:00Z" }
@@ -73,4 +73,4 @@ Returns array of unique person IDs who have not yet been marked in the target se
 
 ## License
 
-MIT © [Jashan Randhawa](https://github.com/Jashan-randhawa)
+MIT © [Mai Tam (maitamdev)](https://github.com/maitamdev)

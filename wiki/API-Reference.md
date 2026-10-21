@@ -45,7 +45,7 @@ Provision a new user account.
 - **Request Body (JSON)**:
   ```json
   {
-    "username": "jashan_operator",
+    "username": "maitam_operator",
     "password": "SecurePassword123!",
     "role": "operator"
   }
@@ -122,7 +122,7 @@ Identifies all faces in an image frame without recording attendance.
     "faces": [
       {
         "person_id": "c7f99147-36e6-42d1-9430-c3d3957bf9e1",
-        "name": "Jashan Randhawa",
+        "name": "Mai Tam (maitamdev)",
         "confidence": 0.872,
         "box": [110, 95, 290, 280]
       }

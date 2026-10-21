@@ -1,5 +1,5 @@
 /**
- * Example demonstrating @jashan-randhawa/smartattend-client and @jashan-randhawa/attendance-domain-core
+ * Example demonstrating @maitamdev/smartattend-client and @maitamdev/attendance-domain-core
  */
 import {
   SmartAttendClient,

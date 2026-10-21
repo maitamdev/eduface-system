@@ -24,8 +24,8 @@ Enrolled subject profiles and metadata.
 ```json
 {
   "_id": "c7f99147-36e6-42d1-9430-c3d3957bf9e1",
-  "name": "Jashan Randhawa",
-  "email": "jashan@example.com",
+  "name": "Mai Tam (maitamdev)",
+  "email": "maitam@dhv.edu.vn",
   "department": "Engineering",
   "photo_url": "https://...",
   "enrolled_at": "2026-09-12T13:05:00Z",
@@ -39,7 +39,7 @@ Enrolled subject profiles and metadata.
 ```json
 {
   "_id": "c7f99147-36e6-42d1-9430-c3d3957bf9e1",
-  "name": "Jashan Randhawa",
+  "name": "Mai Tam (maitamdev)",
   "embeddings": [
     [-0.0421, 0.0812, "... 512 normalized float values ..."]
   ]

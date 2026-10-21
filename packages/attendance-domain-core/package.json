@@ -1,5 +1,5 @@
 {
-  "name": "@jashan-randhawa/attendance-domain-core",
+  "name": "@maitamdev/attendance-domain-core",
   "version": "1.0.0",
   "description": "Database-neutral attendance marking idempotency rules, session status validation, and duplicate event classification.",
   "main": "./dist/index.js",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jashan-randhawa/AI-Attendance-System.git",
+    "url": "git+https://github.com/maitamdev/eduface-system.git",
     "directory": "packages/attendance-domain-core"
   },
   "keywords": [
@@ -34,12 +34,12 @@
     "duplicate-prevention",
     "attendance-rules"
   ],
-  "author": "Jashan Randhawa",
+  "author": "Mai Tam (maitamdev)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Jashan-randhawa/AI-Attendance-System/issues"
+    "url": "https://github.com/maitamdev/eduface-system/issues"
   },
-  "homepage": "https://github.com/Jashan-randhawa/AI-Attendance-System/tree/main/packages/attendance-domain-core#readme",
+  "homepage": "https://github.com/maitamdev/eduface-system/tree/main/packages/attendance-domain-core#readme",
   "engines": {
     "node": ">=18.0.0"
   },

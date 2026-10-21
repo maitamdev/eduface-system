@@ -1,5 +1,5 @@
 /**
- * Example demonstrating @jashan-randhawa/face-matching-core and @jashan-randhawa/face-quality-gates
+ * Example demonstrating @maitamdev/face-matching-core and @maitamdev/face-quality-gates
  */
 import {
   cosineSimilarity,

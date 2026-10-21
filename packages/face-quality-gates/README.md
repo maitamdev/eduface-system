@@ -1,4 +1,4 @@
-# @jashan-randhawa/face-quality-gates
+# @maitamdev/face-quality-gates
 
 > Biometric face image quality evaluation rules, pose limits, edge margin checks, and quality gate diagnostics.
 
@@ -8,7 +8,7 @@
 
 In facial recognition intake pipelines (such as enrollment or kiosk check-in), poor quality inputs lead to false rejections or high identification latency.
 
-`@jashan-randhawa/face-quality-gates` provides zero-dependency quality gate heuristics:
+`@maitamdev/face-quality-gates` provides zero-dependency quality gate heuristics:
 - **Detection Confidence Floor**: Discards low-confidence false positives
 - **Minimum Dimensions**: Ensures sufficient pixel density for feature extraction
 - **Edge Margin Guard**: Rejects faces clipped by camera image boundaries
@@ -21,12 +21,12 @@ In facial recognition intake pipelines (such as enrollment or kiosk check-in), p
 
 ```bash
 # Via GitHub Packages
-npm install @jashan-randhawa/face-quality-gates
+npm install @maitamdev/face-quality-gates
 ```
 
-Ensure your `.npmrc` is configured for the `@jashan-randhawa` scope:
+Ensure your `.npmrc` is configured for the `@maitamdev` scope:
 ```ini
-@jashan-randhawa:registry=https://npm.pkg.github.com
+@maitamdev:registry=https://npm.pkg.github.com
 ```
 
 ---
@@ -34,7 +34,7 @@ Ensure your `.npmrc` is configured for the `@jashan-randhawa` scope:
 ## Quick Start
 
 ```ts
-import { checkFaceQuality, evaluateFaces } from "@jashan-randhawa/face-quality-gates";
+import { checkFaceQuality, evaluateFaces } from "@maitamdev/face-quality-gates";
 
 const detectedFace = {
   score: 0.94,
@@ -65,4 +65,4 @@ Validates list of detected faces in an image frame (including multi-face constra
 
 ## License
 
-MIT © [Jashan Randhawa](https://github.com/Jashan-randhawa)
+MIT © [Mai Tam (maitamdev)](https://github.com/maitamdev)

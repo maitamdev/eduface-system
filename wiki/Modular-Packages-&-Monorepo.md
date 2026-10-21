@@ -1,6 +1,6 @@
 # 📦 Modular Packages & Monorepo Architecture
 
-SmartAttend is engineered as an enterprise-grade monorepo combining a full-stack AI attendance platform with a suite of decoupled, standalone libraries published under the `@jashan-randhawa` scope.
+SmartAttend is engineered as an enterprise-grade monorepo combining a full-stack AI attendance platform with a suite of decoupled, standalone libraries published under the `@maitamdev` scope.
 
 These packages extract the core computer vision algorithms, entity contracts, quality heuristics, domain idempotency rules, and HTTP client SDK into reusable npm and PyPI modules that can be consumed by external web applications, mobile apps, edge devices, and backend microservices.
 
@@ -20,11 +20,11 @@ AI-Attendance-System/
 │       ├── packages-ci.yml         # Automated typechecking, unit tests & tarball smoke tests
 │       └── publish-packages.yml    # Automated publishing to GitHub Packages registry
 ├── packages/
-│   ├── face-matching-core/         # @jashan-randhawa/face-matching-core
-│   ├── attendance-contracts/       # @jashan-randhawa/attendance-contracts
-│   ├── smartattend-client/         # @jashan-randhawa/smartattend-client
-│   ├── face-quality-gates/         # @jashan-randhawa/face-quality-gates
-│   ├── attendance-domain-core/     # @jashan-randhawa/attendance-domain-core
+│   ├── face-matching-core/         # @maitamdev/face-matching-core
+│   ├── attendance-contracts/       # @maitamdev/attendance-contracts
+│   ├── smartattend-client/         # @maitamdev/smartattend-client
+│   ├── face-quality-gates/         # @maitamdev/face-quality-gates
+│   ├── attendance-domain-core/     # @maitamdev/attendance-domain-core
 │   └── python/
 │       └── face-matching-core/     # smartattend-face-matching (Python wheel/sdist)
 ├── examples/
@@ -40,18 +40,18 @@ AI-Attendance-System/
 
 | Package | Registry | Ecosystem | Description |
 | :--- | :---: | :---: | :--- |
-| **`@jashan-randhawa/face-matching-core`** | GitHub Packages / npm | TypeScript / JS | Vector L2 normalization, cosine similarity engine, and top-K candidate matching |
-| **`@jashan-randhawa/attendance-contracts`** | GitHub Packages / npm | TypeScript / JS | Shared domain entity types and API request/response contracts matching FastAPI schemas |
-| **`@jashan-randhawa/smartattend-client`** | GitHub Packages / npm | TypeScript / JS | Production-ready typed HTTP client SDK for browser, Node.js, and mobile clients |
-| **`@jashan-randhawa/face-quality-gates`** | GitHub Packages / npm | TypeScript / JS | Biometric face image quality rules, pose angle limits, edge margins, and diagnostics |
-| **`@jashan-randhawa/attendance-domain-core`** | GitHub Packages / npm | TypeScript / JS | Database-neutral attendance marking idempotency rules and duplicate classification |
+| **`@maitamdev/face-matching-core`** | GitHub Packages / npm | TypeScript / JS | Vector L2 normalization, cosine similarity engine, and top-K candidate matching |
+| **`@maitamdev/attendance-contracts`** | GitHub Packages / npm | TypeScript / JS | Shared domain entity types and API request/response contracts matching FastAPI schemas |
+| **`@maitamdev/smartattend-client`** | GitHub Packages / npm | TypeScript / JS | Production-ready typed HTTP client SDK for browser, Node.js, and mobile clients |
+| **`@maitamdev/face-quality-gates`** | GitHub Packages / npm | TypeScript / JS | Biometric face image quality rules, pose angle limits, edge margins, and diagnostics |
+| **`@maitamdev/attendance-domain-core`** | GitHub Packages / npm | TypeScript / JS | Database-neutral attendance marking idempotency rules and duplicate classification |
 | **`smartattend-face-matching`** | PyPI / GitHub | Python 3.10+ | Pure Python & NumPy vector normalization, cosine similarity, and candidate ranking |
 
 ---
 
 ## 3. Package Deep Dives
 
-### 3.1. `@jashan-randhawa/face-matching-core`
+### 3.1. `@maitamdev/face-matching-core`
 
 A provider-neutral, high-performance vector matching library designed for facial recognition embeddings (ArcFace, FaceNet, InsightFace, etc.).
 
@@ -82,7 +82,7 @@ import {
   normalizeEmbedding,
   findBestMatch,
   DEFAULT_CONFIDENCE_THRESHOLD,
-} from "@jashan-randhawa/face-matching-core";
+} from "@maitamdev/face-matching-core";
 
 const enrolledNorm = normalizeEmbedding(enrolledVector);
 const probeNorm = normalizeEmbedding(cameraProbeVector);
@@ -102,7 +102,7 @@ if (bestMatch && bestMatch.isMatch) {
 
 ---
 
-### 3.2. `@jashan-randhawa/attendance-contracts`
+### 3.2. `@maitamdev/attendance-contracts`
 
 Provides end-to-end TypeScript entity schemas and API payload contracts matching FastAPI Pydantic models. Guarantees compile-time type safety across frontend, mobile, and client SDKs.
 
@@ -128,19 +128,19 @@ Provides end-to-end TypeScript entity schemas and API payload contracts matching
 
 ---
 
-### 3.3. `@jashan-randhawa/smartattend-client`
+### 3.3. `@maitamdev/smartattend-client`
 
 A zero-dependency, isomorphic HTTP client SDK for integrating SmartAttend into Node.js scripts, web apps, Electron kiosks, or React Native attendance terminals.
 
 #### Key Features
 - **Automatic Bearer Token Injection**: Manages JWT credentials via pluggable storage adapters (`MemoryStorageAdapter`, `localStorage`, or AsyncStorage).
-- **Strongly Typed Responses**: Full TypeScript support powered by `@jashan-randhawa/attendance-contracts`.
+- **Strongly Typed Responses**: Full TypeScript support powered by `@maitamdev/attendance-contracts`.
 - **Structured Error Handling**: Throws `ApiError` with HTTP status code and server payload.
 
 #### API Reference
 
 ```typescript
-import { SmartAttendClient } from "@jashan-randhawa/smartattend-client";
+import { SmartAttendClient } from "@maitamdev/smartattend-client";
 
 const client = new SmartAttendClient({
   baseUrl: "http://localhost:8000",
@@ -180,7 +180,7 @@ const diagnostics = await client.getDiagnostics();
 
 ---
 
-### 3.4. `@jashan-randhawa/face-quality-gates`
+### 3.4. `@maitamdev/face-quality-gates`
 
 Biometric quality assessment engine ensuring that photos submitted during enrollment or surveillance satisfy stringent facial recognition standards before feature extraction.
 
@@ -199,7 +199,7 @@ Biometric quality assessment engine ensuring that photos submitted during enroll
 
 ---
 
-### 3.5. `@jashan-randhawa/attendance-domain-core`
+### 3.5. `@maitamdev/attendance-domain-core`
 
 Contains database-neutral business logic and idempotency rules for marking attendance, classifying duplicate events, and computing compliance statistics.
 
@@ -259,7 +259,7 @@ Runs on every push to `main` and all pull requests touching `packages/**`:
 
 ### Publishing Workflow (`.github/workflows/publish-packages.yml`)
 Automatically triggers on new releases or manually via `workflow_dispatch`:
-- Publishes all packages to the **GitHub Packages Registry** under the `@jashan-randhawa` scope.
+- Publishes all packages to the **GitHub Packages Registry** under the `@maitamdev` scope.
 - Automatically generates provenance and semantic version metadata.
 
 ---
@@ -273,11 +273,11 @@ To test all packages locally:
 npm test
 
 # Run individual package tests:
-npm --workspace=@jashan-randhawa/face-matching-core test
-npm --workspace=@jashan-randhawa/attendance-contracts test
-npm --workspace=@jashan-randhawa/smartattend-client test
-npm --workspace=@jashan-randhawa/face-quality-gates test
-npm --workspace=@jashan-randhawa/attendance-domain-core test
+npm --workspace=@maitamdev/face-matching-core test
+npm --workspace=@maitamdev/attendance-contracts test
+npm --workspace=@maitamdev/smartattend-client test
+npm --workspace=@maitamdev/face-quality-gates test
+npm --workspace=@maitamdev/attendance-domain-core test
 
 # Run runnable demo scripts:
 node examples/matching-and-quality-demo.js

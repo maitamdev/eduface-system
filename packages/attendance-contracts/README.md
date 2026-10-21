@@ -1,4 +1,4 @@
-# @jashan-randhawa/attendance-contracts
+# @maitamdev/attendance-contracts
 
 > Shared TypeScript and JavaScript domain types, entity schemas, and API payload contracts for SmartAttend.
 
@@ -25,12 +25,12 @@ Features:
 
 ```bash
 # Via GitHub Packages
-npm install @jashan-randhawa/attendance-contracts
+npm install @maitamdev/attendance-contracts
 ```
 
-Ensure your `.npmrc` is configured for the `@jashan-randhawa` scope:
+Ensure your `.npmrc` is configured for the `@maitamdev` scope:
 ```ini
-@jashan-randhawa:registry=https://npm.pkg.github.com
+@maitamdev:registry=https://npm.pkg.github.com
 ```
 
 ---
@@ -43,7 +43,7 @@ import type {
   Session,
   AttendanceRecord,
   IdentifyResult
-} from "@jashan-randhawa/attendance-contracts";
+} from "@maitamdev/attendance-contracts";
 
 function processIdentification(result: IdentifyResult) {
   console.log(`Matched person: ${result.name} (confidence: ${result.confidence})`);
@@ -54,4 +54,4 @@ function processIdentification(result: IdentifyResult) {
 
 ## License
 
-MIT © [Jashan Randhawa](https://github.com/Jashan-randhawa)
+MIT © [Mai Tam (maitamdev)](https://github.com/maitamdev)

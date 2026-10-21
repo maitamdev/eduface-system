@@ -1,5 +1,5 @@
 {
-  "name": "@jashan-randhawa/face-quality-gates",
+  "name": "@maitamdev/face-quality-gates",
   "version": "1.0.0",
   "description": "Biometric face image quality evaluation rules, pose limits, edge margin checks, and quality gate diagnostics.",
   "main": "./dist/index.js",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jashan-randhawa/AI-Attendance-System.git",
+    "url": "git+https://github.com/maitamdev/eduface-system.git",
     "directory": "packages/face-quality-gates"
   },
   "keywords": [
@@ -34,12 +34,12 @@
     "pose-detection",
     "face-validation"
   ],
-  "author": "Jashan Randhawa",
+  "author": "Mai Tam (maitamdev)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Jashan-randhawa/AI-Attendance-System/issues"
+    "url": "https://github.com/maitamdev/eduface-system/issues"
   },
-  "homepage": "https://github.com/Jashan-randhawa/AI-Attendance-System/tree/main/packages/face-quality-gates#readme",
+  "homepage": "https://github.com/maitamdev/eduface-system/tree/main/packages/face-quality-gates#readme",
   "engines": {
     "node": ">=18.0.0"
   },

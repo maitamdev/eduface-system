@@ -11,14 +11,14 @@ flowchart TD
     subgraph Client & Edge Consumers
         Web["React 18 + Vite SPA\n(Dual Navigation: Rail + Mobile)"]
         Mobile["Mobile & Tablet Kiosks\n(Fit Screen + Camera Switcher)"]
-        SDK["@jashan-randhawa/smartattend-client\n(Node.js / Scripts / Microservices)"]
+        SDK["@maitamdev/smartattend-client\n(Node.js / Scripts / Microservices)"]
     end
 
     subgraph Modular Core Libraries
-        Contracts["@jashan-randhawa/attendance-contracts\n(TypeScript Schemas & Payloads)"]
-        MatchingCore["@jashan-randhawa/face-matching-core\n(Vector Norm & Cosine Similarity)"]
-        QualityCore["@jashan-randhawa/face-quality-gates\n(Pose, Blur & Margin Checks)"]
-        DomainCore["@jashan-randhawa/attendance-domain-core\n(Idempotency & Duplicate Rules)"]
+        Contracts["@maitamdev/attendance-contracts\n(TypeScript Schemas & Payloads)"]
+        MatchingCore["@maitamdev/face-matching-core\n(Vector Norm & Cosine Similarity)"]
+        QualityCore["@maitamdev/face-quality-gates\n(Pose, Blur & Margin Checks)"]
+        DomainCore["@maitamdev/attendance-domain-core\n(Idempotency & Duplicate Rules)"]
     end
 
     Web & Mobile & SDK --> Contracts
@@ -89,7 +89,7 @@ When exceeded, the system is architected to transition from in-memory cosine mat
 
 ## 3. Modular Monorepo Integration
 
-By decoupling core algorithmic logic into `@jashan-randhawa/*` packages:
-1. **Edge Pre-filtering**: Client devices evaluate photo quality locally using `@jashan-randhawa/face-quality-gates` before uploading large image payloads over cellular or low-bandwidth networks.
-2. **Deterministic Idempotency**: Domain deduplication rules (`@jashan-randhawa/attendance-domain-core`) are shared across both client-side optimistic UI updates and backend verification.
-3. **Cross-Platform Client SDK**: External systems, hardware scanners, and background cron jobs consume `@jashan-randhawa/smartattend-client` for seamless API interaction.
+By decoupling core algorithmic logic into `@maitamdev/*` packages:
+1. **Edge Pre-filtering**: Client devices evaluate photo quality locally using `@maitamdev/face-quality-gates` before uploading large image payloads over cellular or low-bandwidth networks.
+2. **Deterministic Idempotency**: Domain deduplication rules (`@maitamdev/attendance-domain-core`) are shared across both client-side optimistic UI updates and backend verification.
+3. **Cross-Platform Client SDK**: External systems, hardware scanners, and background cron jobs consume `@maitamdev/smartattend-client` for seamless API interaction.
