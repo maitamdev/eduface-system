@@ -1,0 +1,18 @@
+name: Render Keep-Alive Ping
+
+on:
+  schedule:
+    # Chạy tự động mỗi 10 phút để giữ server Render luôn thức
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Health Endpoint
+        run: |
+          echo "Pinging https://eduface-system.onrender.com/health ..."
+          curl -fsS --retry 3 --retry-delay 5 https://eduface-system.onrender.com/health
+          echo ""
+          echo "Render backend is awake!"

@@ -89,11 +89,31 @@ async def lifespan(app: FastAPI):
         logger.warning("MONGODB_URL not set — using localhost!")
 
     logger.info("=== Startup complete. Ready to serve requests. ===")
+
+    keepalive_task = None
+    render_url = os.getenv("RENDER_EXTERNAL_URL", "https://eduface-system.onrender.com").rstrip("/")
+    if os.getenv("RENDER") or os.getenv("RENDER_EXTERNAL_URL"):
+        import urllib.request
+
+        async def _self_keepalive():
+            while True:
+                await asyncio.sleep(8 * 60)  # mỗi 8 phút
+                try:
+                    await asyncio.to_thread(
+                        urllib.request.urlopen, f"{render_url}/health", None, 10
+                    )
+                except Exception:
+                    pass
+
+        keepalive_task = asyncio.create_task(_self_keepalive())
+
     try:
         yield
     finally:
         if retry_task and not retry_task.done():
             retry_task.cancel()
+        if keepalive_task and not keepalive_task.done():
+            keepalive_task.cancel()
 
 
 app = FastAPI(

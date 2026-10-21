@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -6,6 +6,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { AppShell } from "@/components/AppShell";
 import { RequireAuth, RequireAdmin } from "@/components/RouteGuards";
+import { healthApi } from "@/api/client";
 
 import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -23,6 +24,14 @@ const DesignPreviewPage = import.meta.env.DEV
   : null;
 
 export const App: React.FC = () => {
+  useEffect(() => {
+    // Giữ kết nối Render luôn thức khi đang mở tab trình duyệt (ping mỗi 4 phút)
+    const timer = window.setInterval(() => {
+      healthApi.check().catch(() => {});
+    }, 4 * 60 * 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <ThemeProvider>
       <LanguageProvider>
