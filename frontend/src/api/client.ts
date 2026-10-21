@@ -91,22 +91,47 @@ export interface TokenResponse {
   access_token: string;
   token_type: string;
   expires_in: number;
-  role: "admin" | "operator";
+  role: "admin" | "operator" | "student";
   username: string;
 }
 
 export interface UserOut {
   id: string;
   username: string;
-  role: "admin" | "operator";
+  role: "admin" | "operator" | "student";
   is_active: boolean;
   created_at: string;
+  person_id?: string | null;
 }
 
 export interface UserCreatePayload {
   username: string;
   password: string;
-  role: "admin" | "operator";
+  role: "admin" | "operator" | "student";
+  person_id?: string | null;
+}
+
+export interface StudentSessionItem {
+  session_id: string;
+  label: string;
+  department: string | null;
+  started_at: string;
+  ended_at: string | null;
+  is_active: boolean;
+  attended: boolean;
+  marked_at: string | null;
+  confidence: number | null;
+  status: "present" | "absent" | "open";
+}
+
+export interface StudentPortalSummary {
+  person: PersonOut | null;
+  total_sessions: number;
+  present_count: number;
+  absent_count: number;
+  attendance_rate: number;
+  is_defaulter: boolean;
+  sessions: StudentSessionItem[];
 }
 
 export interface PersonOut {
@@ -290,6 +315,10 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  getStudentPortal: (personId?: string) =>
+    apiFetch<StudentPortalSummary>(
+      `/api/auth/student-portal${personId ? `?person_id=${encodeURIComponent(personId)}` : ""}`
+    ),
 };
 
 export const dashboardApi = {
@@ -312,12 +341,16 @@ export const personsApi = {
     name: string;
     email?: string;
     department?: string;
+    student_username?: string;
+    student_password?: string;
     photos: (Blob | File)[];
   }) => {
     const fd = new FormData();
     fd.append("name", params.name.trim());
     if (params.email?.trim()) fd.append("email", params.email.trim());
     if (params.department?.trim()) fd.append("department", params.department.trim());
+    if (params.student_username?.trim()) fd.append("student_username", params.student_username.trim());
+    if (params.student_password?.trim()) fd.append("student_password", params.student_password.trim());
     params.photos.forEach((p, idx) => fd.append("photos", p, `photo_${idx + 1}.jpg`));
     return apiFetch<PersonOut>("/api/persons/enroll", {
       method: "POST",

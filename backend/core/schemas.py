@@ -119,9 +119,10 @@ class UserLogin(BaseModel):
 
 
 class UserCreate(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50)
-    password: str = Field(..., min_length=6, max_length=128)
-    role:     str = Field("operator", pattern="^(operator|admin)$")
+    username:  str = Field(..., min_length=3, max_length=50)
+    password:  str = Field(..., min_length=6, max_length=128)
+    role:      str = Field("operator", pattern="^(operator|admin|student)$")
+    person_id: Optional[str] = None
 
 
 class UserOut(BaseModel):
@@ -130,6 +131,7 @@ class UserOut(BaseModel):
     role:       str
     is_active:  bool
     created_at: datetime
+    person_id:  Optional[str] = None
 
     model_config = {"from_attributes": True}
 
@@ -140,3 +142,26 @@ class TokenResponse(BaseModel):
     expires_in:   int
     role:         str
     username:     str
+
+
+class StudentSessionItem(BaseModel):
+    session_id: str
+    label:      str
+    department: Optional[str] = None
+    started_at: datetime
+    ended_at:   Optional[datetime] = None
+    is_active:  bool
+    attended:   bool
+    marked_at:  Optional[datetime] = None
+    confidence: Optional[float] = None
+    status:     str
+
+
+class StudentPortalSummary(BaseModel):
+    person:          Optional[PersonOut] = None
+    total_sessions:  int
+    present_count:   int
+    absent_count:    int
+    attendance_rate: float
+    is_defaulter:    bool
+    sessions:        List[StudentSessionItem]

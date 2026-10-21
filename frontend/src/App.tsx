@@ -16,6 +16,7 @@ import { PeoplePage } from "@/pages/PeoplePage";
 import { EnrollPage } from "@/pages/EnrollPage";
 import { ReportsPage } from "@/pages/ReportsPage";
 import { SystemAdminPage } from "@/pages/SystemAdminPage";
+import { StudentPortalPage } from "@/pages/StudentPortalPage";
 
 const DesignPreviewPage = import.meta.env.DEV
   ? lazy(() => import("@/pages/DesignPreviewPage").then((module) => ({ default: module.DesignPreviewPage })))
@@ -69,6 +70,16 @@ export const App: React.FC = () => {
                     <RequireAuth>
                       <AppShell>
                         <RecordsPage />
+                      </AppShell>
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/student"
+                  element={
+                    <RequireAuth>
+                      <AppShell>
+                        <StudentPortalPage />
                       </AppShell>
                     </RequireAuth>
                   }

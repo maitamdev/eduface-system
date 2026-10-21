@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, ScanFace, CalendarClock, ClipboardList, Users, UserPlus,
   BarChart3, ShieldCheck, Sun, Moon, LogOut, Menu, X, Globe, Wifi,
-  WifiOff, Loader2, ChevronRight,
+  WifiOff, Loader2, ChevronRight, GraduationCap,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -11,7 +11,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { healthApi } from "@/api/client";
 import { appPath } from "@/lib/format";
 
-export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; previewRole?: "admin" | "operator" }> = ({ children, preview = false, previewRole = "admin" }) => {
+export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; previewRole?: "admin" | "operator" | "student" }> = ({ children, preview = false, previewRole = "admin" }) => {
   const { user, role: authRole, logout } = useAuth();
   const role = preview ? previewRole : authRole;
   const { lang, toggleLang, t } = useLanguage();
@@ -66,6 +66,9 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
     { to: "/sessions", icon: CalendarClock, label: t("Phiên điểm danh", "Sessions") },
     { to: "/records", icon: ClipboardList, label: t("Sổ bản ghi điểm danh", "Attendance Logs") },
   ];
+  const studentLinks = [
+    { to: "/student", icon: GraduationCap, label: t("Cổng thông tin sinh viên", "Student Portal") },
+  ];
   const adminLinks = [
     { to: "/people", icon: Users, label: t("Danh bạ sinh viên / NS", "People Directory") },
     { to: "/enroll", icon: UserPlus, label: t("Đăng ký khuôn mặt", "Face Enrollment") },
@@ -73,7 +76,7 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
     { to: "/system", icon: ShieldCheck, label: t("Tài khoản & Hệ thống", "Users & Diagnostics") },
   ];
   const currentPath = preview ? location.pathname.replace(/^\/design-preview/, "") || "/" : location.pathname;
-  const currentPage = [...operationLinks, ...adminLinks].find((item) => item.to === currentPath)?.label || t("Tổng quan", "Dashboard");
+  const currentPage = [...operationLinks, ...studentLinks, ...adminLinks].find((item) => item.to === currentPath)?.label || t("Tổng quan", "Dashboard");
   const handleLogout = () => { if (!preview) logout(); navigate("/login"); };
 
   const renderLinks = (items: typeof operationLinks) => items.map((item) => {
@@ -85,9 +88,11 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
     </NavLink>;
   });
 
+  const roleLabel = role === "admin" ? t("Quản trị viên", "Administrator") : role === "student" ? t("Sinh viên", "Student") : t("Giảng viên / Vận hành", "Operator");
+
   const sidebar = (mobile = false) => <div className="workspace-sidebar-content">
     <div className="workspace-brand">
-      <Link to={preview ? "/design-preview" : "/"} className="brand-lockup" aria-label="EduFace">
+      <Link to={preview ? "/design-preview" : role === "student" ? "/student" : "/"} className="brand-lockup" aria-label="EduFace">
         <span className="brand-symbol"><ScanFace size={25} strokeWidth={1.7} /></span>
         <span className="brand-wordmark">Edu<span>Face</span></span>
       </Link>
@@ -95,12 +100,23 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
     </div>
     <p className="workspace-caption">{t("Quản lý điểm danh", "Attendance management")}</p>
     <div className="workspace-nav-scroll">
-      <p className="nav-section-label">{t("Vận hành điểm danh", "Attendance Operations")}</p>
-      <nav aria-label={t("Vận hành điểm danh", "Attendance Operations")}>{renderLinks(operationLinks)}</nav>
-      {role === "admin" && <><p className="nav-section-label admin-section">{t("Quản trị & Học vụ", "Administration")}</p><nav aria-label={t("Quản trị & Học vụ", "Administration")}>{renderLinks(adminLinks)}</nav></>}
+      {role === "student" ? (
+        <>
+          <p className="nav-section-label">{t("Sinh viên", "Student")}</p>
+          <nav aria-label={t("Sinh viên", "Student")}>{renderLinks(studentLinks)}</nav>
+        </>
+      ) : (
+        <>
+          <p className="nav-section-label">{t("Vận hành điểm danh", "Attendance Operations")}</p>
+          <nav aria-label={t("Vận hành điểm danh", "Attendance Operations")}>{renderLinks(operationLinks)}</nav>
+          <p className="nav-section-label admin-section">{t("Cổng sinh viên", "Student Portal")}</p>
+          <nav aria-label={t("Cổng sinh viên", "Student Portal")}>{renderLinks(studentLinks)}</nav>
+          {role === "admin" && <><p className="nav-section-label admin-section">{t("Quản trị & Học vụ", "Administration")}</p><nav aria-label={t("Quản trị & Học vụ", "Administration")}>{renderLinks(adminLinks)}</nav></>}
+        </>
+      )}
     </div>
     <div className="sidebar-bottom">
-      <div className="sidebar-profile"><div><strong>{preview ? t("Bản xem thử", "Design preview") : user?.username || "User"}</strong><small>{role === "admin" ? t("Quản trị viên", "Administrator") : t("Vận hành viên", "Operator")}</small></div><button className="icon-button" onClick={handleLogout} aria-label={t("Đăng xuất", "Sign out")}><LogOut size={17} /></button></div>
+      <div className="sidebar-profile"><div><strong>{preview ? t("Bản xem thử", "Design preview") : user?.username || "User"}</strong><small>{roleLabel}</small></div><button className="icon-button" onClick={handleLogout} aria-label={t("Đăng xuất", "Sign out")}><LogOut size={17} /></button></div>
     </div>
   </div>;
 

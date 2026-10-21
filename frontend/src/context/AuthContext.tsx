@@ -4,7 +4,7 @@ import { authApi, getStoredToken, setStoredToken, type UserOut } from "@/api/cli
 interface AuthContextValue {
   user: UserOut | null;
   token: string | null;
-  role: "admin" | "operator" | null;
+  role: "admin" | "operator" | "student" | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<UserOut>;

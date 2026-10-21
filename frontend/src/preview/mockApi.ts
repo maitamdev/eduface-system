@@ -52,7 +52,31 @@ export async function previewRequest(path: string, init: RequestInit = {}): Prom
   if (route === "/api/reports/persons") return people.map((person, index) => ({ person_id: person.id, name: person.name, department: person.department, total_sessions: 10, present_count: index === 3 ? 7 : 9, attendance_rate: index === 3 ? 70 : 90, is_defaulter: index === 3 }));
   if (route === "/api/reports/heatmap") { const dates = trend(Number(url.searchParams.get("days")) || 14).map((day) => day.date); return { dates, persons: people.map((person, index) => ({ person_id: person.id, name: person.name, department: person.department, data: dates.map((_, day) => (day + index) % 5 === 0 ? 0 : 1) })) }; }
   if (route === "/api/auth/users") return structuredClone(users);
-  if (route === "/api/auth/register") { if (users.some((user) => user.username === payload.username)) throw new Error("Tên tài khoản đã tồn tại / Username already exists."); const result = { id: crypto.randomUUID(), username: payload.username, role: payload.role, is_active: true, created_at: new Date().toISOString() }; users.unshift(result); return structuredClone(result); }
+  if (route === "/api/auth/student-portal") {
+    const pid = url.searchParams.get("person_id") || people[0]?.id;
+    const person = people.find((item) => item.id === pid) || people[0] || null;
+    if (!person) return { person: null, total_sessions: 0, present_count: 0, absent_count: 0, attendance_rate: 0, is_defaulter: false, sessions: [] };
+    const studentSessions = sessions.filter((s) => !s.department || !person.department || s.department === person.department).map((s) => {
+      const rec = records.find((r) => r.person_id === person.id && r.session_id === s.id);
+      return {
+        session_id: s.id,
+        label: s.label,
+        department: s.department,
+        started_at: s.started_at,
+        ended_at: s.ended_at,
+        is_active: s.is_active,
+        attended: Boolean(rec),
+        marked_at: rec?.marked_at || null,
+        confidence: rec?.confidence ?? null,
+        status: rec ? "present" : s.is_active ? "open" : "absent",
+      };
+    });
+    const presentCount = studentSessions.filter((s) => s.attended).length;
+    const absentCount = studentSessions.filter((s) => s.status === "absent").length;
+    const rate = studentSessions.length ? Math.round((presentCount / studentSessions.length) * 1000) / 10 : 100;
+    return { person, total_sessions: studentSessions.length, present_count: presentCount, absent_count: absentCount, attendance_rate: rate, is_defaulter: studentSessions.length > 0 && rate < 75, sessions: studentSessions };
+  }
+  if (route === "/api/auth/register") { if (users.some((user) => user.username === payload.username)) throw new Error("Tên tài khoản đã tồn tại / Username already exists."); const result = { id: crypto.randomUUID(), username: payload.username, role: payload.role, person_id: payload.person_id || null, is_active: true, created_at: new Date().toISOString() }; users.unshift(result); return structuredClone(result); }
   if (route === "/api/persons/debug-config") return { status: "ok", issues: [], MONGODB_URL: "Sample configuration", MONGODB_DB_NAME: "attendance_demo", MIN_CONFIDENCE: "0.40", DUPLICATE_THRESHOLD: "0.45", AZURE_STORAGE_CONNECTION_STRING: "not set (optional)", API_KEY_ADMIN_configured: false, API_KEY_OPERATOR_configured: false, API_KEY_legacy_configured: false };
   if (route === "/api/persons/debug-encodings") return { total_active_persons: people.length, persons_with_encodings: people.length, persons_missing_encodings: 0, missing: [] };
   throw new Error("Chức năng này cần đăng nhập hệ thống thật / This action requires the real authenticated application.");

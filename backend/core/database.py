@@ -89,13 +89,12 @@ async def init_db() -> None:
     # ── users indexes (per-user identity) ────────────────────────────────────
     await db.users.create_index([("username", ASCENDING)], unique=True)
 
-    # Auto-seed default admin user if users collection is empty
+    # Auto-seed default accounts (admin, operator, student demo) if missing
     try:
-        user_count = await db.users.count_documents({})
-        if user_count == 0:
-            from core.auth import hash_password
-            default_user = os.getenv("DEFAULT_ADMIN_USERNAME", "admin")
-            default_pass = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin123")
+        from core.auth import hash_password
+        default_user = os.getenv("DEFAULT_ADMIN_USERNAME", "admin")
+        default_pass = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin123")
+        if not await db.users.find_one({"username": default_user}):
             await db.users.insert_one({
                 "username": default_user,
                 "password_hash": hash_password(default_pass),
@@ -104,8 +103,30 @@ async def init_db() -> None:
                 "created_at": datetime.now(timezone.utc),
             })
             logger.info("Initialized default administrator account '%s'", default_user)
+
+        if not await db.users.find_one({"username": "operator"}):
+            await db.users.insert_one({
+                "username": "operator",
+                "password_hash": hash_password("operator123"),
+                "role": "operator",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc),
+            })
+            logger.info("Initialized default instructor/operator account 'operator'")
+
+        if not await db.users.find_one({"username": "maitam"}):
+            first_person = await db.persons.find_one({"is_active": True}, sort=[("enrolled_at", -1)])
+            await db.users.insert_one({
+                "username": "maitam",
+                "password_hash": hash_password("123456"),
+                "role": "student",
+                "person_id": str(first_person["_id"]) if first_person else None,
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc),
+            })
+            logger.info("Initialized default student account 'maitam'")
     except Exception as e:
-        logger.warning("Could not auto-seed default admin user: %s", e)
+        logger.warning("Could not auto-seed default accounts: %s", e)
 
     logger.info("MongoDB indexes created on '%s'", DB_NAME)
 

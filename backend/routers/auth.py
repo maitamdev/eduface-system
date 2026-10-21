@@ -8,9 +8,11 @@ Endpoints:
   GET  /api/auth/me        - Get current authenticated user profile
 """
 
+import re
 from datetime import datetime, timezone
+from typing import Optional
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from core.auth import (
@@ -18,11 +20,20 @@ from core.auth import (
     create_access_token,
     hash_password,
     require_admin,
+    require_authenticated,
     require_operator,
     verify_password,
 )
 from core.database import get_db
-from core.schemas import TokenResponse, UserCreate, UserLogin, UserOut
+from core.schemas import (
+    PersonOut,
+    StudentPortalSummary,
+    StudentSessionItem,
+    TokenResponse,
+    UserCreate,
+    UserLogin,
+    UserOut,
+)
 
 router = APIRouter()
 
@@ -78,6 +89,7 @@ async def register_user(
         "role": body.role,
         "is_active": True,
         "created_at": now,
+        "person_id": body.person_id,
     }
     result = await db.users.insert_one(user_doc)
 
@@ -87,10 +99,11 @@ async def register_user(
         role=body.role,
         is_active=True,
         created_at=now,
+        person_id=body.person_id,
     )
 
 
-@router.get("/me", response_model=UserOut, dependencies=[Depends(require_operator)])
+@router.get("/me", response_model=UserOut, dependencies=[Depends(require_authenticated)])
 async def get_current_profile(
     request: Request,
     db: AsyncIOMotorDatabase = Depends(get_db),
@@ -109,6 +122,7 @@ async def get_current_profile(
                 role=doc["role"],
                 is_active=doc.get("is_active", True),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
+                person_id=doc.get("person_id"),
             )
 
     return UserOut(
@@ -134,6 +148,135 @@ async def list_users(
                 role=doc.get("role", "operator"),
                 is_active=doc.get("is_active", True),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
+                person_id=doc.get("person_id"),
             )
         )
     return users
+
+
+@router.get("/student-portal", response_model=StudentPortalSummary, dependencies=[Depends(require_authenticated)])
+async def get_student_portal(
+    request: Request,
+    person_id: Optional[str] = Query(None),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """Return course sessions and attendance history for the authenticated student."""
+    user = getattr(request.state, "user", None)
+    if not isinstance(user, AuthenticatedUser):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Not authenticated.")
+
+    target_person_id = person_id if user.role in ("admin", "operator") and person_id else None
+    if not target_person_id and user.auth_type == "jwt" and ObjectId.is_valid(user.id):
+        user_doc = await db.users.find_one({"_id": ObjectId(user.id)})
+        if user_doc and user_doc.get("person_id"):
+            target_person_id = user_doc["person_id"]
+
+    person_doc = None
+    if target_person_id:
+        person_doc = await db.persons.find_one({"_id": target_person_id, "is_active": True})
+
+    if not person_doc:
+        escaped = re.escape(user.username.strip())
+        person_doc = await db.persons.find_one({
+            "is_active": True,
+            "$or": [
+                {"email": {"$regex": f"^{escaped}$", "$options": "i"}},
+                {"name": {"$regex": f"^{escaped}$", "$options": "i"}},
+            ],
+        })
+
+    if not person_doc:
+        return StudentPortalSummary(
+            person=None,
+            total_sessions=0,
+            present_count=0,
+            absent_count=0,
+            attendance_rate=0.0,
+            is_defaulter=False,
+            sessions=[],
+        )
+
+    pid = str(person_doc["_id"])
+    person_out = PersonOut(
+        id=pid,
+        name=person_doc["name"],
+        email=person_doc.get("email"),
+        department=person_doc.get("department"),
+        photo_url=person_doc.get("photo_url"),
+        enrolled_at=person_doc["enrolled_at"],
+        is_active=person_doc.get("is_active", True),
+        enrolled_by=person_doc.get("enrolled_by"),
+    )
+
+    dept = (person_doc.get("department") or "").strip()
+    if dept:
+        escaped_dept = re.escape(dept)
+        session_query = {
+            "$or": [
+                {"department": {"$regex": f"^{escaped_dept}$", "$options": "i"}},
+                {"department": None},
+                {"department": ""},
+            ]
+        }
+    else:
+        session_query = {}
+
+    session_docs = []
+    async for sdoc in db.sessions.find(session_query).sort("started_at", -1).limit(100):
+        session_docs.append(sdoc)
+
+    attendance_by_session = {}
+    async for adoc in db.attendance.find({"person_id": pid}):
+        sid = str(adoc.get("session_id", ""))
+        attendance_by_session[sid] = adoc
+
+    items = []
+    for sdoc in session_docs:
+        sid = str(sdoc["_id"])
+        att = attendance_by_session.get(sid)
+        is_active = bool(sdoc.get("is_active", False))
+        if att:
+            item_status = "present"
+            attended = True
+            marked_at = att.get("marked_at")
+            confidence = att.get("confidence")
+        elif is_active:
+            item_status = "open"
+            attended = False
+            marked_at = None
+            confidence = None
+        else:
+            item_status = "absent"
+            attended = False
+            marked_at = None
+            confidence = None
+
+        items.append(
+            StudentSessionItem(
+                session_id=sid,
+                label=sdoc["label"],
+                department=sdoc.get("department"),
+                started_at=sdoc["started_at"],
+                ended_at=sdoc.get("ended_at"),
+                is_active=is_active,
+                attended=attended,
+                marked_at=marked_at,
+                confidence=confidence,
+                status=item_status,
+            )
+        )
+
+    total_sessions = len(items)
+    present_count = sum(1 for item in items if item.attended)
+    absent_count = sum(1 for item in items if item.status == "absent")
+    rate = round((present_count / total_sessions) * 100, 1) if total_sessions > 0 else 100.0
+
+    return StudentPortalSummary(
+        person=person_out,
+        total_sessions=total_sessions,
+        present_count=present_count,
+        absent_count=absent_count,
+        attendance_rate=rate,
+        is_defaulter=total_sessions > 0 and rate < 75.0,
+        sessions=items,
+    )

@@ -271,5 +271,28 @@ async def require_operator(
     )
 
 
+async def require_authenticated(
+    request: Request = None,
+    x_api_key: str = Header(default="", alias="X-API-Key"),
+    authorization: Optional[str] = Header(default=None, alias="Authorization"),
+) -> bool:
+    """FastAPI dependency: any authenticated user (student, operator, or admin)."""
+    user, no_keys = _authenticate(request, x_api_key, authorization)
+
+    if no_keys and (not user or user.auth_type == "api_key"):
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "Server misconfiguration: no API key is configured.",
+        )
+
+    if user and user.role in ("student", "operator", "admin"):
+        return True
+
+    raise HTTPException(
+        status.HTTP_401_UNAUTHORIZED,
+        "Missing or invalid authentication token.",
+    )
+
+
 # Backward-compat alias
 require_api_key = require_admin

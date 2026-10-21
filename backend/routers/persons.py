@@ -14,7 +14,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from core.database import get_db
 from core.schemas import PersonOut
 from core import azure_face
-from core.auth import require_admin, get_user_id_from_request
+from core.auth import require_admin, get_user_id_from_request, hash_password
 from core.rate_limit import limiter
 from core.validation import read_and_validate_image
 
@@ -156,12 +156,14 @@ async def analyze_photos(request: Request, photos: List[UploadFile] = File(...))
 )
 @limiter.limit("10/minute")
 async def enroll_person(
-    request:    Request,
-    name:       str              = Form(...),
-    email:      str              = Form(None),
-    department: str              = Form(None),
-    photos:     List[UploadFile] = File(...),
-    db: AsyncIOMotorDatabase     = Depends(get_db),
+    request:          Request,
+    name:             str              = Form(...),
+    email:            str              = Form(None),
+    department:       str              = Form(None),
+    student_username: str              = Form(None),
+    student_password: str              = Form(None),
+    photos:           List[UploadFile] = File(...),
+    db: AsyncIOMotorDatabase           = Depends(get_db),
 ):
     if len(photos) < 1:
         raise HTTPException(400, "At least 1 photo is required.")
@@ -259,6 +261,30 @@ async def enroll_person(
                 azure_id, cleanup_err,
             )
         raise HTTPException(503, "Enrollment could not be completed. Please try again.")
+
+    if student_username and student_username.strip():
+        uname = student_username.strip()
+        raw_pw = (student_password or "").strip() or "123456"
+        if len(uname) >= 3 and len(raw_pw) >= 6 and hasattr(db, "users"):
+            try:
+                existing_user = await db.users.find_one({"username": uname})
+                if existing_user:
+                    await db.users.update_one(
+                        {"_id": existing_user["_id"]},
+                        {"$set": {"person_id": azure_id, "is_active": True}},
+                    )
+                else:
+                    await db.users.insert_one({
+                        "username": uname,
+                        "password_hash": hash_password(raw_pw),
+                        "role": "student",
+                        "person_id": azure_id,
+                        "is_active": True,
+                        "created_at": datetime.now(UTC),
+                    })
+            except Exception as user_err:
+                logger.warning("Could not auto-create student account '%s': %s", uname, user_err)
+
     return PersonOut(**_doc_to_person(person_doc))
 
 

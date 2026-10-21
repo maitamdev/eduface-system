@@ -7,7 +7,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { healthApi } from "@/api/client";
 
 export const LoginPage: React.FC = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const { lang, toggleLang, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -20,7 +20,11 @@ export const LoginPage: React.FC = () => {
   const [backendState, setBackendState] = useState<"checking" | "online" | "offline">("checking");
   const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || "/";
 
-  useEffect(() => { if (isAuthenticated) navigate(fromPath, { replace: true }); }, [isAuthenticated, navigate, fromPath]);
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(user?.role === "student" ? "/student" : fromPath, { replace: true });
+    }
+  }, [isAuthenticated, user?.role, navigate, fromPath]);
   useEffect(() => {
     let active = true;
     healthApi.check().then(() => { if (active) setBackendState("online"); }).catch(() => { if (active) setBackendState("offline"); });
@@ -36,7 +40,11 @@ export const LoginPage: React.FC = () => {
     catch (err: unknown) { setError(err instanceof Error ? err.message : t("Sai thông tin đăng nhập hoặc không kết nối được máy chủ.", "Invalid credentials or server unreachable.")); }
     finally { setSubmitting(false); }
   };
-  const fillDemo = (role: "admin" | "operator") => { setUsername(role); setPassword(`${role}123`); setError(null); };
+  const fillDemo = (role: "admin" | "operator" | "student") => {
+    if (role === "student") { setUsername("maitam"); setPassword("123456"); }
+    else { setUsername(role); setPassword(`${role}123`); }
+    setError(null);
+  };
 
   return <div className="login-page">
     <header className="login-header">
@@ -44,7 +52,7 @@ export const LoginPage: React.FC = () => {
       <div className="login-utilities"><button className="icon-button language-button" onClick={toggleLang} aria-label={t("Chuyển sang Tiếng Anh", "Switch to Vietnamese")}><Globe size={16} /><span>{lang === "vi" ? "Tiếng Việt" : "English"}</span></button><button className="icon-button" onClick={toggleTheme} aria-label={t("Đổi giao diện Sáng / Tối", "Toggle Light / Dark mode")}>{theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</button></div>
     </header>
       <main className="login-form-wrap"><h1>{t("Đăng nhập", "Sign in")}</h1><p className="login-intro">{t("Sử dụng tài khoản được quản trị viên cung cấp để truy cập hệ thống điểm danh.", "Use the account provided by your administrator to access attendance management.")}</p>
-        <div className="login-quick-fill" aria-label={t("Điền tài khoản demo", "Fill demo credentials")}><button type="button" aria-pressed={username === "admin"} onClick={() => fillDemo("admin")}>{t("Điền nhanh: Admin", "Quick fill: Admin")}</button><button type="button" aria-pressed={username === "operator"} onClick={() => fillDemo("operator")}>{t("Điền nhanh: Operator", "Quick fill: Operator")}</button></div>
+        <div className="login-quick-fill" aria-label={t("Điền tài khoản demo", "Fill demo credentials")}><button type="button" aria-pressed={username === "admin"} onClick={() => fillDemo("admin")}>{t("Điền nhanh: Admin", "Quick fill: Admin")}</button><button type="button" aria-pressed={username === "operator"} onClick={() => fillDemo("operator")}>{t("Điền nhanh: Giảng viên", "Quick fill: Instructor")}</button><button type="button" aria-pressed={username === "maitam"} onClick={() => fillDemo("student")}>{t("Điền nhanh: Sinh viên", "Quick fill: Student")}</button></div>
         {error && <div className="login-error" role="alert"><AlertCircle size={17} /><span>{error}</span></div>}
         <form onSubmit={handleSubmit} className="login-form">
           <div><label htmlFor="login-username">{t("Tên đăng nhập", "Username")}</label><div className="login-input-wrap"><User size={17} /><input id="login-username" name="username" autoComplete="username" type="text" value={username} onChange={(event) => setUsername(event.target.value)} placeholder={t("Nhập tên đăng nhập", "Enter your username")} required /></div></div>
@@ -52,7 +60,7 @@ export const LoginPage: React.FC = () => {
           <button type="submit" disabled={submitting} className="primary-button login-submit">{submitting ? <><Loader2 size={17} className="animate-spin" />{t("Đang xác thực…", "Signing in…")}</> : <>{t("Đăng nhập vào hệ thống", "Sign in")}<ArrowRight size={17} /></>}</button>
         </form>
         <p className={`login-connection connection-status is-${backendState}`} role="status">{backendState === "online" ? <><Wifi size={13} />{t("Máy chủ đã sẵn sàng", "Server is ready")}</> : backendState === "checking" ? <><Loader2 size={13} className="animate-spin" />{t("Đang kết nối máy chủ…", "Connecting to the server…")}</> : <><WifiOff size={13} />{t("Chưa kết nối máy chủ", "Server is unavailable")}</>}</p>
-        <details className="login-demo-details"><summary>{t("Thông tin tài khoản demo", "Demo account information")}</summary><p><strong>Admin:</strong> <code>admin / admin123</code></p><p>{t("Tài khoản Operator cần được tạo trong mục Tài khoản & Hệ thống.", "Operator accounts must be created in Users & Diagnostics.")}</p></details>
+        <details className="login-demo-details"><summary>{t("Thông tin tài khoản demo", "Demo account information")}</summary><p><strong>Admin:</strong> <code>admin / admin123</code></p><p><strong>{t("Giảng viên (Operator):", "Instructor (Operator):")}</strong> <code>operator / operator123</code></p><p><strong>{t("Sinh viên (Student):", "Student:")}</strong> <code>maitam / 123456</code></p></details>
         {import.meta.env.DEV && <Link to="/design-preview" className="login-preview-link">{t("Xem thử giao diện với dữ liệu mẫu", "Explore the design with sample data")}<ArrowUpRight size={14} /></Link>}
       </main>
       <p className="login-bottom-note">EduFace · {t("Hệ thống quản lý điểm danh", "Attendance management system")}</p>
