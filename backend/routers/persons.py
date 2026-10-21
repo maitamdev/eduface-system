@@ -11,10 +11,11 @@ from datetime import datetime, UTC
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Form, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from bson import ObjectId
 from core.database import get_db
 from core.schemas import PersonOut
 from core import azure_face
-from core.auth import require_admin, get_user_id_from_request, hash_password
+from core.auth import require_admin, require_authenticated, get_user_id_from_request, hash_password, AuthenticatedUser
 from core.rate_limit import limiter
 from core.validation import read_and_validate_image
 
@@ -284,6 +285,98 @@ async def enroll_person(
                     })
             except Exception as user_err:
                 logger.warning("Could not auto-create student account '%s': %s", uname, user_err)
+
+    return PersonOut(**_doc_to_person(person_doc))
+
+
+@router.post(
+    "/self-enroll",
+    response_model=PersonOut,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_authenticated)],
+)
+@limiter.limit("10/minute")
+async def self_enroll_student(
+    request:    Request,
+    name:       str              = Form(...),
+    student_id: str              = Form(...),
+    department: str              = Form(...),
+    email:      str              = Form(None),
+    photos:     List[UploadFile] = File(...),
+    db: AsyncIOMotorDatabase     = Depends(get_db),
+):
+    """Cho phép sinh viên đăng nhập lần đầu tự khai báo Họ tên, MSSV, Lớp và đăng ký khuôn mặt."""
+    user = getattr(request.state, "user", None)
+    if not isinstance(user, AuthenticatedUser):
+        raise HTTPException(401, "Not authenticated.")
+
+    clean_name = name.strip()
+    clean_mssv = student_id.strip().upper()
+    clean_dept = department.strip()
+    clean_email = (email or user.username or "").strip().lower() or None
+
+    if len(clean_name) < 2 or len(clean_mssv) < 3 or len(clean_dept) < 1:
+        raise HTTPException(400, "Vui lòng nhập đầy đủ Họ tên, MSSV và Lớp học phần.")
+    if len(photos) < 1 or len(photos) > 5:
+        raise HTTPException(400, "Vui lòng cung cấp từ 1 đến 5 ảnh khuôn mặt rõ nét.")
+
+    image_bytes_list = []
+    for photo in photos:
+        image_bytes_list.append(await read_and_validate_image(photo))
+
+    try:
+        await azure_face.ensure_person_group()
+    except Exception:
+        logger.exception("InsightFace setup failed")
+        raise HTTPException(503, "Face service setup error. Please try again.")
+
+    existing_mssv = await db.persons.find_one(
+        {"student_id": {"$regex": f"^{re.escape(clean_mssv)}$", "$options": "i"}, "is_active": True}
+    )
+    if existing_mssv:
+        raise HTTPException(409, f"Mã số sinh viên '{clean_mssv}' đã được đăng ký trước đó.")
+
+    try:
+        duplicate = await azure_face.check_duplicate_face(image_bytes_list)
+    except Exception:
+        logger.exception("Duplicate face check error")
+        raise HTTPException(503, "Không kiểm tra được độ duy nhất của khuôn mặt. Vui lòng thử lại.")
+
+    if duplicate:
+        raise HTTPException(
+            409,
+            f"Khuôn mặt này đã được đăng ký cho '{duplicate['name']}' "
+            f"(độ giống: {duplicate['confidence']*100:.1f}%).",
+        )
+
+    full_display_name = f"{clean_name} ({clean_mssv})" if clean_mssv not in clean_name else clean_name
+
+    try:
+        azure_id = await azure_face.enroll_person(full_display_name, image_bytes_list)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    except Exception:
+        logger.exception("Self-enrollment failed")
+        raise HTTPException(503, "Dịch vụ đăng ký khuôn mặt tạm thời gián đoạn. Vui lòng thử lại.")
+
+    person_doc = {
+        "_id":         azure_id,
+        "name":        clean_name,
+        "student_id":  clean_mssv,
+        "email":       clean_email,
+        "department":  clean_dept,
+        "photo_url":   None,
+        "enrolled_at": datetime.now(UTC),
+        "is_active":   True,
+        "enrolled_by": user.id,
+    }
+    await db.persons.insert_one(person_doc)
+
+    if ObjectId.is_valid(user.id):
+        await db.users.update_one(
+            {"_id": ObjectId(user.id)},
+            {"$set": {"person_id": azure_id, "display_name": clean_name}},
+        )
 
     return PersonOut(**_doc_to_person(person_doc))
 

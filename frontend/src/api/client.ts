@@ -100,6 +100,7 @@ export interface TokenResponse {
 export interface UserOut {
   id: string;
   username: string;
+  display_name?: string | null;
   role: "admin" | "operator" | "student";
   is_active: boolean;
   created_at: string;
@@ -141,6 +142,7 @@ export interface StudentPortalSummary {
 export interface PersonOut {
   id: string;
   name: string;
+  student_id?: string | null;
   email: string | null;
   department: string | null;
   photo_url: string | null;
@@ -391,6 +393,24 @@ export const personsApi = {
     if (params.student_password?.trim()) fd.append("student_password", params.student_password.trim());
     params.photos.forEach((p, idx) => fd.append("photos", p, `photo_${idx + 1}.jpg`));
     return apiFetch<PersonOut>("/api/persons/enroll", {
+      method: "POST",
+      body: fd,
+    });
+  },
+  selfEnroll: (params: {
+    name: string;
+    student_id: string;
+    department: string;
+    email?: string;
+    photos: (Blob | File)[];
+  }) => {
+    const fd = new FormData();
+    fd.append("name", params.name.trim());
+    fd.append("student_id", params.student_id.trim());
+    fd.append("department", params.department.trim());
+    if (params.email?.trim()) fd.append("email", params.email.trim());
+    params.photos.forEach((p, idx) => fd.append("photos", p, `photo_${idx + 1}.jpg`));
+    return apiFetch<PersonOut>("/api/persons/self-enroll", {
       method: "POST",
       body: fd,
     });

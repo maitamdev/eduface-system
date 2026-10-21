@@ -1,10 +1,12 @@
-import React, { useCallback, useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Camera, CheckCircle2, SwitchCamera, Trash2, Upload } from "lucide-react";
 import { authApi, personsApi } from "@/api/client";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { useToast } from "@/context/ToastContext";
+import { useCamera, captureVideoFrame } from "@/hooks/useCamera";
 import { useResource } from "@/hooks/useResource";
-import { dateTime, matchesSearch } from "@/lib/format";
+import { dateTime, errorMessage, isDesignPreview, matchesSearch } from "@/lib/format";
 import {
   PageHeader,
   Section,
@@ -16,13 +18,86 @@ import {
   Table,
 } from "@/components/ProductUI";
 
+type Photo = { blob: Blob; url: string };
+
 export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | "student" }> = ({ previewRole }) => {
-  const { user, role: authRole } = useAuth();
+  const { user, role: authRole, refreshProfile } = useAuth();
   const role = previewRole || authRole || "student";
   const { t, lang } = useLanguage();
+  const toast = useToast();
+  const camera = useCamera();
   const [selectedPersonId, setSelectedPersonId] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<"all" | "present" | "absent" | "open">("all");
   const [search, setSearch] = useState("");
+
+  // State cho biểu mẫu tự khai báo thông tin & khuôn mặt lần đầu
+  const [fullName, setFullName] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [department, setDepartment] = useState("KTCN");
+  const [email, setEmail] = useState("");
+  const [source, setSource] = useState<"camera" | "upload">("camera");
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const photosRef = useRef(photos);
+  const [capturing, setCapturing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [enrollError, setEnrollError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      if (!fullName && user.display_name) setFullName(user.display_name);
+      const userEmail = user.google_email || (user.username?.includes("@") ? user.username : "");
+      if (!email && userEmail) setEmail(userEmail);
+    }
+  }, [user, fullName, email]);
+
+  useEffect(() => {
+    if (source !== "camera") camera.stop();
+  }, [source, camera.stop]);
+
+  useEffect(
+    () => () => {
+      photosRef.current.forEach((photo) => URL.revokeObjectURL(photo.url));
+    },
+    []
+  );
+
+  const changePhotos = (next: Photo[]) => {
+    photosRef.current
+      .filter((photo) => !next.includes(photo))
+      .forEach((photo) => URL.revokeObjectURL(photo.url));
+    photosRef.current = next;
+    setPhotos(next);
+  };
+
+  const addFiles = (files: FileList | null) => {
+    if (!files) return;
+    const incoming = Array.from(files);
+    if (incoming.length + photosRef.current.length > 5) {
+      setEnrollError(t("Tối đa 5 ảnh khuôn mặt.", "Maximum 5 face photos."));
+      return;
+    }
+    if (incoming.some((file) => !file.type.startsWith("image/") || file.size > 10 * 1024 * 1024)) {
+      setEnrollError(t("Chỉ chọn file ảnh, tối đa 10 MB mỗi ảnh.", "Choose image files up to 10 MB each."));
+      return;
+    }
+    setEnrollError(null);
+    changePhotos([...photosRef.current, ...incoming.map((blob) => ({ blob, url: URL.createObjectURL(blob) }))]);
+  };
+
+  const capturePhoto = async () => {
+    if (capturing || submitting || photosRef.current.length >= 5) return;
+    setCapturing(true);
+    try {
+      const blob = await captureVideoFrame(camera.videoRef.current);
+      if (photosRef.current.length < 5) {
+        changePhotos([...photosRef.current, { blob, url: URL.createObjectURL(blob) }]);
+      }
+    } catch (err) {
+      setEnrollError(errorMessage(err));
+    } finally {
+      setCapturing(false);
+    }
+  };
 
   const peopleLoader = useCallback(
     () => (role === "admin" ? personsApi.list() : Promise.resolve([])),
@@ -43,6 +118,39 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
     is_defaulter: false,
     sessions: [],
   });
+
+  const handleSelfEnroll = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (submitting || capturing) return;
+    if (!fullName.trim() || !studentId.trim() || !department.trim()) {
+      setEnrollError(t("Vui lòng nhập đầy đủ Họ tên, MSSV và Lớp học phần.", "Please enter your Full name, Student ID, and Class/Course."));
+      return;
+    }
+    if (!photos.length) {
+      setEnrollError(t("Vui lòng chụp hoặc tải lên ít nhất 1 ảnh khuôn mặt rõ nét.", "Please capture or upload at least 1 clear face photo."));
+      return;
+    }
+    setSubmitting(true);
+    setEnrollError(null);
+    try {
+      await personsApi.selfEnroll({
+        name: fullName.trim(),
+        student_id: studentId.trim().toUpperCase(),
+        department: department.trim(),
+        email: email.trim() || undefined,
+        photos: photos.map((p) => p.blob),
+      });
+      camera.stop();
+      changePhotos([]);
+      toast.success(t("Đã đăng ký hồ sơ & khuôn mặt thành công!", "Student profile & face enrolled!"));
+      await refreshProfile();
+      await portal.reload();
+    } catch (err) {
+      setEnrollError(errorMessage(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const { person, total_sessions, present_count, absent_count, attendance_rate, is_defaulter, sessions } =
     portal.data;
@@ -84,7 +192,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                 <option value="">{t("Hồ sơ liên kết với tài khoản", "Account-linked profile")}</option>
                 {people.data.map((item) => (
                   <option key={item.id} value={item.id}>
-                    {item.name} {item.department ? `· ${item.department}` : ""}
+                    {item.name} {item.student_id ? `(${item.student_id})` : ""} {item.department ? `· ${item.department}` : ""}
                   </option>
                 ))}
               </select>
@@ -93,12 +201,179 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         </Section>
       )}
 
-      <Section title={t("Hồ sơ học vụ & sinh trắc học", "Academic & biometric profile")}>
-        {person ? (
+      {!portal.loading && !person && (
+        <Section
+          title={t("Khai báo thông tin sinh viên & Đăng ký khuôn mặt lần đầu", "First-time student profile & face registration")}
+          description={t(
+            "Chào mừng bạn! Vui lòng điền Họ tên, Mã số sinh viên (MSSV), Lớp học phần và chụp 1–5 ảnh khuôn mặt để hệ thống AI nhận diện bạn khi điểm danh trên lớp.",
+            "Welcome! Please provide your Full name, Student ID, Class/Course, and 1–5 clear face photos so the classroom AI camera can recognize you."
+          )}
+        >
+          <ErrorNotice message={enrollError || camera.error} />
+          <form onSubmit={handleSelfEnroll} className="enrollment-grid">
+            <div className="stack-form">
+              <Field id="self-name" label={t("Họ và tên sinh viên *", "Full name *")}>
+                <input
+                  id="self-name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder={t("VD: Nguyễn Văn A", "e.g. Nguyen Van A")}
+                  maxLength={120}
+                  required
+                />
+              </Field>
+              <Field id="self-mssv" label={t("Mã số sinh viên (MSSV) *", "Student ID (MSSV) *")}>
+                <input
+                  id="self-mssv"
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                  placeholder={t("VD: 2305CT2070", "e.g. 2305CT2070")}
+                  maxLength={40}
+                  required
+                />
+              </Field>
+              <Field id="self-dept" label={t("Lớp / Học phần *", "Class / Course *")}>
+                <input
+                  id="self-dept"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  placeholder={t("VD: KTCN", "e.g. KTCN")}
+                  maxLength={80}
+                  required
+                />
+              </Field>
+              <Field id="self-email" label="Email">
+                <input
+                  id="self-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="mssv@dhv.edu.vn"
+                />
+              </Field>
+              <p className="field-hint">
+                {t(
+                  "Sau khi hoàn tất, mỗi sáng đến lớp bạn chỉ cần nhìn vào Camera của giảng viên là hệ thống tự động ghi nhận điểm danh.",
+                  "Once enrolled, simply look at the instructor's camera in class to be automatically marked present."
+                )}
+              </p>
+              <button className="primary-button" type="submit" disabled={submitting || capturing || !photos.length}>
+                {submitting
+                  ? t("Đang trích xuất khuôn mặt AI…", "Enrolling AI face profile…")
+                  : t("Hoàn tất đăng ký hồ sơ & khuôn mặt", "Complete registration")}
+              </button>
+            </div>
+
+            <div>
+              <div className="source-tabs" aria-label={t("Nguồn ảnh", "Photo source")}>
+                <button type="button" aria-pressed={source === "camera"} onClick={() => setSource("camera")}>
+                  <Camera size={14} />
+                  Camera ({photos.length}/5)
+                </button>
+                <button type="button" aria-pressed={source === "upload"} onClick={() => setSource("upload")}>
+                  <Upload size={14} />
+                  {t("Tải ảnh từ máy", "Upload photos")}
+                </button>
+              </div>
+
+              {source === "camera" ? (
+                <>
+                  <div className="camera-stage">
+                    <video
+                      ref={camera.videoRef}
+                      autoPlay
+                      muted
+                      playsInline
+                      className={camera.facing === "user" ? "mirror-video" : ""}
+                    />
+                    {!camera.streaming && (
+                      <div className="camera-placeholder">
+                        <Camera size={28} />
+                        <p>{t("Bấm 'Bật camera' bên dưới để chụp khuôn mặt", "Click 'Start camera' below to capture your face")}</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="camera-controls">
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      disabled={camera.starting || isDesignPreview()}
+                      onClick={() => (camera.streaming ? camera.stop() : void camera.start())}
+                    >
+                      {camera.starting
+                        ? t("Đang mở…", "Starting…")
+                        : camera.streaming
+                          ? t("Tắt camera", "Stop camera")
+                          : t("Bật camera", "Start camera")}
+                    </button>
+                    <button
+                      className="icon-button"
+                      type="button"
+                      disabled={camera.starting}
+                      onClick={() => void camera.flip()}
+                      aria-label={t("Đổi camera", "Switch camera")}
+                    >
+                      <SwitchCamera size={17} />
+                    </button>
+                    <button
+                      className="primary-button"
+                      type="button"
+                      onClick={capturePhoto}
+                      disabled={!camera.streaming || submitting || capturing || photos.length >= 5}
+                    >
+                      {t("Chụp ảnh khuôn mặt", "Capture photo")}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="upload-zone">
+                  <label htmlFor="self-enroll-photos">{t("Chọn từ 1 đến 5 ảnh rõ khuôn mặt", "Choose 1 to 5 clear face photos")}</label>
+                  <input
+                    id="self-enroll-photos"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={submitting}
+                    onChange={(event) => {
+                      addFiles(event.target.files);
+                      event.target.value = "";
+                    }}
+                  />
+                  <p>{t("Nhìn thẳng, đủ sáng, không đeo khẩu trang · Tối đa 10 MB/ảnh", "Frontal face, well-lit, no mask · Up to 10 MB per photo")}</p>
+                </div>
+              )}
+
+              {photos.length > 0 && (
+                <div className="photo-previews">
+                  {photos.map((photo, index) => (
+                    <figure key={photo.url}>
+                      <img src={photo.url} alt={t(`Ảnh khuôn mặt ${index + 1}`, `Face photo ${index + 1}`)} />
+                      <button
+                        className="icon-button"
+                        type="button"
+                        disabled={submitting}
+                        aria-label={t(`Xóa ảnh ${index + 1}`, `Remove photo ${index + 1}`)}
+                        onClick={() => changePhotos(photos.filter((_, item) => item !== index))}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </figure>
+                  ))}
+                </div>
+              )}
+            </div>
+          </form>
+        </Section>
+      )}
+
+      {person && (
+        <Section title={t("Hồ sơ học vụ & sinh trắc học", "Academic & biometric profile")}>
           <dl className="config-grid">
             <div>
               <dt>{t("Họ và tên sinh viên", "Student name")}</dt>
-              <dd className="font-medium">{person.name}</dd>
+              <dd className="font-medium">
+                {person.name} {person.student_id ? `(${person.student_id})` : ""}
+              </dd>
             </div>
             <div>
               <dt>{t("Lớp / Học phần", "Class / Course")}</dt>
@@ -116,15 +391,8 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
               </dd>
             </div>
           </dl>
-        ) : (
-          <EmptyState loading={portal.loading}>
-            {t(
-              "Tài khoản này chưa được liên kết với hồ sơ khuôn mặt sinh viên nào. Vui lòng liên hệ Quản trị viên để đăng ký khuôn mặt.",
-              "This account is not linked to an enrolled student face profile yet. Please contact the administrator."
-            )}
-          </EmptyState>
-        )}
-      </Section>
+        </Section>
+      )}
 
       <dl className="metric-strip">
         <div>
@@ -148,9 +416,13 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
             {portal.loading ? "…" : person ? `${attendance_rate}%` : "–"}
           </dd>
           <p className={is_defaulter ? "warning-text" : "attendance-status"}>
-            {!person ? t("Chưa liên kết hồ sơ", "Profile not linked") : present_count + absent_count === 0 ? t("Chưa có buổi được đánh giá", "No assessed sessions yet") : is_defaulter
-              ? t("Cảnh báo: Dưới 75% quy định", "Warning: Below 75% requirement")
-              : t("Đủ điều kiện chuyên cần (≥ 75%)", "Meets requirement (≥ 75%)")}
+            {!person
+              ? t("Hoàn tất đăng ký khuôn mặt ở trên để kích hoạt", "Complete face registration above to activate")
+              : present_count + absent_count === 0
+                ? t("Chưa có buổi được đánh giá", "No assessed sessions yet")
+                : is_defaulter
+                  ? t("Cảnh báo: Dưới 75% quy định", "Warning: Below 75% requirement")
+                  : t("Đủ điều kiện chuyên cần (≥ 75%)", "Meets requirement (≥ 75%)")}
           </p>
         </div>
       </dl>

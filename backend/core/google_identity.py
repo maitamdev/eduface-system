@@ -86,22 +86,26 @@ def verify_google_access_token(access_token: str, config: dict) -> dict:
         email_verified = str(info.get("email_verified", "")).lower() == "true"
         email = str(info.get("email", "")).strip().lower()
         sub = str(info.get("sub", "")).strip()
+        name = email
 
-        if not email or not email_verified or "@" not in email:
+        try:
             req = urllib.request.Request(
                 "https://www.googleapis.com/oauth2/v3/userinfo",
                 headers={"Authorization": f"Bearer {access_token}"},
             )
             with urllib.request.urlopen(req, timeout=8) as uresp:
                 uinfo = json.loads(uresp.read().decode("utf-8"))
-            email = str(uinfo.get("email", "")).strip().lower()
-            email_verified = bool(uinfo.get("email_verified"))
+            email = str(uinfo.get("email", email)).strip().lower()
+            email_verified = bool(uinfo.get("email_verified", email_verified))
             sub = str(uinfo.get("sub", sub)).strip()
+            name = str(uinfo.get("name") or email.split("@")[0]).strip()
+        except Exception:
+            pass
 
         if not email or not email_verified or "@" not in email:
             raise ValueError("Unverified Google email")
 
-        return {"sub": sub, "email": email, "name": email}
+        return {"sub": sub, "email": email, "name": name}
     except urllib.error.HTTPError as exc:
         if exc.code >= 500:
             raise HTTPException(503, "Google sign-in is temporarily unavailable.") from None

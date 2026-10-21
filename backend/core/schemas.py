@@ -19,9 +19,10 @@ class PersonCreate(BaseModel):
 class PersonOut(BaseModel):
     id:          str
     name:        str
-    email:       Optional[str]
-    department:  Optional[str]
-    photo_url:   Optional[str]
+    student_id:  Optional[str] = None
+    email:       Optional[str] = None
+    department:  Optional[str] = None
+    photo_url:   Optional[str] = None
     enrolled_at: datetime
     is_active:   bool
     enrolled_by: Optional[str] = None
@@ -126,13 +127,14 @@ class UserCreate(BaseModel):
 
 
 class UserOut(BaseModel):
-    id:           str
-    username:     str
-    role:         str
-    is_active:    bool
-    created_at:   datetime
-    person_id:    Optional[str] = None
-    google_email: Optional[str] = None
+    id:            str
+    username:      str
+    display_name:  Optional[str] = None
+    role:          str
+    is_active:     bool
+    created_at:    datetime
+    person_id:     Optional[str] = None
+    google_email:  Optional[str] = None
     microsoft_oid: Optional[str] = None
 
     model_config = {"from_attributes": True}

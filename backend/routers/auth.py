@@ -119,6 +119,7 @@ async def get_current_profile(
             return UserOut(
                 id=str(doc["_id"]),
                 username=doc["username"],
+                display_name=doc.get("display_name"),
                 role=doc["role"],
                 is_active=doc.get("is_active", True),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
@@ -196,6 +197,7 @@ async def get_student_portal(
     person_out = PersonOut(
         id=pid,
         name=person_doc["name"],
+        student_id=person_doc.get("student_id"),
         email=person_doc.get("email"),
         department=person_doc.get("department"),
         photo_url=person_doc.get("photo_url"),
