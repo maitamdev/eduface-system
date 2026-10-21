@@ -300,9 +300,12 @@ export function getSocketAuthentication() {
   return inMemoryToken ? { authorization: `Bearer ${inMemoryToken}` } : { api_key: FALLBACK_API_KEY };
 }
 
+const DEFAULT_GOOGLE_CLIENT_ID =
+  "839148608863-iv1en34namc76757touqsf36u1950ou2.apps.googleusercontent.com";
+
 export const authApi = {
   googleConfig: async () => {
-    const envClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || "").trim();
+    const envClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID).trim();
     try {
       const cfg = await apiFetch<{ enabled: boolean; client_id: string }>("/api/auth/google/config");
       if (cfg.enabled && cfg.client_id) return cfg;
