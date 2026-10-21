@@ -141,6 +141,7 @@ def _resolve_cors_origins() -> list:
         "http://127.0.0.1:5173",
         "https://ai-attendance-system-mauve.vercel.app",
         "https://eduface-system.vercel.app",
+        "https://face-dhv-edu.vercel.app",
     ]
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
     extra = [o.strip() for o in env_origins.split(",") if o.strip()]
