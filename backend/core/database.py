@@ -88,12 +88,27 @@ async def init_db() -> None:
 
     # ── users indexes (per-user identity) ────────────────────────────────────
     await db.users.create_index([("username", ASCENDING)], unique=True)
+    await db.users.create_index(
+        [("microsoft_tenant_id", ASCENDING), ("microsoft_oid", ASCENDING)],
+        unique=True, partialFilterExpression={"microsoft_oid": {"$type": "string"}},
+        name="microsoft_identity_unique",
+    )
+    await db.auth_challenges.create_index("expires_at", expireAfterSeconds=0)
 
-    # Auto-seed default accounts (admin, operator, student demo) if missing
+    await _seed_accounts(db)
+    logger.info("MongoDB indexes created on '%s'", DB_NAME)
+
+
+async def _seed_accounts(db) -> None:
+    """Keep known demo passwords out of production bootstrap."""
+    production = os.getenv("APP_ENV", os.getenv("ENVIRONMENT", "development")).lower() in {"production", "prod"}
     try:
         from core.auth import hash_password
         default_user = os.getenv("DEFAULT_ADMIN_USERNAME", "admin")
-        default_pass = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin123")
+        default_pass = os.getenv("DEFAULT_ADMIN_PASSWORD", "") or ("" if production else "admin123")
+        if production and (len(default_pass) < 12 or default_pass in {"admin123", "operator123", "123456"}):
+            logger.warning("Production account bootstrap skipped: set a unique DEFAULT_ADMIN_PASSWORD of at least 12 characters or provision an admin using the admin API key.")
+            return
         if not await db.users.find_one({"username": default_user}):
             await db.users.insert_one({
                 "username": default_user,
@@ -103,6 +118,9 @@ async def init_db() -> None:
                 "created_at": datetime.now(timezone.utc),
             })
             logger.info("Initialized default administrator account '%s'", default_user)
+
+        if production:
+            return
 
         if not await db.users.find_one({"username": "operator"}):
             await db.users.insert_one({
@@ -127,9 +145,6 @@ async def init_db() -> None:
             logger.info("Initialized default student account 'maitam'")
     except Exception as e:
         logger.warning("Could not auto-seed default accounts: %s", e)
-
-    logger.info("MongoDB indexes created on '%s'", DB_NAME)
-
 
 async def get_person_by_azure_id(db: AsyncIOMotorDatabase, azure_id: str) -> Optional[dict]:
     return await db.persons.find_one({"_id": azure_id, "is_active": True})

@@ -17,6 +17,7 @@ import pytest
 from fastapi import FastAPI, Depends, Request
 from fastapi.testclient import TestClient
 
+import core.auth as core_auth
 from core.auth import (
     hash_password,
     verify_password,
@@ -25,7 +26,6 @@ from core.auth import (
     require_admin,
     require_operator,
     get_user_id_from_request,
-    JWT_SECRET,
     JWT_ALGORITHM,
 )
 from core.database import get_db
@@ -62,7 +62,7 @@ def test_jwt_expired_token_rejected():
         "role": "operator",
         "exp": int(time.time()) - 10,
     }
-    expired_token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    expired_token = jwt.encode(payload, core_auth.JWT_SECRET, algorithm=JWT_ALGORITHM)
 
     with pytest.raises(Exception) as exc_info:
         decode_access_token(expired_token)

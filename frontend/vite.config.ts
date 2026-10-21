@@ -16,5 +16,11 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 800,
+    rolldownOptions: {
+      input: {
+        main: path.resolve(import.meta.dirname, "index.html"),
+        microsoft: path.resolve(import.meta.dirname, "microsoft-redirect.html"),
+      },
+    },
   },
 });

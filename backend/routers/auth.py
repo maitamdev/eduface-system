@@ -123,6 +123,7 @@ async def get_current_profile(
                 is_active=doc.get("is_active", True),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
                 person_id=doc.get("person_id"),
+                microsoft_oid=doc.get("microsoft_oid"),
             )
 
     return UserOut(
@@ -149,6 +150,7 @@ async def list_users(
                 is_active=doc.get("is_active", True),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
                 person_id=doc.get("person_id"),
+                microsoft_oid=doc.get("microsoft_oid"),
             )
         )
     return users
@@ -175,16 +177,8 @@ async def get_student_portal(
     if target_person_id:
         person_doc = await db.persons.find_one({"_id": target_person_id, "is_active": True})
 
-    if not person_doc:
-        escaped = re.escape(user.username.strip())
-        person_doc = await db.persons.find_one({
-            "is_active": True,
-            "$or": [
-                {"email": {"$regex": f"^{escaped}$", "$options": "i"}},
-                {"name": {"$regex": f"^{escaped}$", "$options": "i"}},
-            ],
-        })
-
+    # Identity must be linked explicitly by an administrator. Names and email
+    # strings are not proof that the account owns a biometric/attendance profile.
     if not person_doc:
         return StudentPortalSummary(
             person=None,
@@ -269,7 +263,8 @@ async def get_student_portal(
     total_sessions = len(items)
     present_count = sum(1 for item in items if item.attended)
     absent_count = sum(1 for item in items if item.status == "absent")
-    rate = round((present_count / total_sessions) * 100, 1) if total_sessions > 0 else 100.0
+    assessed_sessions = present_count + absent_count
+    rate = round((present_count / assessed_sessions) * 100, 1) if assessed_sessions else 100.0
 
     return StudentPortalSummary(
         person=person_out,
@@ -277,6 +272,6 @@ async def get_student_portal(
         present_count=present_count,
         absent_count=absent_count,
         attendance_rate=rate,
-        is_defaulter=total_sessions > 0 and rate < 75.0,
+        is_defaulter=assessed_sessions > 0 and rate < 75.0,
         sessions=items,
     )

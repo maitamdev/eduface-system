@@ -8,6 +8,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<UserOut>;
+  loginMicrosoft: (challengeId: string, idToken: string) => Promise<UserOut>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
 }
@@ -59,6 +60,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) { logout(); throw error; }
   };
 
+  const loginMicrosoft = async (challengeId: string, idToken: string): Promise<UserOut> => {
+    try {
+      const response = await authApi.microsoftExchange(challengeId, idToken);
+      const profile = await authApi.me();
+      setToken(response.access_token); setUser(profile); return profile;
+    } catch (error) { logout(); throw error; }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -68,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: Boolean(user),
         isLoading,
         login,
+        loginMicrosoft,
         logout,
         refreshProfile,
       }}

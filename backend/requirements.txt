@@ -15,8 +15,8 @@ numpy>=1.26.0
 azure-storage-blob>=12.19.0
 
 # Database (MongoDB async)
-motor==3.6.0
-pymongo==4.9.2
+motor==3.7.1
+pymongo==4.19.0
 
 # Env & config
 python-dotenv>=1.0.1
@@ -30,4 +30,4 @@ python-multipart>=0.0.9
 
 # ── Security (Phase 0 hardening) ──────────────────────────────────
 slowapi>=0.1.9        # per-IP rate limiting on expensive/abusable endpoints
-pyjwt>=2.8.0          # signed JWT tokens for per-user identity (Step 11)
+pyjwt[crypto]>=2.8.0 # local JWTs and Microsoft RSA signature verification

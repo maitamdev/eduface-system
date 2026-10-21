@@ -81,7 +81,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                 value={selectedPersonId || person?.id || ""}
                 onChange={(event) => setSelectedPersonId(event.target.value)}
               >
-                <option value="">{t("Tự động chọn hồ sơ", "Auto-select profile")}</option>
+                <option value="">{t("Hồ sơ liên kết với tài khoản", "Account-linked profile")}</option>
                 {people.data.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name} {item.department ? `· ${item.department}` : ""}
@@ -145,10 +145,10 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         <div>
           <dt>{t("Tỷ lệ chuyên cần", "Attendance rate")}</dt>
           <dd className={is_defaulter ? "warning-text" : ""}>
-            {portal.loading ? "…" : `${attendance_rate}%`}
+            {portal.loading ? "…" : person ? `${attendance_rate}%` : "–"}
           </dd>
           <p className={is_defaulter ? "warning-text" : "attendance-status"}>
-            {is_defaulter
+            {!person ? t("Chưa liên kết hồ sơ", "Profile not linked") : present_count + absent_count === 0 ? t("Chưa có buổi được đánh giá", "No assessed sessions yet") : is_defaulter
               ? t("Cảnh báo: Dưới 75% quy định", "Warning: Below 75% requirement")
               : t("Đủ điều kiện chuyên cần (≥ 75%)", "Meets requirement (≥ 75%)")}
           </p>

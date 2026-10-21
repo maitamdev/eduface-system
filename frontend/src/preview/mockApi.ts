@@ -38,6 +38,7 @@ export async function previewRequest(path: string, init: RequestInit = {}): Prom
   const method = init.method || "GET";
   const payload = typeof init.body === "string" ? JSON.parse(init.body) : null;
   if (route === "/health") return { status: "ok" };
+  if (route === "/api/auth/microsoft/config") return { enabled: false, client_id: "", tenant_id: "" };
   if (route === "/api/dashboard/metrics") return previewSnapshot().metrics;
   if (route === "/api/dashboard/activity") return structuredClone(records);
   if (route === "/api/sessions" && method === "GET") return structuredClone(sessions.filter((session) => !url.searchParams.has("active") || session.is_active === (url.searchParams.get("active") === "true")));

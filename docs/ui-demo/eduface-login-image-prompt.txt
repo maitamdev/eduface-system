@@ -1,0 +1,6 @@
+Tool: built-in ImageGen (image_gen.imagegen)
+Output asset: frontend/public/images/eduface-campus.png
+Original PNG copied without editing. AI-generated illustration; no real student photo.
+
+Exact prompt:
+Use case: photorealistic-natural. Asset type: EduFace school attendance application login panel background. Create a premium authentic editorial photograph, vertical portrait composition about 3:4. A contemporary Vietnamese university corridor opening into a sunlit classroom, a Vietnamese female university student aged 21 carrying a laptop and notebooks walking into class, another adult student naturally seated farther back. Eye-level candid moment from several meters away, not posed for camera. Architectural lines, rich dark forest-green door frames, warm natural oak, off-white walls, daylight through tall windows. Natural skin texture, realistic hands and faces, restrained film grain, professional architectural/editorial photography. Keep main adult subject and classroom in upper two thirds, lower third darker and quiet enough for a small white caption overlay added later in code. Sophisticated warm daylight contrasting crisp cool green shadows. No text, no brand logo, no UI graphics, no face-detection rectangles, no neon, no gradients, no holograms, no watermark. Realism and natural character, not stock corporate smiles. Only adults.

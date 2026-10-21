@@ -104,6 +104,7 @@ export interface UserOut {
   is_active: boolean;
   created_at: string;
   person_id?: string | null;
+  microsoft_oid?: string | null;
 }
 
 export interface UserCreatePayload {
@@ -299,6 +300,14 @@ export function getSocketAuthentication() {
 }
 
 export const authApi = {
+  microsoftConfig: () => apiFetch<{ enabled: boolean; client_id: string; tenant_id: string }>("/api/auth/microsoft/config"),
+  microsoftChallenge: () => apiFetch<{ challenge_id: string; nonce: string }>("/api/auth/microsoft/challenge", { method: "POST" }),
+  microsoftExchange: async (challengeId: string, idToken: string) => {
+    const response = await apiFetch<TokenResponse>("/api/auth/microsoft", { method: "POST", body: JSON.stringify({ challenge_id: challengeId, id_token: idToken }) });
+    setStoredToken(response.access_token);
+    return response;
+  },
+  linkMicrosoft: (userId: string, objectId: string | null) => apiFetch<{ linked: boolean; object_id: string | null }>(`/api/auth/users/${encodeURIComponent(userId)}/microsoft`, { method: "PUT", body: JSON.stringify({ object_id: objectId }) }),
   login: async (username: string, password: string): Promise<TokenResponse> => {
     const res = await apiFetch<TokenResponse>("/api/auth/login", {
       method: "POST",

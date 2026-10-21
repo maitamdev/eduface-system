@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/microsoft-redirect.html",
+      "destination": "/microsoft-redirect.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

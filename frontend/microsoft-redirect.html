@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>EduFace · Microsoft sign-in</title>
+  </head>
+  <body>
+    <p id="status" role="status">Đang hoàn tất đăng nhập Microsoft… / Completing Microsoft sign-in…</p>
+    <script type="module">
+      import { broadcastResponseToMainFrame } from "@azure/msal-browser/redirect-bridge";
+      broadcastResponseToMainFrame().catch(() => {
+        document.getElementById("status").textContent = "Không thể hoàn tất đăng nhập. Mở lại trang đăng nhập và thử lại. / Sign-in could not be completed. Return to the sign-in page and try again.";
+      });
+    </script>
+  </body>
+</html>
