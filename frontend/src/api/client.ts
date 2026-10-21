@@ -3,7 +3,9 @@
  * Tầng giao tiếp API chuẩn hóa 100% theo backend/core/schemas.py và backend/routers/*.py
  */
 
-const RAW_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const RAW_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? "https://eduface-system.onrender.com" : "http://localhost:8000");
 export const API_BASE_URL = RAW_BASE_URL.replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_API_KEY = import.meta.env.VITE_API_KEY || "";
 
