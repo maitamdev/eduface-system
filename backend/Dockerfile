@@ -1,0 +1,35 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# System libraries for insightface compilation + OpenCV runtime (libxcb, libgl1, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    g++ \
+    libgomp1 \
+    libglib2.0-0 \
+    libgl1 \
+    libxcb1 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libsm6 \
+    libice6 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Pre-download the InsightFace buffalo_sc model into the image layer.
+# This runs once at build time, so cold starts don't waste ~60s downloading it.
+RUN python - <<'EOF'
+from insightface.app import FaceAnalysis
+app = FaceAnalysis(name="buffalo_sc", providers=["CPUExecutionProvider"])
+app.prepare(ctx_id=-1, det_size=(640, 640))
+print("InsightFace buffalo_sc model cached in image.")
+EOF
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]

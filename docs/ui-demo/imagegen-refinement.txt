@@ -1,0 +1,9 @@
+Use case: ui-mockup refinement.
+Edit the supplied AuraAttend demo image. Keep the entire design, composition, branding, colors, all text outside the bottom table, all cards, navigation, session cards and chart unchanged.
+Change only the bottom 'Lượt điểm danh gần đây' table to match the implemented application. It must have exactly these six columns, in this order: 'Sinh viên / Nhân sự', 'Khoa / Lớp', 'Phiên điểm danh', 'Thời gian', 'Trạng thái', 'Độ tin cậy'. Remove the row-number column, student-ID column and action column entirely. Do not show any student IDs or action menus.
+Four rows, exactly:
+Nguyễn Minh Anh | CNTT · K24 | Lập trình ứng dụng Web | 08:42 | Có mặt | 99%
+Trần Hoàng Nam | CNTT · K24 | Lập trình ứng dụng Web | 08:41 | Có mặt | 98%
+Lê Phương Linh | Thiết kế · K23 | Thiết kế giao diện người dùng | 08:40 | Có mặt | 99%
+Phạm Đức Huy | CNTT · K24 | Lập trình ứng dụng Web | 08:38 | Có mặt | 97%
+Use round initials avatars before names, pale green status badges. Maintain correct Vietnamese diacritics and clear readable text. Do not change any other part of the image.
