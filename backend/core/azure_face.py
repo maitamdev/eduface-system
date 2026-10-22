@@ -228,18 +228,31 @@ def _check_occlusion_and_landmarks(face, bgr: np.ndarray | None = None) -> tuple
             if np.dot(nose - le, v) < 0:
                 v = -v
 
-            nose_t = float(np.dot(nose - le, u) / eye_dist)
-            nose_d = float(np.dot(nose - le, v) / eye_dist)
-            lm_t   = float(np.dot(lm - le, u) / eye_dist)
-            rm_t   = float(np.dot(rm - le, u) / eye_dist)
+            nose_t  = float(np.dot(nose - le, u) / eye_dist)
+            nose_d  = float(np.dot(nose - le, v) / eye_dist)
+            mouth_d = float(np.dot((lm + rm) * 0.5 - le, v) / eye_dist)
+            lm_t    = float(np.dot(lm - le, u) / eye_dist)
+            rm_t    = float(np.dot(rm - le, u) / eye_dist)
 
-            if not (0.33 <= nose_t <= 0.67) or nose_d < 0.44 or lm_t < 0.0 or rm_t > 1.0:
+            if not (0.20 <= nose_t <= 0.80) or lm_t < -0.15 or rm_t > 1.15:
+                return False, (
+                    "Góc mặt nghiêng hoặc quay ngang quá lớn (extreme angle). "
+                    "Vui lòng nhìn thẳng hơn vào camera."
+                )
+
+            if lm_t < 0.0 or rm_t > 1.0:
                 return False, (
                     "Phát hiện vùng mũi hoặc miệng bị che khuất / lệch góc mặt "
                     "(không dùng tay che mặt hoặc đeo khẩu trang)."
                 )
 
-            if bgr is not None and float(np.std(bgr)) > 0.0:
+            if bgr is None or float(np.std(bgr)) == 0.0:
+                if not (0.31 <= nose_t <= 0.69) or nose_d < 0.40:
+                    return False, (
+                        "Phát hiện vùng mũi hoặc miệng bị che khuất / lệch góc mặt "
+                        "(không dùng tay che mặt hoặc đeo khẩu trang)."
+                    )
+            else:
                 h, w = bgr.shape[:2]
                 box = face.bbox.astype(int)
                 fw = max(1, int(box[2] - box[0]))
@@ -263,7 +276,7 @@ def _check_occlusion_and_landmarks(face, bgr: np.ndarray | None = None) -> tuple
                     mean_red_diff = float(np.mean(mouth_crop[:, :, 1]) - np.mean(upper_crop[:, :, 1]))
                     lum_diff      = float(np.mean(mouth_crop[:, :, 0]) - np.mean(upper_crop[:, :, 0]))
 
-                    if (lip_red_diff < 3.2 and mean_red_diff < 1.0) or (lum_diff > 6.0 and mean_red_diff < 1.2):
+                    if (lip_red_diff < 3.5 and mean_red_diff < 1.2) or (lum_diff > 4.0 and mean_red_diff < 1.5):
                         return False, (
                             "Phát hiện vật cản che vùng mũi/miệng (tay che mặt hoặc khẩu trang). "
                             "Vui lòng để lộ rõ toàn bộ khuôn mặt."
@@ -276,8 +289,8 @@ def _check_face_quality(face, image_w: int, image_h: int, bgr: np.ndarray | None
     det_score = float(face.det_score)
     if det_score < 0.60:
         return False, (
-            f"Low detection confidence ({det_score:.2f} < 0.60) — Độ rõ khuôn mặt quá thấp, "
-            "vui lòng chụp nơi đủ sáng."
+            f"Độ rõ khuôn mặt quá thấp ({det_score:.2f} < 0.60, low detection confidence). "
+            "Vui lòng chụp nơi đủ sáng."
         )
 
     box    = face.bbox.astype(int)
@@ -285,22 +298,41 @@ def _check_face_quality(face, image_w: int, image_h: int, bgr: np.ndarray | None
     face_h = box[3] - box[1]
     if face_w < 60 or face_h < 60:
         return False, (
-            f"Face too small ({face_w}x{face_h} px). Move closer to the camera."
+            f"Khuôn mặt quá nhỏ ({face_w}x{face_h} px, face too small). "
+            "Vui lòng ngồi gần camera hơn."
         )
-
-    margin_x = max(int(image_w * 0.05), 10)
-    margin_y = max(int(image_h * 0.05), 10)
-    if (box[0] < margin_x or box[1] < margin_y
-            or box[2] > (image_w - margin_x) or box[3] > (image_h - margin_y)):
-        return False, "Face is too close to the image edge. Center your face in the frame."
 
     kps = getattr(face, "kps", None)
     if kps is not None and len(kps) >= 2:
         eye_dist = float(np.linalg.norm(kps[1] - kps[0]))
-        if eye_dist < face_w * 0.20:
+        if eye_dist < face_w * 0.30:
             return False, (
-                "Face appears to be at too extreme an angle. "
-                "Please face the camera more directly."
+                "Góc mặt quay ngang quá lớn (extreme angle). "
+                "Vui lòng nhìn thẳng vào camera."
+            )
+
+    if kps is not None and len(kps) >= 5:
+        kp_arr = np.asarray(kps[:5], dtype=np.float32)
+        kp_margin_x = max(image_w * 0.03, 4.0)
+        kp_margin_y = max(image_h * 0.035, 4.0)
+        if (
+            np.any(kp_arr[:, 0] < kp_margin_x)
+            or np.any(kp_arr[:, 0] > (image_w - kp_margin_x))
+            or np.any(kp_arr[:, 1] < kp_margin_y)
+            or np.any(kp_arr[:, 1] > (image_h - kp_margin_y))
+        ):
+            return False, (
+                "Khuôn mặt (mắt/mũi/miệng) bị khuất sát mép khung hình (face too close to edge). "
+                "Vui lòng căn giữa camera."
+            )
+    else:
+        margin_x = max(int(image_w * 0.05), 10)
+        margin_y = max(int(image_h * 0.05), 10)
+        if (box[0] < margin_x or box[1] < margin_y
+                or box[2] > (image_w - margin_x) or box[3] > (image_h - margin_y)):
+            return False, (
+                "Khuôn mặt quá sát mép khung hình (face too close to edge). "
+                "Vui lòng căn giữa camera."
             )
 
     occ_ok, occ_reason = _check_occlusion_and_landmarks(face, bgr)
