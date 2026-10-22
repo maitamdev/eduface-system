@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Camera, Upload, SwitchCamera, ScanFace } from "lucide-react";
-import { attendanceApi, sessionsApi, getSocketAuthentication, type IdentifyResult, type WsFrameResponse } from "@/api/client";
+import { attendanceApi, personsApi, sessionsApi, getSocketAuthentication, type IdentifyResult, type WsFrameResponse } from "@/api/client";
 import { useLanguage } from "@/context/LanguageContext";
 import { useResource } from "@/hooks/useResource";
 import { useCamera, captureVideoFrame } from "@/hooks/useCamera";
@@ -15,8 +15,10 @@ export const LiveScannerPage: React.FC = () => {
   const sessions = useResource(sessionLoader, []);
   const sessionId = params.get("sessionId") || sessions.data[0]?.id || "";
   const selected = sessions.data.find((session) => session.id === sessionId);
-  const recordsLoader = useCallback(() => selected ? attendanceApi.list({ session_id: selected.id, limit: 50 }) : Promise.resolve([]), [selected?.id]);
+  const recordsLoader = useCallback(() => selected ? attendanceApi.list({ session_id: selected.id, limit: 200 }) : Promise.resolve([]), [selected?.id]);
   const records = useResource(recordsLoader, []);
+  const peopleLoader = useCallback(() => personsApi.list(), []);
+  const people = useResource(peopleLoader, []);
   const camera = useCamera();
   const [source, setSource] = useState<"camera" | "upload">("camera");
   const [mode, setMode] = useState<"mark" | "identify">("mark");
@@ -38,7 +40,41 @@ export const LiveScannerPage: React.FC = () => {
   const [frameSize, setFrameSize] = useState({ width: 1280, height: 720 });
 
   const [livenessCheck, setLivenessCheck] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const [livenessPrompt, setLivenessPrompt] = useState<string | null>(null);
+
+  const playCheckinTone = useCallback((kind: "success" | "warning") => {
+    if (!soundEnabled || typeof window === "undefined") return;
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const now = ctx.currentTime;
+      if (kind === "success") {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1174.66, now + 0.09);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(240, now);
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        osc.start(now);
+        osc.stop(now + 0.32);
+      }
+      setTimeout(() => void ctx.close(), 400);
+    } catch {
+      // Ignore audio errors on restricted browsers
+    }
+  }, [soundEnabled]);
 
   useEffect(() => {
     if (mode === "mark" && source === "upload") {
@@ -101,6 +137,7 @@ export const LiveScannerPage: React.FC = () => {
       setResults(identified);
       const spoofed = identified.filter((item) => item.is_live === false);
       if (spoofed.length > 0) {
+        playCheckinTone("warning");
         setError(
           t(
             `⚠️ ĐÃ CHẶN GIẢ MẠO (${spoofed.map((s) => s.name).join(", ")}): ${spoofed[0].spoof_reason || "Phát hiện nghi vấn ảnh tĩnh / màn hình điện thoại"}`,
@@ -119,11 +156,14 @@ export const LiveScannerPage: React.FC = () => {
                 ? t("Những người này đã điểm danh trong phiên.", "These people have already checked in.")
                 : t("Không tìm thấy khuôn mặt đã đăng ký.", "No enrolled faces found.")
         );
-        if (response.new_records) void records.reload();
+        if (response.new_records) {
+          playCheckinTone("success");
+          void records.reload();
+        }
       }
     } catch (err) { if (request === generation.current) { setError(errorMessage(err)); setAuto(false); } }
     finally { busy.current = false; setScanning(false); setLivenessPrompt(null); }
-  }, [mode, selected?.id, source, uploaded, confidence, livenessCheck, camera.videoRef, records.reload, t]);
+  }, [mode, selected?.id, source, uploaded, confidence, livenessCheck, playCheckinTone, camera.videoRef, records.reload, t]);
   const scanRef = useRef(scan); scanRef.current = scan;
   useEffect(() => {
     if (!auto || !camera.streaming || source !== "camera") return;
@@ -188,10 +228,32 @@ export const LiveScannerPage: React.FC = () => {
           </label>
         )}
         {source === "camera" && <label className="checkbox-label"><input type="checkbox" checked={auto} disabled={!camera.streaming || socketState !== "off" || (mode === "mark" && !selected)} onChange={(event) => setAuto(event.target.checked)} />{t("Quét tự động", "Auto scan")}</label>}
+        <label className="checkbox-label"><input type="checkbox" checked={soundEnabled} onChange={(event) => setSoundEnabled(event.target.checked)} />{t("Âm báo khi quét", "Audio beep")}</label>
       </div>
       <div className="page-actions"><button className="primary-button" disabled={scanning || auto || socketState !== "off" || (source === "camera" ? !camera.streaming : !uploaded) || (mode === "mark" && !selected) || isDesignPreview()} onClick={() => void scan()}><ScanFace size={15} />{scanning ? t("Đang xác thực…", "Verifying…") : mode === "mark" ? t("Quét và điểm danh", "Scan and check in") : t("Nhận diện", "Identify")}</button>{source === "camera" && mode === "identify" && <button className="secondary-button" disabled={!camera.streaming || !selected || scanning || isDesignPreview()} onClick={() => socketState === "off" ? startSocket() : stopSocket()}>{socketState === "off" ? t("Nhận diện trực tiếp", "Live recognition") : socketState === "connecting" ? t("Hủy kết nối", "Cancel connection") : t("Dừng trực tiếp", "Stop live recognition")}</button>}</div>
       {message && <p className="scan-message" role="status">{message}</p>}
     </Section><Section title={t("Kết quả nhận diện & Xác thực người thật", "Recognition & Liveness results")} description={mode === "identify" ? t("Chế độ này không ghi điểm danh.", "This mode does not record attendance.") : t("Tự động chặn ghi điểm danh nếu phát hiện ảnh tĩnh hoặc màn hình điện thoại.", "Automatically blocks check-in if a static photo or phone screen is detected.")}>{results.length ? <div className="recognition-list">{results.map((result) => <div key={result.azure_person_id}><strong>{result.name}</strong><span>{Math.round(result.confidence * 100)}%</span><small className={result.is_live === false ? "warning-text" : "attendance-status"}>{result.is_live === false ? t(`⚠️ Chặn ảnh giả (${result.spoof_reason || "Spoof"})`, `⚠️ Spoof blocked`) : mode === "mark" ? result.already_marked ? t("Đã có bản ghi", "Already recorded") : t("✓ Người thật · Đã ghi điểm danh", "✓ Live · Recorded") : t("✓ Người thật · Đã nhận diện", "✓ Live · Identified")}</small></div>)}</div> : <EmptyState>{t("Kết quả xuất hiện sau khi quét.", "Results appear after scanning.")}</EmptyState>}</Section></div>
-    <Section title={t("Bản ghi của phiên đang chọn", "Selected session records")} action={<Link to={appPath(`/records${selected ? `?sessionId=${selected.id}` : ""}`)} className="text-link">{t("Mở sổ điểm danh", "View records")}</Link>}><Table label={t("Điểm danh trong phiên", "Session check-ins")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>{t("Khoa / Lớp", "Department")}</th><th>{t("Thời gian", "Time")}</th><th className="align-right">{t("Độ tin cậy", "Confidence")}</th></tr></thead><tbody>{records.data.map((record) => <tr key={record.id}><td className="cell-strong">{record.person_name}</td><td>{record.department || "–"}</td><td>{dateTime(record.marked_at, lang)}</td><td className="align-right">{record.confidence != null ? `${Math.round(record.confidence * 100)}%` : "–"}</td></tr>)}</tbody></Table>{!records.data.length && <EmptyState loading={records.loading}>{records.error ? t("Bản ghi chưa tải được.", "Records unavailable.") : t("Chưa có lượt điểm danh trong phiên.", "No check-ins in this session.")}</EmptyState>}</Section>
+    <Section
+      title={t("Bản ghi của phiên đang chọn", "Selected session records")}
+      description={
+        selected
+          ? (() => {
+              const classTotal = selected.department
+                ? people.data.filter((p) => (p.department || "").toLowerCase() === selected.department!.toLowerCase()).length
+                : people.data.length;
+              const checkedInCount = records.data.filter((r) => r.status === "present" || r.status === "late").length;
+              return classTotal > 0
+                ? t(
+                    `Tiến độ điểm danh lớp ${selected.department || "chung"}: Đã có mặt ${checkedInCount} / ${classTotal} sinh viên (${Math.round((checkedInCount / classTotal) * 100)}%)`,
+                    `Class check-in progress: ${checkedInCount} / ${classTotal} students present (${Math.round((checkedInCount / classTotal) * 100)}%)`
+                  )
+                : undefined;
+            })()
+          : undefined
+      }
+      action={<Link to={appPath(`/records${selected ? `?sessionId=${selected.id}` : ""}`)} className="text-link">{t("Mở sổ điểm danh", "View records")}</Link>}
+    >
+      <Table label={t("Điểm danh trong phiên", "Session check-ins")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>MSSV</th><th>{t("Khoa / Lớp", "Department")}</th><th>{t("Trạng thái", "Status")}</th><th>{t("Thời gian", "Time")}</th><th className="align-right">{t("Độ tin cậy", "Confidence")}</th></tr></thead><tbody>{records.data.map((record) => <tr key={record.id}><td className="cell-strong">{record.person_name}</td><td className="numeric-cell">{record.student_id || "–"}</td><td>{record.department || "–"}</td><td className={record.status === "absent" ? "warning-text" : "attendance-status"}>{record.status === "present" ? t("Có mặt", "Present") : record.status === "late" ? t("Đi muộn", "Late") : record.status === "excused" ? t("Có phép", "Excused") : t("Vắng", "Absent")}</td><td>{dateTime(record.marked_at, lang)}</td><td className="align-right">{record.confidence != null ? `${Math.round(record.confidence * 100)}%` : "–"}</td></tr>)}</tbody></Table>{!records.data.length && <EmptyState loading={records.loading}>{records.error ? t("Bản ghi chưa tải được.", "Records unavailable.") : t("Chưa có lượt điểm danh trong phiên.", "No check-ins in this session.")}</EmptyState>}
+    </Section>
   </div>;
 };

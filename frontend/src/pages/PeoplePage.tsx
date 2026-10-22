@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, Camera, Download } from "lucide-react";
 import { personsApi, attendanceApi, reportsApi, type PersonOut, type AttendanceOut } from "@/api/client";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -84,9 +84,34 @@ export const PeoplePage: React.FC = () => {
     } catch (err) { toast.error(errorMessage(err)); } finally { setDeleting(false); }
   };
 
+  const exportRosterCsv = () => {
+    const header = ["Họ và tên", "MSSV", "Lớp / Khoa", "Email", "Ngày đăng ký", "Tỷ lệ chuyên cần (90 ngày)"];
+    const csvRows = [header.join(",")];
+    filtered.forEach((p) => {
+      const stat = stats.error ? undefined : stats.data.find((item) => item.person_id === p.id);
+      const row = [
+        `"${(p.name || "").replace(/"/g, '""')}"`,
+        `"${(p.student_id || "").replace(/"/g, '""')}"`,
+        `"${(p.department || "").replace(/"/g, '""')}"`,
+        `"${(p.email || "").replace(/"/g, '""')}"`,
+        `"${dateTime(p.enrolled_at, lang)}"`,
+        `"${stat ? `${stat.attendance_rate}%` : ""}"`,
+      ];
+      csvRows.push(row.join(","));
+    });
+    const blob = new Blob(["\uFEFF" + csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `danh-sach-lop-${department || "tat-ca"}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return <div className="product-page">
     <PageHeader title={t("Danh sách Lớp & Sinh viên", "Class & student directory")} description={t("Quản lý hồ sơ sinh viên, phân lớp và theo dõi tỷ lệ chuyên cần.", "Manage student profiles, class rosters and attendance rates.")}>
       <RefreshButton onClick={() => { void reload(); void stats.reload(); }} loading={loading} />
+      <button type="button" className="secondary-button" disabled={!filtered.length} onClick={exportRosterCsv}><Download size={14} />{t("Xuất danh sách (CSV)", "Export roster (CSV)")}</button>
       {role === "admin" && <Link to={appPath("/enroll")} className="primary-button"><Plus size={14} />{t("Đăng ký khuôn mặt", "Enroll person")}</Link>}
     </PageHeader>
     <ErrorNotice message={error} retry={reload} /><ErrorNotice message={stats.error ? t("Chưa tải được tỷ lệ chuyên cần. Danh bạ vẫn sử dụng được.", "Attendance rates unavailable. The directory is still usable.") : null} retry={stats.reload} />
@@ -107,7 +132,13 @@ export const PeoplePage: React.FC = () => {
     <Section><div className="directory-filters"><SearchField label={t("Tìm tên, MSSV, email hoặc lớp…", "Search name, student ID, email or class…")} value={search} onChange={(value) => { setSearch(value); setPage(1); }} /><Field id="people-department" label={t("Khoa / Lớp", "Class / Department")}><select id="people-department" value={department} onChange={(event) => { setDepartment(event.target.value); setPage(1); }}><option value="">{t("Tất cả khoa / lớp", "All classes")}</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></Field></div>
     <Table label={t("Danh bạ sinh viên", "Student directory")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>MSSV</th><th>{t("Khoa / Lớp", "Class")}</th><th>Email</th><th>{t("Ngày đăng ký", "Enrolled")}</th><th>{t("Chuyên cần · 90 ngày", "Attendance · 90 days")}</th><th className="align-right">{t("Thao tác", "Actions")}</th></tr></thead><tbody>{rows.map((person) => {
       const stat = stats.error ? undefined : stats.data.find((item) => item.person_id === person.id);
-      return <tr key={person.id}><td><button className="text-button cell-strong" onClick={() => setSelected(person)}>{person.name}</button></td><td className="numeric-cell">{person.student_id || "–"}</td><td>{person.department || "–"}</td><td>{person.email || "–"}</td><td>{dateTime(person.enrolled_at, lang)}</td><td><span className={stat?.is_defaulter ? "warning-text" : "attendance-status"}>{stat ? `${stat.attendance_rate}%` : "–"}</span></td><td className="align-right"><div className="row-actions"><button className="text-button" onClick={() => setSelected(person)}>{t("Lịch sử", "History")}</button><button className="text-button" onClick={() => openEdit(person)}><Pencil size={13} /> {t("Sửa", "Edit")}</button>{role === "admin" && <button className="icon-button danger-text" aria-label={t(`Xóa hồ sơ ${person.name}`, `Delete ${person.name}`)} onClick={() => setDeleteTarget(person)}><Trash2 size={14} /></button>}</div></td></tr>;
+      const reenrollQuery = new URLSearchParams({
+        name: person.name,
+        ...(person.student_id ? { studentId: person.student_id } : {}),
+        ...(person.department ? { department: person.department } : {}),
+        ...(person.email ? { email: person.email } : {}),
+      }).toString();
+      return <tr key={person.id}><td><button className="text-button cell-strong" onClick={() => setSelected(person)}>{person.name}</button></td><td className="numeric-cell">{person.student_id || "–"}</td><td>{person.department || "–"}</td><td>{person.email || "–"}</td><td>{dateTime(person.enrolled_at, lang)}</td><td><span className={stat?.is_defaulter ? "warning-text" : "attendance-status"}>{stat ? `${stat.attendance_rate}%` : "–"}</span></td><td className="align-right"><div className="row-actions"><button className="text-button" onClick={() => setSelected(person)}>{t("Lịch sử", "History")}</button><button className="text-button" onClick={() => openEdit(person)}><Pencil size={13} /> {t("Sửa", "Edit")}</button>{role === "admin" && <Link className="text-button" to={appPath(`/enroll?${reenrollQuery}`)} title={t("Chụp lại bộ ảnh khuôn mặt AI cho sinh viên này", "Re-capture AI face photos")}><Camera size={13} /> {t("Chụp lại mặt", "Re-enroll face")}</Link>}{role === "admin" && <button className="icon-button danger-text" aria-label={t(`Xóa hồ sơ ${person.name}`, `Delete ${person.name}`)} onClick={() => setDeleteTarget(person)}><Trash2 size={14} /></button>}</div></td></tr>;
     })}</tbody></Table>{!rows.length && <EmptyState loading={loading}>{error ? t("Danh bạ chưa tải được.", "Directory unavailable.") : t("Không có hồ sơ phù hợp.", "No matching profiles.")}</EmptyState>}<Pager count={filtered.length} page={currentPage} pages={pages} onChange={setPage} /></Section>
 
     {selected && <Dialog title={selected.name} onClose={() => setSelected(null)}><dl className="profile-details"><div><dt>MSSV</dt><dd>{selected.student_id || "–"}</dd></div><div><dt>{t("Khoa / Lớp", "Class")}</dt><dd>{selected.department || "–"}</dd></div><div><dt>Email</dt><dd>{selected.email || "–"}</dd></div><div><dt>{t("Đăng ký lúc", "Enrolled at")}</dt><dd>{dateTime(selected.enrolled_at, lang)}</dd></div></dl><h3 className="dialog-subheading">{t("50 lượt điểm danh gần nhất", "Latest 50 check-ins")}</h3><ErrorNotice message={history.error} retry={history.reload} />{history.loading ? <EmptyState loading>{null}</EmptyState> : history.data.length ? <Table label={t("Lịch sử cá nhân", "Personal attendance")}><thead><tr><th>{t("Phiên", "Session")}</th><th>{t("Trạng thái", "Status")}</th><th>{t("Thời gian", "Time")}</th></tr></thead><tbody>{history.data.map((record) => <tr key={record.id}><td>{record.session_label}</td><td className={record.status === "absent" ? "warning-text" : "attendance-status"}>{record.status === "present" ? t("Có mặt", "Present") : record.status === "late" ? t("Đi muộn", "Late") : record.status === "excused" ? t("Có phép", "Excused") : t("Vắng mặt", "Absent")}</td><td>{dateTime(record.marked_at, lang)}</td></tr>)}</tbody></Table> : <EmptyState>{history.error ? t("Lịch sử chưa tải được.", "History unavailable.") : t("Chưa có lượt điểm danh.", "No check-ins yet.")}</EmptyState>}</Dialog>}

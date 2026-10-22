@@ -347,11 +347,19 @@ async def self_enroll_student(
         logger.exception("InsightFace setup failed")
         raise HTTPException(503, "Face service setup error. Please try again.")
 
+    own_person = None
+    if user.person_id:
+        own_person = await db.persons.find_one({"_id": user.person_id, "is_active": True})
+    if not own_person and clean_email:
+        own_person = await db.persons.find_one(
+            {"email": {"$regex": f"^{re.escape(clean_email)}$", "$options": "i"}, "is_active": True}
+        )
+
     existing_mssv = await db.persons.find_one(
         {"student_id": {"$regex": f"^{re.escape(clean_mssv)}$", "$options": "i"}, "is_active": True}
     )
-    if existing_mssv:
-        raise HTTPException(409, f"Mã số sinh viên '{clean_mssv}' đã được đăng ký trước đó.")
+    if existing_mssv and (not own_person or existing_mssv["_id"] != own_person["_id"]):
+        raise HTTPException(409, f"Mã số sinh viên '{clean_mssv}' đã được đăng ký bởi hồ sơ khác.")
 
     try:
         duplicate = await azure_face.check_duplicate_face(image_bytes_list)
@@ -359,7 +367,7 @@ async def self_enroll_student(
         logger.exception("Duplicate face check error")
         raise HTTPException(503, "Không kiểm tra được độ duy nhất của khuôn mặt. Vui lòng thử lại.")
 
-    if duplicate:
+    if duplicate and (not own_person or duplicate.get("person_id") != own_person["_id"]):
         raise HTTPException(
             409,
             f"Khuôn mặt này đã được đăng ký cho '{duplicate['name']}' "
@@ -369,25 +377,42 @@ async def self_enroll_student(
     full_display_name = f"{clean_name} ({clean_mssv})" if clean_mssv not in clean_name else clean_name
 
     try:
-        azure_id = await azure_face.enroll_person(full_display_name, image_bytes_list)
+        if own_person:
+            azure_id = await azure_face.enroll_person(
+                full_display_name, image_bytes_list, existing_person_id=own_person["_id"]
+            )
+        else:
+            azure_id = await azure_face.enroll_person(full_display_name, image_bytes_list)
     except ValueError as e:
         raise HTTPException(422, str(e))
     except Exception:
         logger.exception("Self-enrollment failed")
         raise HTTPException(503, "Dịch vụ đăng ký khuôn mặt tạm thời gián đoạn. Vui lòng thử lại.")
 
-    person_doc = {
-        "_id":         azure_id,
-        "name":        clean_name,
-        "student_id":  clean_mssv,
-        "email":       clean_email,
-        "department":  clean_dept,
-        "photo_url":   None,
-        "enrolled_at": datetime.now(UTC),
-        "is_active":   True,
-        "enrolled_by": user.id,
-    }
-    await db.persons.insert_one(person_doc)
+    if own_person:
+        update_fields = {
+            "name":        clean_name,
+            "student_id":  clean_mssv,
+            "email":       clean_email or own_person.get("email"),
+            "department":  clean_dept,
+            "enrolled_at": datetime.now(UTC),
+            "is_active":   True,
+        }
+        await db.persons.update_one({"_id": azure_id}, {"$set": update_fields})
+        person_doc = {**own_person, **update_fields, "_id": azure_id}
+    else:
+        person_doc = {
+            "_id":         azure_id,
+            "name":        clean_name,
+            "student_id":  clean_mssv,
+            "email":       clean_email,
+            "department":  clean_dept,
+            "photo_url":   None,
+            "enrolled_at": datetime.now(UTC),
+            "is_active":   True,
+            "enrolled_by": user.id,
+        }
+        await db.persons.insert_one(person_doc)
 
     if ObjectId.is_valid(user.id):
         await db.users.update_one(

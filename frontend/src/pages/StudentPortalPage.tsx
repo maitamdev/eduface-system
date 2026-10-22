@@ -43,6 +43,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
   const [capturing, setCapturing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [enrollError, setEnrollError] = useState<string | null>(null);
+  const [showReenroll, setShowReenroll] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -159,7 +160,8 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
       });
       camera.stop();
       changePhotos([]);
-      toast.success(t("Đã đăng ký hồ sơ & khuôn mặt thành công!", "Student profile & face enrolled!"));
+      setShowReenroll(false);
+      toast.success(t("Đã lưu hồ sơ & mẫu khuôn mặt AI thành công!", "Student profile & face saved!"));
       await refreshProfile();
       await portal.reload();
     } catch (err) {
@@ -176,6 +178,28 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
     if (statusFilter !== "all" && item.status !== statusFilter) return false;
     return matchesSearch(search, item.label, item.department);
   });
+
+  const poseGuides = [
+    t("1. Chính diện (0°)", "1. Frontal (0°)"),
+    t("2. Nghiêng nhẹ trái (~15°)", "2. Slight left (~15°)"),
+    t("3. Nghiêng nhẹ phải (~15°)", "3. Slight right (~15°)"),
+    t("4. Hơi nâng nhẹ cằm", "4. Slight chin up"),
+    t("5. Biểu cảm tự nhiên / Có kính", "5. Natural / Glasses"),
+  ];
+
+  const openReenrollForm = () => {
+    if (person) {
+      setFullName(person.name || "");
+      setStudentId(person.student_id || "");
+      setDepartment(person.department || "KTCN");
+      setEmail(person.email || user?.google_email || "");
+    }
+    setEnrollError(null);
+    setShowReenroll((prev) => {
+      if (prev) camera.stop();
+      return !prev;
+    });
+  };
 
   return (
     <div className="product-page">
@@ -218,13 +242,24 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         </Section>
       )}
 
-      {!portal.loading && !person && (
+      {!portal.loading && (!person || showReenroll) && (
         <Section
-          title={t("Khai báo thông tin sinh viên & Đăng ký khuôn mặt lần đầu", "First-time student profile & face registration")}
+          title={
+            person
+              ? t("Cập nhật thông tin & Chụp lại khuôn mặt AI", "Update student profile & re-capture AI face")
+              : t("Khai báo thông tin sinh viên & Đăng ký khuôn mặt lần đầu", "First-time student profile & face registration")
+          }
           description={t(
-            "Chào mừng bạn! Vui lòng điền Họ tên, Mã số sinh viên (MSSV), Lớp học phần và chụp 1–5 ảnh khuôn mặt để hệ thống AI nhận diện bạn khi điểm danh trên lớp.",
-            "Welcome! Please provide your Full name, Student ID, Class/Course, and 1–5 clear face photos so the classroom AI camera can recognize you."
+            "Vui lòng điền Họ tên, Mã số sinh viên (MSSV), Lớp học phần và chụp 1–5 góc mặt (lộ rõ 2 mắt, mũi, miệng) để AI nhận diện chính xác nhất.",
+            "Please provide your Full name, Student ID, Class/Course, and 1–5 clear face photos so the classroom AI camera can recognize you."
           )}
+          action={
+            person ? (
+              <button type="button" className="secondary-button" onClick={openReenrollForm}>
+                {t("Đóng", "Close")}
+              </button>
+            ) : undefined
+          }
         >
           <ErrorNotice message={enrollError || camera.error} />
           <form onSubmit={handleSelfEnroll} className="enrollment-grid">
@@ -360,6 +395,25 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                 </div>
               )}
 
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+                {poseGuides.map((guide, idx) => (
+                  <span
+                    key={idx}
+                    className={idx < photos.length ? "attendance-status" : "muted"}
+                    style={{
+                      fontSize: 11,
+                      padding: "3px 8px",
+                      border: "1px solid var(--ui-border)",
+                      borderRadius: 4,
+                      background: idx === photos.length ? "var(--ui-soft)" : undefined,
+                      fontWeight: idx === photos.length ? 600 : 400,
+                    }}
+                  >
+                    {idx < photos.length ? "✓ " : idx === photos.length ? "👉 " : ""}{guide}
+                  </span>
+                ))}
+              </div>
+
               {photos.length > 0 && (
                 <div className="photo-previews">
                   {photos.map((photo, index) => (
@@ -409,7 +463,17 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
       )}
 
       {person && (
-        <Section title={t("Hồ sơ học vụ & sinh trắc học", "Academic & biometric profile")}>
+        <Section
+          title={t("Hồ sơ học vụ & sinh trắc học", "Academic & biometric profile")}
+          action={
+            <button type="button" className="secondary-button" onClick={openReenrollForm}>
+              <Camera size={14} />
+              {showReenroll
+                ? t("Ẩn khung chụp lại", "Hide re-capture")
+                : t("Chụp lại khuôn mặt / Sửa hồ sơ", "Re-capture face / Edit profile")}
+            </button>
+          }
+        >
           <dl className="config-grid">
             <div>
               <dt>{t("Họ và tên sinh viên", "Student name")}</dt>
