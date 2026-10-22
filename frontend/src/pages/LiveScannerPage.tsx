@@ -37,6 +37,15 @@ export const LiveScannerPage: React.FC = () => {
   const socketFrameBusy = useRef(false);
   const [frameSize, setFrameSize] = useState({ width: 1280, height: 720 });
 
+  const [livenessCheck, setLivenessCheck] = useState(true);
+  const [livenessPrompt, setLivenessPrompt] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (mode === "mark" && source === "upload") {
+      setSource("camera");
+    }
+  }, [mode, source]);
+
   useEffect(() => {
     if (!uploaded) { setUploadUrl(""); return; }
     const url = URL.createObjectURL(uploaded); setUploadUrl(url);
@@ -63,7 +72,8 @@ export const LiveScannerPage: React.FC = () => {
     context.clearRect(0, 0, canvas.width, canvas.height);
     results.forEach((result) => {
       const box = result.face_box;
-      context.strokeStyle = result.already_marked ? "#d6ae5e" : "#81b798"; context.lineWidth = 3;
+      context.strokeStyle = result.is_live === false ? "#dc2626" : result.already_marked ? "#d6ae5e" : "#81b798";
+      context.lineWidth = 3;
       context.strokeRect(box.left, box.top, box.width, box.height);
     });
   }, [results, frameSize]);
@@ -75,21 +85,45 @@ export const LiveScannerPage: React.FC = () => {
     const request = generation.current;
     busy.current = true; setScanning(true); setError(null); setMessage(null);
     try {
+      let probeFrame: Blob | undefined;
+      if (source === "camera" && mode === "mark" && livenessCheck) {
+        setLivenessPrompt(t("Giữ tự nhiên / Nghiêng nhẹ đầu để xác thực người thật (Chống ảnh giả)…", "Hold naturally / slightly move head for 3D liveness check…"));
+        probeFrame = await captureVideoFrame(camera.videoRef.current);
+        await new Promise((resolve) => setTimeout(resolve, 280));
+      }
       const frame = source === "camera" ? await captureVideoFrame(camera.videoRef.current) : uploaded!;
+      setLivenessPrompt(null);
       if (request !== generation.current) return;
       if (source === "camera" && camera.videoRef.current) setFrameSize({ width: camera.videoRef.current.videoWidth, height: camera.videoRef.current.videoHeight });
-      const response = mode === "mark" && selected ? await attendanceApi.mark(selected.id, frame, confidence) : await attendanceApi.identify(frame, confidence);
+      const response = mode === "mark" && selected ? await attendanceApi.mark(selected.id, frame, confidence, probeFrame) : await attendanceApi.identify(frame, confidence);
       if (request !== generation.current) return;
       const identified = Array.isArray(response) ? response : response.identified;
       setResults(identified);
+      const spoofed = identified.filter((item) => item.is_live === false);
+      if (spoofed.length > 0) {
+        setError(
+          t(
+            `⚠️ ĐÃ CHẶN GIẢ MẠO (${spoofed.map((s) => s.name).join(", ")}): ${spoofed[0].spoof_reason || "Phát hiện nghi vấn ảnh tĩnh / màn hình điện thoại"}`,
+            `⚠️ SPOOF BLOCKED (${spoofed.map((s) => s.name).join(", ")}): ${spoofed[0].spoof_reason || "Suspected photo or phone screen"}`
+          )
+        );
+      }
       if (Array.isArray(response)) setMessage(identified.length ? t(`Đã nhận diện ${identified.length} người. Không ghi điểm danh.`, `Identified ${identified.length} people. Attendance was not recorded.`) : t("Không tìm thấy khuôn mặt đã đăng ký.", "No enrolled faces found."));
       else {
-        setMessage(response.new_records ? t(`Đã ghi nhận ${response.new_records} lượt điểm danh.`, `${response.new_records} check-ins recorded.`) : identified.length ? t("Những người này đã điểm danh trong phiên.", "These people have already checked in.") : t("Không tìm thấy khuôn mặt đã đăng ký.", "No enrolled faces found."));
+        setMessage(
+          response.new_records
+            ? t(`Đã xác thực người thật và ghi nhận ${response.new_records} lượt điểm danh.`, `${response.new_records} live check-ins recorded.`)
+            : spoofed.length > 0
+              ? t("Đã từ chối ghi điểm danh do phát hiện nghi vấn ảnh giả / màn hình.", "Check-in blocked due to suspected photo/screen spoof.")
+              : identified.length
+                ? t("Những người này đã điểm danh trong phiên.", "These people have already checked in.")
+                : t("Không tìm thấy khuôn mặt đã đăng ký.", "No enrolled faces found.")
+        );
         if (response.new_records) void records.reload();
       }
     } catch (err) { if (request === generation.current) { setError(errorMessage(err)); setAuto(false); } }
-    finally { busy.current = false; setScanning(false); }
-  }, [mode, selected?.id, source, uploaded, confidence, camera.videoRef, records.reload, t]);
+    finally { busy.current = false; setScanning(false); setLivenessPrompt(null); }
+  }, [mode, selected?.id, source, uploaded, confidence, livenessCheck, camera.videoRef, records.reload, t]);
   const scanRef = useRef(scan); scanRef.current = scan;
   useEffect(() => {
     if (!auto || !camera.streaming || source !== "camera") return;
@@ -137,14 +171,27 @@ export const LiveScannerPage: React.FC = () => {
     <div className="scanner-setup"><Field id="scanner-session" label={t("Phiên điểm danh", "Attendance session")}><select id="scanner-session" value={selected?.id || ""} disabled={scanning || socketState !== "off"} onChange={(event) => { const next = new URLSearchParams(params); next.set("sessionId", event.target.value); setParams(next, { replace: true }); }}><option value="">{t("Chọn phiên đang mở", "Choose an active session")}</option>{sessions.data.map((session) => <option value={session.id} key={session.id}>{session.label}</option>)}</select></Field><Field id="scanner-mode" label={t("Chế độ", "Mode")}><select id="scanner-mode" value={mode} disabled={scanning} onChange={(event) => setMode(event.target.value as "mark" | "identify")}><option value="mark">{t("Nhận diện và ghi điểm danh", "Recognize and record attendance")}</option><option value="identify">{t("Chỉ nhận diện · Không lưu điểm danh", "Recognize only · No attendance record")}</option></select></Field></div>
     {!selected && mode === "mark" && !sessions.loading && <p className="section-note">{t("Cần một phiên đang mở để ghi điểm danh.", "An active session is required to record attendance.")} <Link to={appPath("/sessions")} className="text-link">{t("Tạo phiên", "Create session")}</Link></p>}
     <div className="scanner-grid"><Section title={t("Hình ảnh đầu vào", "Input image")}>
-      <div className="source-tabs" aria-label={t("Nguồn ảnh", "Image source")}><button aria-pressed={source === "camera"} onClick={() => setSource("camera")} disabled={scanning}><Camera size={14} />Camera</button><button aria-pressed={source === "upload"} onClick={() => setSource("upload")} disabled={scanning}><Upload size={14} />{t("Tải ảnh", "Upload")}</button></div>
+      <div className="source-tabs" aria-label={t("Nguồn ảnh", "Image source")}>
+        <button aria-pressed={source === "camera"} onClick={() => setSource("camera")} disabled={scanning}><Camera size={14} />Camera</button>
+        <button aria-pressed={source === "upload"} onClick={() => setSource("upload")} disabled={scanning || mode === "mark"} title={mode === "mark" ? t("Chế độ Ghi điểm danh bắt buộc dùng Camera trực tiếp để chống gian lận bằng ảnh tĩnh", "Live camera required when marking attendance to prevent photo spoofing") : undefined}><Upload size={14} />{t("Tải ảnh (Chỉ thử nghiệm)", "Upload (Test only)")}</button>
+      </div>
+      {livenessPrompt && <p className="scan-message" role="status">{livenessPrompt}</p>}
       <div className="camera-stage"><video ref={camera.videoRef} autoPlay muted playsInline className={`${source !== "camera" ? "hidden" : ""} ${camera.facing === "user" ? "mirror-video" : ""}`} />{source === "upload" && uploadUrl && <img src={uploadUrl} alt={t("Ảnh dùng để nhận diện", "Image selected for recognition")} onLoad={(event) => setFrameSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })} />}{((source === "camera" && !camera.streaming) || (source === "upload" && !uploadUrl)) && <div className="camera-placeholder"><Camera size={30} /><p>{source === "camera" ? t("Camera chưa bật", "Camera is off") : t("Chưa chọn ảnh", "No image selected")}</p></div>}<canvas ref={overlayRef} className={`camera-overlay ${source === "camera" && camera.facing === "user" ? "mirror-video" : ""}`} /></div>
       {source === "camera" ? <div className="camera-controls"><button className="secondary-button" disabled={camera.starting || isDesignPreview()} onClick={() => camera.streaming ? stopCamera() : void camera.start()}>{camera.starting ? t("Đang mở…", "Starting…") : camera.streaming ? t("Tắt camera", "Stop camera") : t("Bật camera", "Start camera")}</button><button className="icon-button" disabled={camera.starting || scanning || socketState !== "off"} onClick={() => { setAuto(false); void camera.flip(); }} aria-label={t("Đổi camera", "Switch camera")}><SwitchCamera size={17} /></button></div> : <Field id="scanner-upload" label={t("Chọn ảnh · Tối đa 10 MB", "Choose image · Up to 10 MB")}><input id="scanner-upload" type="file" accept="image/*" disabled={scanning} onChange={(event) => { changeUpload(event.target.files?.[0]); event.target.value = ""; }} /></Field>}
       {isDesignPreview() && <p className="field-hint">{t("Bản xem thử không mở camera hoặc gửi ảnh lên máy chủ.", "Preview does not open the camera or send photos to the server.")}</p>}
-      <div className="scan-options"><Field id="scanner-confidence" label={t(`Ngưỡng nhận diện: ${Math.round(confidence * 100)}%`, `Recognition threshold: ${Math.round(confidence * 100)}%`)}><input id="scanner-confidence" type="range" min="0.1" max="1" step="0.05" value={confidence} disabled={scanning || auto || socketState !== "off"} onChange={(event) => setConfidence(Number(event.target.value))} /></Field>{source === "camera" && <label className="checkbox-label"><input type="checkbox" checked={auto} disabled={!camera.streaming || socketState !== "off" || (mode === "mark" && !selected)} onChange={(event) => setAuto(event.target.checked)} />{t("Quét tự động", "Auto scan")}</label>}</div>
-      <div className="page-actions"><button className="primary-button" disabled={scanning || auto || socketState !== "off" || (source === "camera" ? !camera.streaming : !uploaded) || (mode === "mark" && !selected) || isDesignPreview()} onClick={() => void scan()}><ScanFace size={15} />{scanning ? t("Đang quét…", "Scanning…") : mode === "mark" ? t("Quét và điểm danh", "Scan and check in") : t("Nhận diện", "Identify")}</button>{source === "camera" && mode === "identify" && <button className="secondary-button" disabled={!camera.streaming || !selected || scanning || isDesignPreview()} onClick={() => socketState === "off" ? startSocket() : stopSocket()}>{socketState === "off" ? t("Nhận diện trực tiếp", "Live recognition") : socketState === "connecting" ? t("Hủy kết nối", "Cancel connection") : t("Dừng trực tiếp", "Stop live recognition")}</button>}</div>
+      <div className="scan-options">
+        <Field id="scanner-confidence" label={t(`Ngưỡng nhận diện: ${Math.round(confidence * 100)}%`, `Recognition threshold: ${Math.round(confidence * 100)}%`)}><input id="scanner-confidence" type="range" min="0.1" max="1" step="0.05" value={confidence} disabled={scanning || auto || socketState !== "off"} onChange={(event) => setConfidence(Number(event.target.value))} /></Field>
+        {source === "camera" && mode === "mark" && (
+          <label className="checkbox-label">
+            <input type="checkbox" checked={livenessCheck} disabled={scanning} onChange={(event) => setLivenessCheck(event.target.checked)} />
+            {t("Chống giả mạo 2 khung hình (Liveness)", "Dual-frame anti-spoofing")}
+          </label>
+        )}
+        {source === "camera" && <label className="checkbox-label"><input type="checkbox" checked={auto} disabled={!camera.streaming || socketState !== "off" || (mode === "mark" && !selected)} onChange={(event) => setAuto(event.target.checked)} />{t("Quét tự động", "Auto scan")}</label>}
+      </div>
+      <div className="page-actions"><button className="primary-button" disabled={scanning || auto || socketState !== "off" || (source === "camera" ? !camera.streaming : !uploaded) || (mode === "mark" && !selected) || isDesignPreview()} onClick={() => void scan()}><ScanFace size={15} />{scanning ? t("Đang xác thực…", "Verifying…") : mode === "mark" ? t("Quét và điểm danh", "Scan and check in") : t("Nhận diện", "Identify")}</button>{source === "camera" && mode === "identify" && <button className="secondary-button" disabled={!camera.streaming || !selected || scanning || isDesignPreview()} onClick={() => socketState === "off" ? startSocket() : stopSocket()}>{socketState === "off" ? t("Nhận diện trực tiếp", "Live recognition") : socketState === "connecting" ? t("Hủy kết nối", "Cancel connection") : t("Dừng trực tiếp", "Stop live recognition")}</button>}</div>
       {message && <p className="scan-message" role="status">{message}</p>}
-    </Section><Section title={t("Kết quả nhận diện", "Recognition results")} description={mode === "identify" ? t("Chế độ này không ghi điểm danh.", "This mode does not record attendance.") : undefined}>{results.length ? <div className="recognition-list">{results.map((result) => <div key={result.azure_person_id}><strong>{result.name}</strong><span>{Math.round(result.confidence * 100)}%</span><small>{mode === "mark" ? result.already_marked ? t("Đã có bản ghi", "Already recorded") : t("Đã ghi điểm danh", "Recorded") : t("Đã nhận diện", "Identified")}</small></div>)}</div> : <EmptyState>{t("Kết quả xuất hiện sau khi quét.", "Results appear after scanning.")}</EmptyState>}</Section></div>
+    </Section><Section title={t("Kết quả nhận diện & Xác thực người thật", "Recognition & Liveness results")} description={mode === "identify" ? t("Chế độ này không ghi điểm danh.", "This mode does not record attendance.") : t("Tự động chặn ghi điểm danh nếu phát hiện ảnh tĩnh hoặc màn hình điện thoại.", "Automatically blocks check-in if a static photo or phone screen is detected.")}>{results.length ? <div className="recognition-list">{results.map((result) => <div key={result.azure_person_id}><strong>{result.name}</strong><span>{Math.round(result.confidence * 100)}%</span><small className={result.is_live === false ? "warning-text" : "attendance-status"}>{result.is_live === false ? t(`⚠️ Chặn ảnh giả (${result.spoof_reason || "Spoof"})`, `⚠️ Spoof blocked`) : mode === "mark" ? result.already_marked ? t("Đã có bản ghi", "Already recorded") : t("✓ Người thật · Đã ghi điểm danh", "✓ Live · Recorded") : t("✓ Người thật · Đã nhận diện", "✓ Live · Identified")}</small></div>)}</div> : <EmptyState>{t("Kết quả xuất hiện sau khi quét.", "Results appear after scanning.")}</EmptyState>}</Section></div>
     <Section title={t("Bản ghi của phiên đang chọn", "Selected session records")} action={<Link to={appPath(`/records${selected ? `?sessionId=${selected.id}` : ""}`)} className="text-link">{t("Mở sổ điểm danh", "View records")}</Link>}><Table label={t("Điểm danh trong phiên", "Session check-ins")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>{t("Khoa / Lớp", "Department")}</th><th>{t("Thời gian", "Time")}</th><th className="align-right">{t("Độ tin cậy", "Confidence")}</th></tr></thead><tbody>{records.data.map((record) => <tr key={record.id}><td className="cell-strong">{record.person_name}</td><td>{record.department || "–"}</td><td>{dateTime(record.marked_at, lang)}</td><td className="align-right">{record.confidence != null ? `${Math.round(record.confidence * 100)}%` : "–"}</td></tr>)}</tbody></Table>{!records.data.length && <EmptyState loading={records.loading}>{records.error ? t("Bản ghi chưa tải được.", "Records unavailable.") : t("Chưa có lượt điểm danh trong phiên.", "No check-ins in this session.")}</EmptyState>}</Section>
   </div>;
 };

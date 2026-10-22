@@ -86,6 +86,9 @@ class IdentifyResult(BaseModel):
     confidence:      float
     face_box:        dict
     already_marked:  bool = False
+    is_live:         bool = True
+    liveness_score:  Optional[float] = None
+    spoof_reason:    Optional[str] = None
 
 
 class MarkAttendanceResponse(BaseModel):

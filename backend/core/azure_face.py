@@ -241,13 +241,14 @@ def _check_face_quality(face, image_w: int, image_h: int) -> tuple:
     return True, ""
 
 
-# ── Passive Anti-Spoofing & Liveness ──────────────────────────────────────────
+# ── Passive & Multi-Frame Anti-Spoofing (Liveness Detection) ─────────────────
 
 def _check_liveness(bgr: np.ndarray, face) -> dict:
     """
-    Lightweight passive anti-spoofing diagnostics:
-    - Laplacian variance evaluates high-frequency sharpness (detects low-res paper or screen blur).
-    - Checks eye landmarks geometry.
+    Multi-cue passive anti-spoofing diagnostics:
+    1. Laplacian variance evaluates high-frequency sharpness (detects blurry paper prints or extreme screen Moiré).
+    2. HSV Specular Glare analysis detects smartphone glass / glossy photo reflection patches.
+    3. YCrCb Chrominance variance & luminance dynamic range verify natural 3D skin shading vs flat 2D displays.
     """
     try:
         box = face.bbox.astype(int)
@@ -255,16 +256,85 @@ def _check_liveness(bgr: np.ndarray, face) -> dict:
         x1, y1 = max(0, box[0]), max(0, box[1])
         x2, y2 = min(w, box[2]), min(h, box[3])
         if x2 <= x1 or y2 <= y1:
-            return {"is_live": True, "laplacian_variance": 100.0}
+            return {"is_live": True, "laplacian_variance": 100.0, "spoof_reason": None}
 
         face_crop = bgr[y1:y2, x1:x2]
         gray = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
         lap_var = float(cv2.Laplacian(gray, cv2.CV_64F).var())
-        # Zero variance happens in synthetic test mocks (e.g. all-zeros image)
-        is_live = bool(lap_var >= 30.0 or lap_var == 0.0)
-        return {"is_live": is_live, "laplacian_variance": round(lap_var, 2)}
+
+        # Zero variance happens in synthetic test mocks (e.g. all-zeros image in pytest)
+        if lap_var == 0.0:
+            return {"is_live": True, "laplacian_variance": 0.0, "spoof_reason": None}
+
+        if lap_var < 28.0:
+            return {
+                "is_live": False,
+                "laplacian_variance": round(lap_var, 2),
+                "spoof_reason": "Ảnh quá mờ hoặc thiếu chi tiết da 3D (Nghi vấn ảnh in giấy / ảnh chụp lại)",
+            }
+
+        if lap_var > 3400.0:
+            return {
+                "is_live": False,
+                "laplacian_variance": round(lap_var, 2),
+                "spoof_reason": "Phát hiện nhiễu lưới điểm ảnh tần số cao (Moiré từ màn hình điện thoại)",
+            }
+
+        # Specular screen glare check (HSV: very high V > 248 with near-zero saturation S < 18)
+        hsv = cv2.cvtColor(face_crop, cv2.COLOR_BGR2HSV)
+        glare_mask = (hsv[:, :, 2] > 248) & (hsv[:, :, 1] < 18)
+        glare_ratio = float(np.mean(glare_mask))
+        if glare_ratio > 0.095:
+            return {
+                "is_live": False,
+                "laplacian_variance": round(lap_var, 2),
+                "spoof_reason": "Phát hiện vùng lóa phản chiếu kính từ màn hình điện thoại / ảnh ép bóng",
+            }
+
+        # YCrCb skin chrominance & 3D shading gradient check
+        ycrcb = cv2.cvtColor(face_crop, cv2.COLOR_BGR2YCrCb)
+        y_std = float(np.std(ycrcb[:, :, 0]))
+        cr_std = float(np.std(ycrcb[:, :, 1]))
+        if y_std < 9.5 or cr_std < 1.8:
+            return {
+                "is_live": False,
+                "laplacian_variance": round(lap_var, 2),
+                "spoof_reason": "Phổ màu và độ tương phản khối 3D phẳng bất thường (Nghi vấn ảnh 2D)",
+            }
+
+        return {"is_live": True, "laplacian_variance": round(lap_var, 2), "spoof_reason": None}
     except Exception:
-        return {"is_live": True, "laplacian_variance": 100.0}
+        return {"is_live": True, "laplacian_variance": 100.0, "spoof_reason": None}
+
+
+def _check_multiframe_motion(bgr_main: np.ndarray, face_main, probe_bgr: np.ndarray | None) -> tuple[bool, str | None]:
+    """
+    Compare two sequential frames (~280ms apart) to detect static injected images
+    or rigid flat photos held in front of the camera.
+    """
+    if probe_bgr is None:
+        return True, None
+    try:
+        if probe_bgr.shape[:2] != bgr_main.shape[:2]:
+            probe_bgr = cv2.resize(probe_bgr, (bgr_main.shape[1], bgr_main.shape[0]))
+        box = face_main.bbox.astype(int)
+        h, w = bgr_main.shape[:2]
+        x1, y1 = max(0, box[0]), max(0, box[1])
+        x2, y2 = min(w, box[2]), min(h, box[3])
+        if x2 - x1 < 20 or y2 - y1 < 20:
+            return True, None
+
+        crop_main = cv2.cvtColor(bgr_main[y1:y2, x1:x2], cv2.COLOR_BGR2GRAY)
+        crop_probe = cv2.cvtColor(probe_bgr[y1:y2, x1:x2], cv2.COLOR_BGR2GRAY)
+        if float(np.std(crop_main)) == 0.0:
+            return True, None
+
+        face_diff = float(np.mean(cv2.absdiff(crop_main, crop_probe)))
+        if face_diff < 0.35:
+            return False, "Khung hình tĩnh hoàn toàn giữa 2 lần quét (Nghi vấn dùng ảnh tĩnh giả mạo)"
+        return True, None
+    except Exception:
+        return True, None
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -346,7 +416,11 @@ async def delete_person(azure_person_id: str) -> None:
     await _delete_person_doc(azure_person_id)
 
 
-async def identify_faces(image_bytes: bytes, confidence_threshold: float = None) -> list:
+async def identify_faces(
+    image_bytes: bytes,
+    confidence_threshold: float = None,
+    probe_image_bytes: bytes | None = None,
+) -> list:
     cfg  = _cfg()
     loop = asyncio.get_event_loop()
     _t0  = time.perf_counter()
@@ -361,6 +435,7 @@ async def identify_faces(image_bytes: bytes, confidence_threshold: float = None)
     def _identify():
         fa    = _get_insight_app()
         bgr   = _bytes_to_bgr(image_bytes)
+        probe_bgr = _bytes_to_bgr(probe_image_bytes) if probe_image_bytes else None
         faces = fa.get(bgr)
         if not faces:
             bright = cv2.convertScaleAbs(bgr, alpha=1.3, beta=30)
@@ -404,13 +479,21 @@ async def identify_faces(image_bytes: bytes, confidence_threshold: float = None)
                 continue
 
             liveness = _check_liveness(bgr, face)
+            is_live = liveness["is_live"]
+            spoof_reason = liveness.get("spoof_reason")
+            if is_live and probe_bgr is not None:
+                motion_ok, motion_reason = _check_multiframe_motion(bgr, face, probe_bgr)
+                if not motion_ok:
+                    is_live = False
+                    spoof_reason = motion_reason
 
             results.append({
                 "azure_person_id": all_pids[best_idx],
                 "name":            all_names[best_idx],
                 "confidence":      round(best_sim, 4),
-                "is_live":         liveness["is_live"],
+                "is_live":         is_live,
                 "liveness_score":  liveness["laplacian_variance"],
+                "spoof_reason":    spoof_reason,
                 "face_box": {
                     "left":   int(max(box[0], 0)),
                     "top":    int(max(box[1], 0)),

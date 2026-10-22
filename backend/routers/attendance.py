@@ -87,11 +87,12 @@ async def identify_frame(
 )
 @limiter.limit("20/minute")
 async def mark_attendance(
-    request:    Request,
-    session_id: str,
-    frame:      UploadFile = File(...),
-    confidence: float      = Query(0.40, ge=0.1, le=1.0),
-    db: AsyncIOMotorDatabase = Depends(get_db),
+    request:     Request,
+    session_id:  str,
+    frame:       UploadFile           = File(...),
+    probe_frame: Optional[UploadFile] = File(None),
+    confidence:  float                = Query(0.40, ge=0.1, le=1.0),
+    db: AsyncIOMotorDatabase          = Depends(get_db),
 ):
     try:
         session_oid = ObjectId(session_id)
@@ -103,8 +104,15 @@ async def mark_attendance(
         raise HTTPException(404, "Active session not found.")
 
     image_bytes = await read_and_validate_image(frame)
+    probe_bytes = await read_and_validate_image(probe_frame) if probe_frame is not None else None
     try:
-        raw_results = await azure_face.identify_faces(image_bytes, confidence)
+        if probe_bytes is not None:
+            try:
+                raw_results = await azure_face.identify_faces(image_bytes, confidence, probe_image_bytes=probe_bytes)
+            except TypeError:
+                raw_results = await azure_face.identify_faces(image_bytes, confidence)
+        else:
+            raw_results = await azure_face.identify_faces(image_bytes, confidence)
     except Exception:
         logger.exception("Identify error during mark")
         raise HTTPException(503, "Face recognition service temporarily unavailable.")
@@ -118,7 +126,25 @@ async def mark_attendance(
             logger.warning("Azure person %s not in DB — skipping.", r["azure_person_id"])
             continue
 
+        is_live = bool(r.get("is_live", True))
         already = await person_already_marked(db, person["_id"], session_oid)
+
+        if not is_live:
+            logger.warning(
+                "Spoof attempt blocked for person=%s (%s): %s",
+                person["_id"], r["name"], r.get("spoof_reason"),
+            )
+            identified.append(IdentifyResult(
+                azure_person_id=r["azure_person_id"],
+                name=r["name"],
+                confidence=r["confidence"],
+                face_box=r["face_box"],
+                already_marked=already,
+                is_live=False,
+                liveness_score=r.get("liveness_score"),
+                spoof_reason=r.get("spoof_reason") or "Phát hiện nghi vấn ảnh giả / màn hình điện thoại",
+            ))
+            continue
 
         if not already:
             try:
@@ -160,6 +186,9 @@ async def mark_attendance(
             confidence=r["confidence"],
             face_box=r["face_box"],
             already_marked=already,
+            is_live=True,
+            liveness_score=r.get("liveness_score"),
+            spoof_reason=None,
         ))
 
     return MarkAttendanceResponse(

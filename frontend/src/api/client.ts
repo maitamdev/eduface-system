@@ -197,7 +197,8 @@ export interface IdentifyResult {
   face_box: FaceBox;
   already_marked: boolean;
   is_live?: boolean;
-  liveness_score?: number;
+  liveness_score?: number | null;
+  spoof_reason?: string | null;
 }
 
 export interface MarkAttendanceResponse {
@@ -487,9 +488,12 @@ export const attendanceApi = {
       body: fd,
     });
   },
-  mark: (sessionId: string, frameBlob: Blob | File, confidence = 0.4) => {
+  mark: (sessionId: string, frameBlob: Blob | File, confidence = 0.4, probeBlob?: Blob | File) => {
     const fd = new FormData();
     fd.append("frame", frameBlob, "frame.jpg");
+    if (probeBlob) {
+      fd.append("probe_frame", probeBlob, "probe_frame.jpg");
+    }
     return apiFetch<MarkAttendanceResponse>(
       `/api/attendance/mark/${sessionId}?confidence=${confidence}`,
       {
