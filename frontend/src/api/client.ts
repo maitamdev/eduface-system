@@ -152,10 +152,77 @@ export interface PersonOut {
   student_id?: string | null;
   email: string | null;
   department: string | null;
+  phone?: string | null;
+  date_of_birth?: string | null;
+  gender?: string | null;
+  cohort?: string | null;
+  major?: string | null;
+  advisor?: string | null;
+  academic_status?: string | null;
+  notes?: string | null;
   photo_url: string | null;
   enrolled_at: string;
   is_active: boolean;
   enrolled_by?: string | null;
+}
+
+export interface CourseOut {
+  id: string;
+  code: string;
+  name: string;
+  department: string;
+  credits: number;
+  lecturer?: string | null;
+  schedule?: string | null;
+  room?: string | null;
+  semester?: string | null;
+  created_at: string;
+}
+
+export interface StudentGradeRow {
+  person_id: string;
+  name: string;
+  student_id?: string | null;
+  department?: string | null;
+  total_sessions: number;
+  present_count: number;
+  attendance_rate: number;
+  attendance_score: number;
+  midterm_score?: number | null;
+  final_score?: number | null;
+  bonus_score: number;
+  total_10?: number | null;
+  gpa_4?: number | null;
+  letter_grade?: string | null;
+  exam_eligible: boolean;
+  note?: string | null;
+}
+
+export interface LeaveRequestOut {
+  id: string;
+  person_id: string;
+  person_name: string;
+  student_id?: string | null;
+  department?: string | null;
+  session_id?: string | null;
+  session_label?: string | null;
+  leave_date: string;
+  reason: string;
+  evidence_url?: string | null;
+  status: "pending" | "approved" | "rejected";
+  reviewer_note?: string | null;
+  created_at: string;
+  reviewed_at?: string | null;
+}
+
+export interface AnnouncementOut {
+  id: string;
+  title: string;
+  content: string;
+  department?: string | null;
+  priority: "normal" | "important" | "exam";
+  author: string;
+  created_at: string;
 }
 
 export interface PhotoQualityItem {
@@ -394,6 +461,14 @@ export const personsApi = {
       student_id?: string | null;
       department?: string | null;
       email?: string | null;
+      phone?: string | null;
+      date_of_birth?: string | null;
+      gender?: string | null;
+      cohort?: string | null;
+      major?: string | null;
+      advisor?: string | null;
+      academic_status?: string | null;
+      notes?: string | null;
     }
   ) =>
     apiFetch<PersonOut>(`/api/persons/${encodeURIComponent(id)}`, {
@@ -588,4 +663,121 @@ export const reportsApi = {
     if (department) qs.set("department", department);
     return apiFetch<HeatmapReport>(`/api/reports/heatmap?${qs.toString()}`);
   },
+};
+
+export const academicApi = {
+  listCourses: (department?: string) => {
+    const qs = new URLSearchParams();
+    if (department) qs.set("department", department);
+    return apiFetch<CourseOut[]>(`/api/academic/courses${qs.toString() ? `?${qs.toString()}` : ""}`);
+  },
+  createCourse: (payload: {
+    code: string;
+    name: string;
+    department: string;
+    credits: number;
+    lecturer?: string;
+    schedule?: string;
+    room?: string;
+    semester?: string;
+  }) =>
+    apiFetch<CourseOut>("/api/academic/courses", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  deleteCourse: (id: string) =>
+    apiFetch<void>(`/api/academic/courses/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
+  listGrades: (department?: string) => {
+    const qs = new URLSearchParams();
+    if (department) qs.set("department", department);
+    return apiFetch<StudentGradeRow[]>(`/api/academic/grades${qs.toString() ? `?${qs.toString()}` : ""}`);
+  },
+  getMyGrade: (personId?: string) => {
+    const qs = new URLSearchParams();
+    if (personId) qs.set("person_id", personId);
+    return apiFetch<StudentGradeRow | null>(`/api/academic/my-grade${qs.toString() ? `?${qs.toString()}` : ""}`);
+  },
+  upsertGrade: (payload: {
+    person_id: string;
+    midterm_score?: number | null;
+    final_score?: number | null;
+    bonus_score?: number;
+    note?: string | null;
+  }) =>
+    apiFetch<StudentGradeRow>("/api/academic/grades", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  listLeaves: (filters?: { department?: string; status?: string }) => {
+    const qs = new URLSearchParams();
+    if (filters?.department) qs.set("department", filters.department);
+    if (filters?.status) qs.set("status", filters.status);
+    return apiFetch<LeaveRequestOut[]>(`/api/academic/leaves${qs.toString() ? `?${qs.toString()}` : ""}`);
+  },
+  createLeave: (
+    payload: {
+      session_id?: string;
+      leave_date: string;
+      reason: string;
+      evidence_url?: string;
+    },
+    personId?: string
+  ) => {
+    const qs = new URLSearchParams();
+    if (personId) qs.set("person_id", personId);
+    return apiFetch<LeaveRequestOut>(`/api/academic/leaves${qs.toString() ? `?${qs.toString()}` : ""}`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  reviewLeave: (id: string, payload: { status: "approved" | "rejected"; reviewer_note?: string }) =>
+    apiFetch<LeaveRequestOut>(`/api/academic/leaves/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
+  listAnnouncements: (department?: string) => {
+    const qs = new URLSearchParams();
+    if (department) qs.set("department", department);
+    return apiFetch<AnnouncementOut[]>(`/api/academic/announcements${qs.toString() ? `?${qs.toString()}` : ""}`);
+  },
+  createAnnouncement: (payload: {
+    title: string;
+    content: string;
+    department?: string;
+    priority: "normal" | "important" | "exam";
+  }) =>
+    apiFetch<AnnouncementOut>("/api/academic/announcements", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  deleteAnnouncement: (id: string) =>
+    apiFetch<void>(`/api/academic/announcements/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
+  importStudents: (payload: {
+    students: Array<{
+      student_id: string;
+      name: string;
+      department: string;
+      email?: string;
+      phone?: string;
+      gender?: string;
+      date_of_birth?: string;
+      cohort?: string;
+      major?: string;
+    }>;
+    create_login_accounts?: boolean;
+    default_password?: string;
+  }) =>
+    apiFetch<{
+      created: number;
+      updated: number;
+      accounts_created: number;
+      total_processed: number;
+    }>("/api/academic/import-students", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 };

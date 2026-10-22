@@ -1,6 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, CheckCircle2, SwitchCamera, Trash2, Upload } from "lucide-react";
-import { authApi, personsApi, type EnrollmentAnalysisReport } from "@/api/client";
+import { Camera, CheckCircle2, SwitchCamera, Trash2, Upload, FileCheck2, Megaphone, BookOpen, Award, Send } from "lucide-react";
+import {
+  authApi,
+  personsApi,
+  academicApi,
+  type EnrollmentAnalysisReport,
+  type StudentGradeRow,
+  type LeaveRequestOut,
+  type AnnouncementOut,
+  type CourseOut,
+} from "@/api/client";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast } from "@/context/ToastContext";
@@ -137,6 +146,62 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
     sessions: [],
   });
 
+  const gradeLoader = useCallback(
+    () => academicApi.getMyGrade(selectedPersonId || undefined).catch(() => null),
+    [selectedPersonId]
+  );
+  const myGrade = useResource<StudentGradeRow | null>(gradeLoader, null);
+
+  const leavesLoader = useCallback(() => academicApi.listLeaves().catch(() => []), []);
+  const myLeaves = useResource<LeaveRequestOut[]>(leavesLoader, []);
+
+  const announcementsLoader = useCallback(
+    () => academicApi.listAnnouncements(portal.data.person?.department || undefined).catch(() => []),
+    [portal.data.person?.department]
+  );
+  const announcements = useResource<AnnouncementOut[]>(announcementsLoader, []);
+
+  const coursesLoader = useCallback(
+    () => academicApi.listCourses(portal.data.person?.department || undefined).catch(() => []),
+    [portal.data.person?.department]
+  );
+  const courses = useResource<CourseOut[]>(coursesLoader, []);
+
+  // State cho biểu mẫu xin nghỉ phép trực tuyến
+  const [leaveSessionId, setLeaveSessionId] = useState("");
+  const [leaveDate, setLeaveDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [leaveReason, setLeaveReason] = useState("");
+  const [submittingLeave, setSubmittingLeave] = useState(false);
+
+  const handleCreateLeave = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!leaveReason.trim() || submittingLeave) return;
+    setSubmittingLeave(true);
+    try {
+      await academicApi.createLeave(
+        {
+          session_id: leaveSessionId || undefined,
+          leave_date: leaveDate,
+          reason: leaveReason.trim(),
+        },
+        selectedPersonId || portal.data.person?.id || undefined
+      );
+      setLeaveReason("");
+      setLeaveSessionId("");
+      toast.success(
+        t(
+          "Đã gửi đơn xin nghỉ phép cho Giảng viên. Khi được duyệt, buổi học sẽ tự động tính Vắng có phép.",
+          "Leave request submitted. Once approved, your session will be marked Excused."
+        )
+      );
+      await myLeaves.reload();
+    } catch (err) {
+      toast.error(errorMessage(err));
+    } finally {
+      setSubmittingLeave(false);
+    }
+  };
+
   const handleSelfEnroll = async (event: React.FormEvent) => {
     event.preventDefault();
     if (submitting || capturing) return;
@@ -210,7 +275,16 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
           "Track enrolled classes, session-by-session check-ins and personal attendance standing."
         )}
       >
-        <RefreshButton onClick={portal.reload} loading={portal.loading} />
+        <RefreshButton
+          onClick={() => {
+            void portal.reload();
+            void myGrade.reload();
+            void myLeaves.reload();
+            void announcements.reload();
+            void courses.reload();
+          }}
+          loading={portal.loading}
+        />
       </PageHeader>
 
       <ErrorNotice message={portal.error} retry={portal.reload} />
@@ -532,6 +606,226 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
           </p>
         </div>
       </dl>
+
+      {person && myGrade.data && (
+        <Section
+          title={t("Bảng điểm Học vụ & Xét điều kiện dự thi cá nhân", "Personal Academic Gradebook & Exam Eligibility")}
+          description={t(
+            "Điểm chuyên cần (10%) được hệ thống AI tự động quy đổi từ tỷ lệ điểm danh khuôn mặt. Điểm Giữa kỳ (30%) và Cuối kỳ (60%) do Giảng viên cập nhật.",
+            "Attendance score (10%) is automatically computed from AI facial check-ins. Midterm (30%) and Final (60%) scores are updated by your lecturer."
+          )}
+        >
+          <dl className="metric-strip">
+            <div>
+              <dt>{t("Điểm chuyên cần AI (10%)", "AI Attendance (10%)")}</dt>
+              <dd>{myGrade.data.attendance_score.toFixed(1)}</dd>
+              <p>{t(`Tỷ lệ đi học: ${myGrade.data.attendance_rate}%`, `Attendance rate: ${myGrade.data.attendance_rate}%`)}</p>
+            </div>
+            <div>
+              <dt>{t("Giữa kỳ (30%) · Cuối kỳ (60%)", "Midterm (30%) · Final (60%)")}</dt>
+              <dd>
+                {myGrade.data.midterm_score != null ? myGrade.data.midterm_score.toFixed(1) : "–"} /{" "}
+                {myGrade.data.final_score != null ? myGrade.data.final_score.toFixed(1) : "–"}
+              </dd>
+              <p>
+                {t(
+                  `Điểm cộng thưởng: +${(myGrade.data.bonus_score || 0).toFixed(1)}`,
+                  `Bonus score: +${(myGrade.data.bonus_score || 0).toFixed(1)}`
+                )}
+              </p>
+            </div>
+            <div>
+              <dt>{t("Tổng kết Hệ 10 & Điểm chữ", "Total (10-pt) & Letter Grade")}</dt>
+              <dd>
+                {myGrade.data.total_10 != null ? `${myGrade.data.total_10.toFixed(2)} (${myGrade.data.letter_grade})` : "–"}
+              </dd>
+              <p>
+                {myGrade.data.gpa_4 != null
+                  ? t(`GPA Hệ 4.0: ${myGrade.data.gpa_4.toFixed(2)} / 4.0`, `4.0 GPA: ${myGrade.data.gpa_4.toFixed(2)} / 4.0`)
+                  : t("Đang chờ nhập đủ cột điểm", "Awaiting exam scores")}
+              </p>
+            </div>
+            <div>
+              <dt>{t("Xét điều kiện dự thi", "Final Exam Eligibility")}</dt>
+              <dd className={myGrade.data.exam_eligible ? "attendance-status" : "warning-text"}>
+                <Award size={16} />{" "}
+                {myGrade.data.exam_eligible
+                  ? t("Đủ điều kiện dự thi", "Eligible for Final Exam")
+                  : t("Cấm thi (< 75%)", "Ineligible (< 75%)")}
+              </dd>
+              <p>{myGrade.data.note || t("Quy chế đào tạo tín chỉ đại học", "University credit regulation")}</p>
+            </div>
+          </dl>
+        </Section>
+      )}
+
+      {(announcements.data.length > 0 || courses.data.length > 0) && (
+        <div className="enrollment-grid">
+          <Section
+            title={t("Bảng tin & Thông báo Lớp học", "Class & Academic Announcements")}
+            description={t("Thông báo mới nhất từ Khoa và Giảng viên phụ trách.", "Latest notices from your department and lecturer.")}
+          >
+            {announcements.data.length > 0 ? (
+              <div className="stack-form">
+                {announcements.data.slice(0, 5).map((ann) => (
+                  <div
+                    key={ann.id}
+                    style={{
+                      padding: "10px 12px",
+                      border: "1px solid var(--ui-border)",
+                      borderRadius: 6,
+                      background: ann.priority !== "normal" ? "var(--ui-soft)" : undefined,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+                      <strong>
+                        <Megaphone size={13} style={{ marginRight: 5, verticalAlign: "-2px" }} />
+                        {ann.title}
+                      </strong>
+                      <span className={ann.priority !== "normal" ? "warning-text" : "muted"} style={{ fontSize: 12 }}>
+                        {ann.department || t("Toàn trường", "All classes")} · {dateTime(ann.created_at, lang)}
+                      </span>
+                    </div>
+                    <p style={{ margin: "6px 0 0", fontSize: 13 }}>{ann.content}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState>{t("Chưa có thông báo mới.", "No announcements yet.")}</EmptyState>
+            )}
+          </Section>
+
+          <Section
+            title={t("Học phần & Thời khóa biểu", "Enrolled Courses & Schedule")}
+            description={t("Lịch học, phòng học và giảng viên phụ trách.", "Class schedule, room and instructor.")}
+          >
+            {courses.data.length > 0 ? (
+              <Table label={t("Thời khóa biểu học phần", "Course schedule")}>
+                <thead>
+                  <tr>
+                    <th>{t("Mã HP", "Code")}</th>
+                    <th>{t("Tên học phần", "Course")}</th>
+                    <th>{t("Tín chỉ", "Credits")}</th>
+                    <th>{t("Lịch học & Phòng", "Schedule & Room")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {courses.data.map((c) => (
+                    <tr key={c.id}>
+                      <td className="numeric-cell cell-strong">{c.code}</td>
+                      <td>
+                        <BookOpen size={12} style={{ marginRight: 4 }} />
+                        {c.name}
+                        {c.lecturer ? <div className="muted" style={{ fontSize: 11 }}>GV: {c.lecturer}</div> : null}
+                      </td>
+                      <td className="numeric-cell">{c.credits}</td>
+                      <td>{[c.schedule, c.room].filter(Boolean).join(" · ") || "–"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            ) : (
+              <EmptyState>{t("Chưa có lịch học học phần.", "No course schedule published yet.")}</EmptyState>
+            )}
+          </Section>
+        </div>
+      )}
+
+      {person && (
+        <Section
+          title={t("Xin nghỉ phép trực tuyến & Theo dõi duyệt đơn", "Online Leave Request & Approval Status")}
+          description={t(
+            "Gửi đơn xin phép vắng mặt có lý do chính đáng. Khi Giảng viên bấm Duyệt, buổi học tương ứng sẽ tự động chuyển thành 'Vắng có phép' để bảo toàn điểm chuyên cần.",
+            "Submit an online leave request. When approved by your lecturer, the linked session is automatically marked Excused."
+          )}
+        >
+          <div className="enrollment-grid">
+            <form className="stack-form" onSubmit={handleCreateLeave}>
+              <Field id="student-leave-session" label={t("Chọn buổi học xin phép (nếu đã mở phiên)", "Select class session (optional)")}>
+                <select
+                  id="student-leave-session"
+                  value={leaveSessionId}
+                  onChange={(e) => setLeaveSessionId(e.target.value)}
+                >
+                  <option value="">{t("— Xin phép theo ngày (chưa có phiên cụ thể) —", "— Request by date —")}</option>
+                  {sessions.map((s) => (
+                    <option key={s.session_id} value={s.session_id}>
+                      {s.label} ({dateTime(s.started_at, lang)})
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field id="student-leave-date" label={t("Ngày xin nghỉ phép *", "Leave date *")}>
+                <input
+                  id="student-leave-date"
+                  type="date"
+                  value={leaveDate}
+                  onChange={(e) => setLeaveDate(e.target.value)}
+                  required
+                />
+              </Field>
+              <Field id="student-leave-reason" label={t("Lý do xin nghỉ phép & Minh chứng *", "Reason for leave *")}>
+                <input
+                  id="student-leave-reason"
+                  value={leaveReason}
+                  onChange={(e) => setLeaveReason(e.target.value)}
+                  placeholder={t("VD: Khám bệnh tại BV / Công tác Đoàn trường…", "e.g. Medical appointment / University event…")}
+                  minLength={3}
+                  maxLength={500}
+                  required
+                />
+              </Field>
+              <button type="submit" className="primary-button" disabled={submittingLeave || !leaveReason.trim()}>
+                <Send size={14} />
+                {submittingLeave ? t("Đang gửi đơn…", "Submitting…") : t("Gửi đơn xin nghỉ phép", "Submit leave request")}
+              </button>
+            </form>
+
+            <div>
+              <Table label={t("Lịch sử đơn xin nghỉ phép", "Leave request history")}>
+                <thead>
+                  <tr>
+                    <th>{t("Ngày / Buổi học", "Date / Session")}</th>
+                    <th>{t("Lý do", "Reason")}</th>
+                    <th>{t("Trạng thái duyệt", "Status")}</th>
+                    <th>{t("Phản hồi GV", "Note")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myLeaves.data.map((lv) => (
+                    <tr key={lv.id}>
+                      <td>
+                        <div className="cell-strong">{lv.leave_date}</div>
+                        {lv.session_label && <small className="muted">{lv.session_label}</small>}
+                      </td>
+                      <td>{lv.reason}</td>
+                      <td>
+                        {lv.status === "approved" ? (
+                          <span className="attendance-status">
+                            <FileCheck2 size={12} /> {t("Đã duyệt (Có phép)", "Approved (Excused)")}
+                          </span>
+                        ) : lv.status === "rejected" ? (
+                          <span className="warning-text">{t("Từ chối", "Rejected")}</span>
+                        ) : (
+                          <span className="session-status">
+                            <span className="status-dot" /> {t("Đang chờ duyệt", "Pending")}
+                          </span>
+                        )}
+                      </td>
+                      <td>{lv.reviewer_note || "–"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              {!myLeaves.data.length && (
+                <EmptyState loading={myLeaves.loading}>
+                  {t("Bạn chưa gửi đơn xin nghỉ phép nào.", "You haven't submitted any leave requests yet.")}
+                </EmptyState>
+              )}
+            </div>
+          </div>
+        </Section>
+      )}
 
       <Section
         title={t("Chi tiết điểm danh theo từng buổi học", "Session-by-session attendance log")}

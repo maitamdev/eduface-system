@@ -18,6 +18,7 @@ import { EnrollPage } from "@/pages/EnrollPage";
 import { ReportsPage } from "@/pages/ReportsPage";
 import { SystemAdminPage } from "@/pages/SystemAdminPage";
 import { StudentPortalPage } from "@/pages/StudentPortalPage";
+import { AcademicManagementPage } from "@/pages/AcademicManagementPage";
 
 const DesignPreviewPage = import.meta.env.DEV
   ? lazy(() => import("@/pages/DesignPreviewPage").then((module) => ({ default: module.DesignPreviewPage })))
@@ -101,6 +102,16 @@ export const App: React.FC = () => {
                     <RequireAuth>
                       <AppShell>
                         <PeoplePage />
+                      </AppShell>
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/academic"
+                  element={
+                    <RequireAuth>
+                      <AppShell>
+                        <AcademicManagementPage />
                       </AppShell>
                     </RequireAuth>
                   }

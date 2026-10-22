@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, ScanFace, CalendarClock, ClipboardList, Users, UserPlus,
   BarChart3, ShieldCheck, Sun, Moon, LogOut, Menu, X, Globe, Wifi,
-  WifiOff, Loader2, ChevronRight, GraduationCap,
+  WifiOff, Loader2, ChevronRight, GraduationCap, BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -65,8 +65,9 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
     { to: "/scanner", icon: ScanFace, label: t("Máy quét AI trực tiếp", "Live AI Scanner"), badge: "LIVE" },
     { to: "/sessions", icon: CalendarClock, label: t("Phiên điểm danh", "Sessions") },
     { to: "/records", icon: ClipboardList, label: t("Sổ bản ghi điểm danh", "Attendance Logs") },
-    { to: "/people", icon: Users, label: t("Danh sách Lớp & Sinh viên", "Class & Student Directory") },
-    { to: "/reports", icon: BarChart3, label: t("Báo cáo & Chuyên cần", "Analytics & Reports") },
+    { to: "/people", icon: Users, label: t("Hồ sơ Sinh viên & Lớp", "Student Profiles & Classes") },
+    { to: "/academic", icon: BookOpen, label: t("Quản trị Học vụ & Điểm số", "Academic & Gradebook") },
+    { to: "/reports", icon: BarChart3, label: t("Báo cáo & Thống kê", "Analytics & Reports") },
   ];
   const studentLinks = [
     { to: "/student", icon: GraduationCap, label: t("Cổng thông tin sinh viên", "Student Portal") },
@@ -98,7 +99,7 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
       </Link>
       {mobile && <button className="icon-button" aria-label={t("Đóng menu", "Close menu")} onClick={() => setMobileOpen(false)}><X size={20} /></button>}
     </div>
-    <p className="workspace-caption">{t("Quản lý điểm danh", "Attendance management")}</p>
+    <p className="workspace-caption">{t("Quản trị Sinh viên & Điểm danh AI", "AI Student & Attendance System")}</p>
     <div className="workspace-nav-scroll">
       {role === "student" ? (
         <>

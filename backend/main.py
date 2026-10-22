@@ -43,7 +43,7 @@ from slowapi.errors import RateLimitExceeded
 from core.database import init_db
 from core.rate_limit import limiter
 from core.logging_context import RequestIDMiddleware, install_request_id_filter
-from routers import persons, sessions, attendance, reports, dashboard, auth, microsoft_auth, google_auth
+from routers import persons, sessions, attendance, reports, dashboard, auth, microsoft_auth, google_auth, academic
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -164,6 +164,8 @@ def _resolve_cors_origins() -> list:
         "https://face-dhv-edu.vercel.app",
         "https://dhv-edu.tech",
         "https://www.dhv-edu.tech",
+        "https://maitamdev.io.vn",
+        "https://www.maitamdev.io.vn",
     ]
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
     extra = [o.strip() for o in env_origins.split(",") if o.strip()]
@@ -188,7 +190,7 @@ allow_origins = _resolve_cors_origins()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allow_origins,
-    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*(vercel\.app|dhv-edu\.tech)$",
+    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*(vercel\.app|dhv-edu\.tech|maitamdev\.io\.vn)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -202,6 +204,7 @@ app.include_router(persons.router,    prefix="/api/persons",    tags=["Persons"]
 app.include_router(sessions.router,   prefix="/api/sessions",   tags=["Sessions"])
 app.include_router(attendance.router, prefix="/api/attendance", tags=["Attendance"])
 app.include_router(reports.router,    prefix="/api/reports",    tags=["Reports"])
+app.include_router(academic.router,   prefix="/api/academic",   tags=["Academic Management"])
 
 
 @app.get("/", tags=["Health"])

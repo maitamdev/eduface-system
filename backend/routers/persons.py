@@ -468,6 +468,10 @@ async def update_person(
         updates["email"] = body.email.strip() or None
     if body.department is not None:
         updates["department"] = body.department.strip() or None
+    for field_name in ("phone", "date_of_birth", "gender", "cohort", "major", "advisor", "academic_status", "notes"):
+        val = getattr(body, field_name, None)
+        if val is not None:
+            updates[field_name] = val.strip() or None
 
     if updates:
         await db.persons.update_one({"_id": person_id}, {"$set": updates})
