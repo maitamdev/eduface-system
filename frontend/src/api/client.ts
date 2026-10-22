@@ -116,6 +116,13 @@ export interface UserCreatePayload {
   person_id?: string | null;
 }
 
+export interface UserUpdatePayload {
+  role?: "admin" | "operator" | "student";
+  is_active?: boolean;
+  password?: string;
+  person_id?: string | null;
+}
+
 export interface StudentSessionItem {
   session_id: string;
   label: string;
@@ -126,7 +133,7 @@ export interface StudentSessionItem {
   attended: boolean;
   marked_at: string | null;
   confidence: number | null;
-  status: "present" | "absent" | "open";
+  status: "present" | "late" | "excused" | "absent" | "open";
 }
 
 export interface StudentPortalSummary {
@@ -173,6 +180,7 @@ export interface SessionOut {
   started_at: string;
   ended_at: string | null;
   is_active: boolean;
+  late_after_minutes?: number | null;
 }
 
 export interface FaceBox {
@@ -202,6 +210,7 @@ export interface AttendanceOut {
   id: string;
   person_id: string;
   person_name: string;
+  student_id?: string | null;
   department: string | null;
   session_id: string;
   session_label: string;
@@ -355,6 +364,11 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  updateUser: (userId: string, payload: UserUpdatePayload) =>
+    apiFetch<UserOut>(`/api/auth/users/${encodeURIComponent(userId)}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
   getStudentPortal: (personId?: string) =>
     apiFetch<StudentPortalSummary>(
       `/api/auth/student-portal${personId ? `?person_id=${encodeURIComponent(personId)}` : ""}`
@@ -367,8 +381,24 @@ export const dashboardApi = {
 };
 
 export const personsApi = {
-  list: () => apiFetch<PersonOut[]>("/api/persons"),
+  list: (department?: string) =>
+    apiFetch<PersonOut[]>(
+      `/api/persons${department ? `?department=${encodeURIComponent(department)}` : ""}`
+    ),
   get: (id: string) => apiFetch<PersonOut>(`/api/persons/${id}`),
+  update: (
+    id: string,
+    payload: {
+      name?: string;
+      student_id?: string | null;
+      department?: string | null;
+      email?: string | null;
+    }
+  ) =>
+    apiFetch<PersonOut>(`/api/persons/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
   analyzePhotos: (photos: (Blob | File)[]) => {
     const fd = new FormData();
     photos.forEach((p, idx) => fd.append("photos", p, `photo_${idx + 1}.jpg`));
@@ -379,6 +409,7 @@ export const personsApi = {
   },
   enroll: (params: {
     name: string;
+    student_id?: string;
     email?: string;
     department?: string;
     student_username?: string;
@@ -387,6 +418,7 @@ export const personsApi = {
   }) => {
     const fd = new FormData();
     fd.append("name", params.name.trim());
+    if (params.student_id?.trim()) fd.append("student_id", params.student_id.trim());
     if (params.email?.trim()) fd.append("email", params.email.trim());
     if (params.department?.trim()) fd.append("department", params.department.trim());
     if (params.student_username?.trim()) fd.append("student_username", params.student_username.trim());
@@ -431,12 +463,13 @@ export const sessionsApi = {
     return apiFetch<SessionOut[]>(`/api/sessions?${qs.toString()}`);
   },
   get: (id: string) => apiFetch<SessionOut>(`/api/sessions/${id}`),
-  create: (label: string, department?: string) =>
+  create: (label: string, department?: string, lateAfterMinutes = 15) =>
     apiFetch<SessionOut>("/api/sessions", {
       method: "POST",
       body: JSON.stringify({
         label: label.trim(),
         department: department?.trim() || undefined,
+        late_after_minutes: lateAfterMinutes,
       }),
     }),
   end: (id: string) =>
@@ -481,11 +514,20 @@ export const attendanceApi = {
     const queryStr = qs.toString();
     return apiFetch<AttendanceOut[]>(`/api/attendance${queryStr ? `?${queryStr}` : ""}`);
   },
+  setManual: (payload: {
+    person_id: string;
+    session_id: string;
+    status: "present" | "late" | "excused" | "absent";
+  }) =>
+    apiFetch<AttendanceOut>("/api/attendance/manual", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
   /**
    * Tải xuống CSV có đính kèm JWT Authorization header
    * (Sửa lỗi 401 khi mở tab mới bằng window.open của bản cũ)
    */
-  downloadCsv: async (filters?: { session_id?: string; date?: string }): Promise<void> => {
+  downloadCsv: async (filters?: { session_id?: string; date?: string; department?: string }): Promise<void> => {
     if (import.meta.env.DEV && /^\/design-preview(?:\/|$)/.test(window.location.pathname)) {
       const { downloadPreviewCsv } = await import("@/preview/mockApi");
       return downloadPreviewCsv(filters);
@@ -493,6 +535,7 @@ export const attendanceApi = {
     const qs = new URLSearchParams();
     if (filters?.session_id) qs.set("session_id", filters.session_id);
     if (filters?.date) qs.set("date", filters.date);
+    if (filters?.department) qs.set("department", filters.department);
     const queryStr = qs.toString();
 
     const response = await fetch(
@@ -526,7 +569,19 @@ export const attendanceApi = {
 };
 
 export const reportsApi = {
-  getDaily: (days = 30) => apiFetch<DailyAttendanceStat[]>(`/api/reports/daily?days=${days}`),
-  getPersons: (days = 30) => apiFetch<PersonAttendanceStat[]>(`/api/reports/persons?days=${days}`),
-  getHeatmap: (days = 14) => apiFetch<HeatmapReport>(`/api/reports/heatmap?days=${days}`),
+  getDaily: (days = 30, department?: string) => {
+    const qs = new URLSearchParams({ days: String(days) });
+    if (department) qs.set("department", department);
+    return apiFetch<DailyAttendanceStat[]>(`/api/reports/daily?${qs.toString()}`);
+  },
+  getPersons: (days = 30, department?: string) => {
+    const qs = new URLSearchParams({ days: String(days) });
+    if (department) qs.set("department", department);
+    return apiFetch<PersonAttendanceStat[]>(`/api/reports/persons?${qs.toString()}`);
+  },
+  getHeatmap: (days = 14, department?: string) => {
+    const qs = new URLSearchParams({ days: String(days) });
+    if (department) qs.set("department", department);
+    return apiFetch<HeatmapReport>(`/api/reports/heatmap?${qs.toString()}`);
+  },
 };

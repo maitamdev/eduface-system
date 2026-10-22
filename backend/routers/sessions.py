@@ -3,9 +3,11 @@ routers/sessions.py - MongoDB version
 """
 
 from datetime import datetime, UTC
+import re
 from typing import List, Optional
 from bson import ObjectId
 from bson.errors import InvalidId
+from pymongo.errors import DuplicateKeyError
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -18,8 +20,11 @@ router = APIRouter()
 
 
 def _doc_to_session(doc: dict) -> dict:
-    doc["id"] = str(doc.pop("_id"))
-    return doc
+    out = dict(doc)
+    out["id"] = str(out.pop("_id"))
+    if "late_after_minutes" not in out or out["late_after_minutes"] is None:
+        out["late_after_minutes"] = 15
+    return out
 
 
 def _parse_object_id(session_id: str) -> ObjectId:
@@ -63,11 +68,12 @@ async def create_session(
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     doc = {
-        "label":      body.label,
-        "department": body.department,
-        "started_at": datetime.now(UTC),
-        "ended_at":   None,
-        "is_active":  True,
+        "label":              body.label,
+        "department":         body.department,
+        "started_at":         datetime.now(UTC),
+        "ended_at":           None,
+        "is_active":          True,
+        "late_after_minutes": body.late_after_minutes if body.late_after_minutes is not None else 15,
     }
     result = await db.sessions.insert_one(doc)
     doc["_id"] = result.inserted_id
@@ -102,4 +108,32 @@ async def end_session(session_id: str, db: AsyncIOMotorDatabase = Depends(get_db
     )
     doc["ended_at"]  = now
     doc["is_active"] = False
+
+    # Automatically mark absent for active students in the session's class/department
+    if hasattr(db, "persons") and hasattr(db, "attendance"):
+        try:
+            person_query: dict = {"is_active": True}
+            dept = (doc.get("department") or "").strip()
+            if dept:
+                person_query["department"] = {"$regex": f"^{re.escape(dept)}$", "$options": "i"}
+            marked_ids = set()
+            async for att in db.attendance.find({"session_id": {"$in": [oid, session_id]}}):
+                marked_ids.add(att.get("person_id"))
+            async for person in db.persons.find(person_query):
+                pid = person["_id"]
+                if pid not in marked_ids:
+                    try:
+                        await db.attendance.insert_one({
+                            "person_id":  pid,
+                            "session_id": oid,
+                            "marked_at":  now,
+                            "confidence": None,
+                            "status":     "absent",
+                            "marked_by":  "system_auto_close",
+                        })
+                    except DuplicateKeyError:
+                        pass
+        except Exception:
+            pass
+
     return SessionOut(**_doc_to_session(doc))

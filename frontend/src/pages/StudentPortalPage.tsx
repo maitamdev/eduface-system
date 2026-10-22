@@ -489,6 +489,16 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                       <CheckCircle2 size={12} />
                       {t("Có mặt", "Present")}
                     </span>
+                  ) : session.status === "late" ? (
+                    <span className="attendance-status">
+                      <CheckCircle2 size={12} />
+                      {t("Đi muộn (Late)", "Late")}
+                    </span>
+                  ) : session.status === "excused" ? (
+                    <span className="attendance-status">
+                      <CheckCircle2 size={12} />
+                      {t("Vắng có phép", "Excused")}
+                    </span>
                   ) : session.status === "open" ? (
                     <span className="session-status">
                       <span className="status-dot" />

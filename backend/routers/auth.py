@@ -33,6 +33,7 @@ from core.schemas import (
     UserCreate,
     UserLogin,
     UserOut,
+    UserUpdate,
 )
 
 router = APIRouter()
@@ -148,6 +149,7 @@ async def list_users(
             UserOut(
                 id=str(doc["_id"]),
                 username=doc["username"],
+                display_name=doc.get("display_name"),
                 role=doc.get("role", "operator"),
                 is_active=doc.get("is_active", True),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
@@ -157,6 +159,56 @@ async def list_users(
             )
         )
     return users
+
+
+@router.patch("/users/{user_id}", response_model=UserOut, dependencies=[Depends(require_admin)])
+async def update_user(
+    request: Request,
+    user_id: str,
+    body: UserUpdate,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """Cập nhật vai trò (role), trạng thái (is_active), mật khẩu hoặc hồ sơ liên kết (Admin only)."""
+    if not ObjectId.is_valid(user_id):
+        raise HTTPException(400, "Invalid user_id.")
+    oid = ObjectId(user_id)
+    doc = await db.users.find_one({"_id": oid})
+    if not doc:
+        raise HTTPException(404, "User not found.")
+
+    current_user = getattr(request.state, "user", None)
+    is_self = isinstance(current_user, AuthenticatedUser) and current_user.id == user_id
+    if is_self:
+        if body.is_active is False:
+            raise HTTPException(400, "Không thể tự khóa tài khoản đang đăng nhập của chính bạn.")
+        if body.role is not None and body.role != "admin":
+            raise HTTPException(400, "Không thể tự hạ quyền Admin của tài khoản đang đăng nhập.")
+
+    updates: dict = {}
+    if body.role is not None:
+        updates["role"] = body.role
+    if body.is_active is not None:
+        updates["is_active"] = body.is_active
+    if body.password is not None and body.password.strip():
+        updates["password_hash"] = hash_password(body.password.strip())
+    if body.person_id is not None:
+        updates["person_id"] = body.person_id.strip() or None
+
+    if updates:
+        await db.users.update_one({"_id": oid}, {"$set": updates})
+        doc.update(updates)
+
+    return UserOut(
+        id=str(doc["_id"]),
+        username=doc["username"],
+        display_name=doc.get("display_name"),
+        role=doc.get("role", "operator"),
+        is_active=doc.get("is_active", True),
+        created_at=doc.get("created_at", datetime.now(timezone.utc)),
+        person_id=doc.get("person_id"),
+        google_email=doc.get("google_email"),
+        microsoft_oid=doc.get("microsoft_oid"),
+    )
 
 
 @router.get("/student-portal", response_model=StudentPortalSummary, dependencies=[Depends(require_authenticated)])
@@ -234,8 +286,13 @@ async def get_student_portal(
         att = attendance_by_session.get(sid)
         is_active = bool(sdoc.get("is_active", False))
         if att:
-            item_status = "present"
-            attended = True
+            raw_status = att.get("status", "present")
+            if raw_status in ("present", "late", "excused"):
+                item_status = raw_status if raw_status in ("present", "late", "excused") else "present"
+                attended = True
+            else:
+                item_status = "absent"
+                attended = False
             marked_at = att.get("marked_at")
             confidence = att.get("confidence")
         elif is_active:

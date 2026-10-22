@@ -5,17 +5,17 @@ routers/persons.py - MongoDB version
 import logging
 import os
 import re
-from typing import List
+from typing import List, Optional
 from datetime import datetime, UTC
 
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Form, status
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Form, Query, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from bson import ObjectId
 from core.database import get_db
-from core.schemas import PersonOut
+from core.schemas import PersonOut, PersonUpdate
 from core import azure_face
-from core.auth import require_admin, require_authenticated, get_user_id_from_request, hash_password, AuthenticatedUser
+from core.auth import require_admin, require_operator, require_authenticated, get_user_id_from_request, hash_password, AuthenticatedUser
 from core.rate_limit import limiter
 from core.validation import read_and_validate_image
 
@@ -110,10 +110,16 @@ async def debug_config():
     }
 
 
-@router.get("", response_model=List[PersonOut], dependencies=[Depends(require_admin)])
-async def list_persons(db: AsyncIOMotorDatabase = Depends(get_db)):
+@router.get("", response_model=List[PersonOut], dependencies=[Depends(require_operator)])
+async def list_persons(
+    department: Optional[str] = Query(None),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    query: dict = {"is_active": True}
+    if department and department.strip():
+        query["department"] = {"$regex": f"^{re.escape(department.strip())}$", "$options": "i"}
     docs = []
-    async for doc in db.persons.find({"is_active": True}).sort("name", 1):
+    async for doc in db.persons.find(query).sort("name", 1):
         docs.append(PersonOut(**_doc_to_person(doc)))
     return docs
 
@@ -159,6 +165,7 @@ async def analyze_photos(request: Request, photos: List[UploadFile] = File(...))
 async def enroll_person(
     request:          Request,
     name:             str              = Form(...),
+    student_id:       str              = Form(None),
     email:            str              = Form(None),
     department:       str              = Form(None),
     student_username: str              = Form(None),
@@ -240,9 +247,11 @@ async def enroll_person(
         logger.warning("Blob upload failed (non-critical): %s", e)
 
     enrolled_by = get_user_id_from_request(request)
+    clean_mssv = student_id.strip().upper() if student_id and student_id.strip() else None
     person_doc = {
         "_id":         azure_id,
         "name":        name.strip(),
+        "student_id":  clean_mssv,
         "email":       email,
         "department":  department,
         "photo_url":   photo_url or None,
@@ -381,11 +390,58 @@ async def self_enroll_student(
     return PersonOut(**_doc_to_person(person_doc))
 
 
-@router.get("/{person_id}", response_model=PersonOut, dependencies=[Depends(require_admin)])
+@router.get("/{person_id}", response_model=PersonOut, dependencies=[Depends(require_operator)])
 async def get_person(person_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
     doc = await db.persons.find_one({"_id": person_id})
     if not doc:
         raise HTTPException(404, "Person not found.")
+    return PersonOut(**_doc_to_person(doc))
+
+
+@router.patch("/{person_id}", response_model=PersonOut, dependencies=[Depends(require_operator)])
+async def update_person(
+    person_id: str,
+    body: PersonUpdate,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    doc = await db.persons.find_one({"_id": person_id, "is_active": True})
+    if not doc:
+        raise HTTPException(404, "Person not found.")
+
+    updates: dict = {}
+    if body.name is not None and body.name.strip():
+        clean_name = body.name.strip()
+        if clean_name.lower() != doc["name"].lower():
+            dup = await db.persons.find_one({
+                "_id": {"$ne": person_id},
+                "name": {"$regex": f"^{re.escape(clean_name)}$", "$options": "i"},
+                "is_active": True,
+            })
+            if dup:
+                raise HTTPException(409, f"Hồ sơ mang tên '{clean_name}' đã tồn tại.")
+        updates["name"] = clean_name
+    if body.student_id is not None:
+        clean_mssv = body.student_id.strip().upper() or None
+        if clean_mssv:
+            dup_mssv = await db.persons.find_one({
+                "_id": {"$ne": person_id},
+                "student_id": {"$regex": f"^{re.escape(clean_mssv)}$", "$options": "i"},
+                "is_active": True,
+            })
+            if dup_mssv:
+                raise HTTPException(409, f"MSSV '{clean_mssv}' đã thuộc về hồ sơ '{dup_mssv['name']}'.")
+        updates["student_id"] = clean_mssv
+    if body.email is not None:
+        updates["email"] = body.email.strip() or None
+    if body.department is not None:
+        updates["department"] = body.department.strip() or None
+
+    if updates:
+        await db.persons.update_one({"_id": person_id}, {"$set": updates})
+        if "name" in updates and hasattr(db, "face_encodings"):
+            await db.face_encodings.update_one({"_id": person_id}, {"$set": {"name": updates["name"]}})
+        doc.update(updates)
+
     return PersonOut(**_doc_to_person(doc))
 
 

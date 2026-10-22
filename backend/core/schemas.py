@@ -12,8 +12,16 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 # ── Person ────────────────────────────────────────────────────────────────────
 class PersonCreate(BaseModel):
     name:       str = Field(..., min_length=2, max_length=120)
+    student_id: Optional[str] = None
     email:      Optional[str] = None
     department: Optional[str] = None
+
+
+class PersonUpdate(BaseModel):
+    name:       Optional[str] = Field(None, min_length=2, max_length=120)
+    student_id: Optional[str] = Field(None, max_length=60)
+    email:      Optional[str] = Field(None, max_length=120)
+    department: Optional[str] = Field(None, max_length=120)
 
 
 class PersonOut(BaseModel):
@@ -32,35 +40,44 @@ class PersonOut(BaseModel):
 
 # ── Session ───────────────────────────────────────────────────────────────────
 class SessionCreate(BaseModel):
-    label:      str = Field(..., min_length=2, max_length=200)
-    department: Optional[str] = None
+    label:              str = Field(..., min_length=2, max_length=200)
+    department:         Optional[str] = None
+    late_after_minutes: Optional[int] = Field(15, ge=0, le=240)
 
 
 class SessionOut(BaseModel):
-    id:         str
-    label:      str
-    department: Optional[str]
-    started_at: datetime
-    ended_at:   Optional[datetime]
-    is_active:  bool
+    id:                 str
+    label:              str
+    department:         Optional[str]
+    started_at:         datetime
+    ended_at:           Optional[datetime]
+    is_active:          bool
+    late_after_minutes: Optional[int] = 15
 
     model_config = {"from_attributes": True}
 
 
 # ── Attendance ────────────────────────────────────────────────────────────────
 class AttendanceOut(BaseModel):
-    id:           str
-    person_id:    str
-    person_name:  str
-    department:   Optional[str]
-    session_id:   str
+    id:            str
+    person_id:     str
+    person_name:   str
+    student_id:    Optional[str] = None
+    department:    Optional[str]
+    session_id:    str
     session_label: str
-    marked_at:    datetime
-    confidence:   Optional[float]
-    status:       str
-    marked_by:    Optional[str] = None
+    marked_at:     datetime
+    confidence:    Optional[float]
+    status:        str
+    marked_by:     Optional[str] = None
 
     model_config = {"from_attributes": True}
+
+
+class ManualAttendancePayload(BaseModel):
+    person_id:  str = Field(..., min_length=1)
+    session_id: str = Field(..., min_length=1)
+    status:     str = Field(..., pattern="^(present|late|excused|absent)$")
 
 
 class IdentifyResult(BaseModel):
@@ -123,6 +140,13 @@ class UserCreate(BaseModel):
     username:  str = Field(..., min_length=3, max_length=50)
     password:  str = Field(..., min_length=6, max_length=128)
     role:      str = Field("operator", pattern="^(operator|admin|student)$")
+    person_id: Optional[str] = None
+
+
+class UserUpdate(BaseModel):
+    role:      Optional[str] = Field(None, pattern="^(operator|admin|student)$")
+    is_active: Optional[bool] = None
+    password:  Optional[str] = Field(None, min_length=6, max_length=128)
     person_id: Optional[str] = None
 
 

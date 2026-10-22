@@ -23,7 +23,7 @@ from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from core.database import get_db, get_database, person_already_marked, get_person_by_azure_id
-from core.schemas import AttendanceOut, MarkAttendanceResponse, IdentifyResult
+from core.schemas import AttendanceOut, ManualAttendancePayload, MarkAttendanceResponse, IdentifyResult
 from core import azure_face
 from core.auth import require_operator, require_admin, get_user_id_from_request
 from core.rate_limit import limiter
@@ -45,6 +45,18 @@ def _safe_csv_cell(value):
     if isinstance(value, str) and value.lstrip().startswith(("=", "+", "-", "@", "\t", "\r", "\n")):
         return "'" + value
     return value
+
+
+def _compute_scan_status(session: dict, now: datetime) -> str:
+    """Return 'late' if session has late_after_minutes > 0 and elapsed time exceeds it."""
+    late_mins = session.get("late_after_minutes")
+    started = session.get("started_at")
+    if isinstance(late_mins, (int, float)) and late_mins > 0 and isinstance(started, datetime):
+        started_utc = started if started.tzinfo else started.replace(tzinfo=UTC)
+        now_utc = now if now.tzinfo else now.replace(tzinfo=UTC)
+        if (now_utc - started_utc).total_seconds() > late_mins * 60:
+            return "late"
+    return "present"
 
 
 @router.post(
@@ -111,12 +123,14 @@ async def mark_attendance(
         if not already:
             try:
                 user_id = get_user_id_from_request(request)
+                now_utc = datetime.now(UTC)
+                scan_status = _compute_scan_status(session, now_utc)
                 att_doc = {
                     "person_id":  person["_id"],
                     "session_id": session_oid,
-                    "marked_at":  datetime.now(UTC),
+                    "marked_at":  now_utc,
                     "confidence": r["confidence"],
-                    "status":     "present",
+                    "status":     scan_status,
                 }
                 if user_id:
                     att_doc["marked_by"] = user_id
@@ -198,6 +212,7 @@ async def list_attendance(
             id=str(doc["_id"]),
             person_id=doc["person_id"],
             person_name=doc["person"]["name"],
+            student_id=doc["person"].get("student_id"),
             department=doc["person"].get("department"),
             session_id=str(doc["session_id"]),
             session_label=doc["session"]["label"],
@@ -209,10 +224,69 @@ async def list_attendance(
     return rows
 
 
-@router.get("/export/csv", dependencies=[Depends(require_admin)])
+@router.put("/manual", response_model=AttendanceOut, dependencies=[Depends(require_operator)])
+async def set_manual_attendance(
+    request: Request,
+    body: ManualAttendancePayload,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """Cho phép Giảng viên hoặc Admin điểm danh thủ công / đổi trạng thái (present, late, excused, absent)."""
+    try:
+        session_oid = ObjectId(body.session_id)
+    except (InvalidId, TypeError):
+        raise HTTPException(400, f"Invalid session_id format: '{body.session_id}'.")
+
+    session = await db.sessions.find_one({"_id": session_oid})
+    if not session:
+        raise HTTPException(404, "Session not found.")
+
+    person = await db.persons.find_one({"_id": body.person_id, "is_active": True})
+    if not person:
+        raise HTTPException(404, "Person not found.")
+
+    now_utc = datetime.now(UTC)
+    user_id = get_user_id_from_request(request) or "manual"
+    existing = await db.attendance.find_one({"person_id": body.person_id, "session_id": session_oid})
+
+    if existing:
+        await db.attendance.update_one(
+            {"_id": existing["_id"]},
+            {"$set": {"status": body.status, "marked_at": now_utc, "marked_by": user_id}},
+        )
+        att_id = str(existing["_id"])
+        conf = existing.get("confidence")
+    else:
+        res = await db.attendance.insert_one({
+            "person_id":  body.person_id,
+            "session_id": session_oid,
+            "marked_at":  now_utc,
+            "confidence": None,
+            "status":     body.status,
+            "marked_by":  user_id,
+        })
+        att_id = str(res.inserted_id)
+        conf = None
+
+    return AttendanceOut(
+        id=att_id,
+        person_id=body.person_id,
+        person_name=person["name"],
+        student_id=person.get("student_id"),
+        department=person.get("department"),
+        session_id=str(session_oid),
+        session_label=session["label"],
+        marked_at=now_utc,
+        confidence=conf,
+        status=body.status,
+        marked_by=user_id,
+    )
+
+
+@router.get("/export/csv", dependencies=[Depends(require_operator)])
 async def export_csv(
     session_id:  Optional[str]  = Query(None),
     date_filter: Optional[date] = Query(None, alias="date"),
+    department:  Optional[str]  = Query(None),
     db: AsyncIOMotorDatabase     = Depends(get_db),
 ):
     records = await list_attendance(
@@ -220,9 +294,13 @@ async def export_csv(
         date_filter=date_filter, status_filter=None,
         limit=10000, db=db,
     )
+    if department and department.strip():
+        dept_lower = department.strip().lower()
+        records = [r for r in records if (r.department or "").strip().lower() == dept_lower]
+
     output = io.StringIO()
     writer = csv.DictWriter(output, fieldnames=[
-        "id", "person_name", "department", "session_label",
+        "id", "student_id", "person_name", "department", "session_label",
         "marked_at", "confidence", "status"
     ])
     writer.writeheader()
@@ -232,6 +310,7 @@ async def export_csv(
         marked_vn = marked_dt.astimezone(vn_tz).strftime("%Y-%m-%d %H:%M:%S")
         writer.writerow({key: _safe_csv_cell(value) for key, value in {
             "id":            r.id,
+            "student_id":    r.student_id or "",
             "person_name":   r.person_name,
             "department":    r.department or "",
             "session_label": r.session_label,

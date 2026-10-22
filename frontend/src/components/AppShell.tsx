@@ -65,14 +65,14 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
     { to: "/scanner", icon: ScanFace, label: t("Máy quét AI trực tiếp", "Live AI Scanner"), badge: "LIVE" },
     { to: "/sessions", icon: CalendarClock, label: t("Phiên điểm danh", "Sessions") },
     { to: "/records", icon: ClipboardList, label: t("Sổ bản ghi điểm danh", "Attendance Logs") },
+    { to: "/people", icon: Users, label: t("Danh sách Lớp & Sinh viên", "Class & Student Directory") },
+    { to: "/reports", icon: BarChart3, label: t("Báo cáo & Chuyên cần", "Analytics & Reports") },
   ];
   const studentLinks = [
     { to: "/student", icon: GraduationCap, label: t("Cổng thông tin sinh viên", "Student Portal") },
   ];
   const adminLinks = [
-    { to: "/people", icon: Users, label: t("Danh bạ sinh viên / NS", "People Directory") },
     { to: "/enroll", icon: UserPlus, label: t("Đăng ký khuôn mặt", "Face Enrollment") },
-    { to: "/reports", icon: BarChart3, label: t("Báo cáo & Chuyên cần", "Analytics & Reports") },
     { to: "/system", icon: ShieldCheck, label: t("Tài khoản & Hệ thống", "Users & Diagnostics") },
   ];
   const currentPath = preview ? location.pathname.replace(/^\/design-preview/, "") || "/" : location.pathname;

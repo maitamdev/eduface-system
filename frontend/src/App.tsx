@@ -94,28 +94,14 @@ export const App: React.FC = () => {
                   }
                 />
 
-                {/* Admin-only routes */}
+                {/* Operator (Instructor) & Admin routes */}
                 <Route
                   path="/people"
                   element={
                     <RequireAuth>
-                      <RequireAdmin>
-                        <AppShell>
-                          <PeoplePage />
-                        </AppShell>
-                      </RequireAdmin>
-                    </RequireAuth>
-                  }
-                />
-                <Route
-                  path="/enroll"
-                  element={
-                    <RequireAuth>
-                      <RequireAdmin>
-                        <AppShell>
-                          <EnrollPage />
-                        </AppShell>
-                      </RequireAdmin>
+                      <AppShell>
+                        <PeoplePage />
+                      </AppShell>
                     </RequireAuth>
                   }
                 />
@@ -123,9 +109,21 @@ export const App: React.FC = () => {
                   path="/reports"
                   element={
                     <RequireAuth>
+                      <AppShell>
+                        <ReportsPage />
+                      </AppShell>
+                    </RequireAuth>
+                  }
+                />
+
+                {/* Admin-only routes */}
+                <Route
+                  path="/enroll"
+                  element={
+                    <RequireAuth>
                       <RequireAdmin>
                         <AppShell>
-                          <ReportsPage />
+                          <EnrollPage />
                         </AppShell>
                       </RequireAdmin>
                     </RequireAuth>

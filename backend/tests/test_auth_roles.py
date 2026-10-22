@@ -160,15 +160,17 @@ def test_dashboard_routes_require_operator():
         assert "require_operator" in _dependant_callables(route)
 
 
-def test_reports_routes_require_admin():
+def test_reports_routes_require_operator():
     from routers import reports
     for path in ("/daily", "/persons", "/heatmap"):
         route = _route(reports.router, path, "GET")
-        assert "require_admin" in _dependant_callables(route)
+        assert "require_operator" in _dependant_callables(route)
 
 
-def test_persons_list_and_detail_routes_require_admin():
+def test_persons_list_and_detail_routes_require_operator():
     from routers import persons
     for path in ("", "/{person_id}"):
         route = _route(persons.router, path, "GET")
-        assert "require_admin" in _dependant_callables(route)
+        assert "require_operator" in _dependant_callables(route)
+    delete_route = _route(persons.router, "/{person_id}", "DELETE")
+    assert "require_admin" in _dependant_callables(delete_route)
