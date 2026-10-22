@@ -91,6 +91,27 @@ def test_quality_accepts_a_clean_centered_face():
     assert reason == ""
 
 
+def test_quality_rejects_occluded_lower_face_landmarks():
+    """When a hand or mask covers the nose and mouth, the 5 facial keypoints
+    distort (nose shifts off-center/upward and mouth corners shift outside the
+    eye span) and must be rejected."""
+    face = FakeFace(
+        embedding=[0.1] * 8,
+        bbox=[20, 20, 140, 160],
+        det_score=0.83,
+        kps=np.array([
+            [50.0, 65.0],   # left_eye
+            [95.0, 63.0],   # right_eye
+            [62.0, 80.0],   # nose shifted left & collapsed upward (nose_t=0.28, nose_d=0.38)
+            [48.0, 108.0],  # left_mouth shifted outside eye span (lm_t < 0)
+            [80.0, 107.0],  # right_mouth
+        ]),
+    )
+    ok, reason = azure_face._check_face_quality(face, image_w=200, image_h=200)
+    assert not ok
+    assert "che khuất" in reason.lower() or "khẩu trang" in reason.lower()
+
+
 # ── identify_faces() threshold behavior ──────────────────────────────────────
 
 @pytest.mark.asyncio

@@ -207,12 +207,77 @@ def _cfg() -> dict:
 
 # ── Face quality check ────────────────────────────────────────────────────────
 
-def _check_face_quality(face, image_w: int, image_h: int) -> tuple:
+def _check_occlusion_and_landmarks(face, bgr: np.ndarray | None = None) -> tuple[bool, str]:
+    """
+    Detect hand-over-face / mask occlusion and abnormal 5-keypoint geometry:
+    1. Rotation-invariant 5-keypoint projection (left_eye, right_eye, nose, left_mouth, right_mouth):
+       When a hand or mask covers the nose/mouth, SCRFD's predicted nose and mouth landmarks
+       shift off the central facial axis or collapse vertically toward the eyes.
+    2. CIE LAB Lip-to-Upper-Face Chrominance & Luminance Contrast:
+       Uncovered lips have higher LAB 'A' (redness) and darker mouth-line shadow than the nose bridge.
+       When covered by the back of a hand or mask, lip redness disappears and the lower face becomes uniform/brighter.
+    """
+    kps = getattr(face, "kps", None)
+    if kps is not None and len(kps) >= 5:
+        le, re_pt, nose, lm, rm = [np.array(pt, dtype=np.float32) for pt in kps[:5]]
+        eye_vec = re_pt - le
+        eye_dist = float(np.linalg.norm(eye_vec))
+        if eye_dist > 10.0:
+            u = eye_vec / eye_dist
+            v = np.array([-u[1], u[0]], dtype=np.float32)
+            if np.dot(nose - le, v) < 0:
+                v = -v
+
+            nose_t = float(np.dot(nose - le, u) / eye_dist)
+            nose_d = float(np.dot(nose - le, v) / eye_dist)
+            lm_t   = float(np.dot(lm - le, u) / eye_dist)
+            rm_t   = float(np.dot(rm - le, u) / eye_dist)
+
+            if not (0.33 <= nose_t <= 0.67) or nose_d < 0.44 or lm_t < 0.0 or rm_t > 1.0:
+                return False, (
+                    "Phát hiện vùng mũi hoặc miệng bị che khuất / lệch góc mặt "
+                    "(không dùng tay che mặt hoặc đeo khẩu trang)."
+                )
+
+            if bgr is not None and float(np.std(bgr)) > 0.0:
+                h, w = bgr.shape[:2]
+                box = face.bbox.astype(int)
+                fw = max(1, int(box[2] - box[0]))
+                fh = max(1, int(box[3] - box[1]))
+                lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB).astype(np.float32)
+
+                ux1 = int(max(0, min(le[0], re_pt[0])))
+                ux2 = int(min(w, max(le[0], re_pt[0])))
+                uy1 = int(max(0, min(le[1], re_pt[1])))
+                uy2 = int(min(h, nose[1]))
+
+                mx1 = int(max(0, min(lm[0], rm[0]) - 0.06 * fw))
+                mx2 = int(min(w, max(lm[0], rm[0]) + 0.06 * fw))
+                my1 = int(max(0, min(lm[1], rm[1]) - 0.09 * fh))
+                my2 = int(min(h, max(lm[1], rm[1]) + 0.09 * fh))
+
+                if ux2 > ux1 + 4 and uy2 > uy1 + 4 and mx2 > mx1 + 4 and my2 > my1 + 4:
+                    upper_crop = lab[uy1:uy2, ux1:ux2]
+                    mouth_crop = lab[my1:my2, mx1:mx2]
+                    lip_red_diff  = float(np.percentile(mouth_crop[:, :, 1], 85) - np.median(upper_crop[:, :, 1]))
+                    mean_red_diff = float(np.mean(mouth_crop[:, :, 1]) - np.mean(upper_crop[:, :, 1]))
+                    lum_diff      = float(np.mean(mouth_crop[:, :, 0]) - np.mean(upper_crop[:, :, 0]))
+
+                    if (lip_red_diff < 3.2 and mean_red_diff < 1.0) or (lum_diff > 6.0 and mean_red_diff < 1.2):
+                        return False, (
+                            "Phát hiện vật cản che vùng mũi/miệng (tay che mặt hoặc khẩu trang). "
+                            "Vui lòng để lộ rõ toàn bộ khuôn mặt."
+                        )
+
+    return True, ""
+
+
+def _check_face_quality(face, image_w: int, image_h: int, bgr: np.ndarray | None = None) -> tuple:
     det_score = float(face.det_score)
     if det_score < 0.60:
         return False, (
-            f"Low detection confidence ({det_score:.2f} < 0.60). "
-            "Use better lighting or a clearer photo."
+            f"Low detection confidence ({det_score:.2f} < 0.60) — Độ rõ khuôn mặt quá thấp, "
+            "vui lòng chụp nơi đủ sáng."
         )
 
     box    = face.bbox.astype(int)
@@ -237,6 +302,10 @@ def _check_face_quality(face, image_w: int, image_h: int) -> tuple:
                 "Face appears to be at too extreme an angle. "
                 "Please face the camera more directly."
             )
+
+    occ_ok, occ_reason = _check_occlusion_and_landmarks(face, bgr)
+    if not occ_ok:
+        return False, occ_reason
 
     return True, ""
 
@@ -300,6 +369,14 @@ def _check_liveness(bgr: np.ndarray, face) -> dict:
                 "is_live": False,
                 "laplacian_variance": round(lap_var, 2),
                 "spoof_reason": "Phổ màu và độ tương phản khối 3D phẳng bất thường (Nghi vấn ảnh 2D)",
+            }
+
+        occ_ok, occ_reason = _check_occlusion_and_landmarks(face, bgr)
+        if not occ_ok:
+            return {
+                "is_live": False,
+                "laplacian_variance": round(lap_var, 2),
+                "spoof_reason": occ_reason,
             }
 
         return {"is_live": True, "laplacian_variance": round(lap_var, 2), "spoof_reason": None}
@@ -371,11 +448,19 @@ async def enroll_person(name: str, image_bytes_list: list) -> str:
 
                 faces_detected += 1
                 face = max(faces, key=lambda f: (f.bbox[2]-f.bbox[0]) * (f.bbox[3]-f.bbox[1]))
-                ok, reason = _check_face_quality(face, w, h)
+                ok, reason = _check_face_quality(face, w, h, bgr)
                 if not ok:
-                    quality_errors.append(f"Photo {idx+1}: {reason}")
+                    quality_errors.append(f"Ảnh {idx+1}: {reason}")
                     logger.warning("Photo %d failed quality check: %s", idx+1, reason)
                     continue
+
+                if new_embeddings and float(np.std(bgr)) > 0.0:
+                    sim_to_first = _cosine_similarity(np.array(face.embedding, dtype=np.float32), np.array(new_embeddings[0], dtype=np.float32))
+                    if sim_to_first < 0.52:
+                        reason = f"Khuôn mặt không đồng nhất với ảnh đầu tiên (độ khớp {sim_to_first*100:.0f}% < 52% — nghi vấn bị che mặt hoặc khác người)."
+                        quality_errors.append(f"Ảnh {idx+1}: {reason}")
+                        logger.warning("Photo %d failed cross-photo consistency: %.3f", idx+1, sim_to_first)
+                        continue
 
                 new_embeddings.append(face.embedding)
                 logger.info("Encoded face for '%s' photo %d (det_score=%.2f)",
@@ -384,20 +469,13 @@ async def enroll_person(name: str, image_bytes_list: list) -> str:
                 logger.warning("Skipping photo %d: %s", idx+1, e)
                 quality_errors.append(f"Photo {idx+1}: Processing error — {e}")
 
-        if not new_embeddings:
+        if quality_errors or not new_embeddings:
             _log_timing("enroll", _t0, photos=len(image_bytes_list),
-                        faces_detected=faces_detected, embeddings=0, result="rejected")
+                        faces_detected=faces_detected, embeddings=len(new_embeddings), result="rejected")
             detail = " | ".join(quality_errors) if quality_errors else (
                 "No valid face detected in any of the provided images."
             )
             raise ValueError(detail)
-
-        if len(new_embeddings) < len(image_bytes_list):
-            logger.warning(
-                "Only %d/%d photos passed quality check for '%s'. Issues: %s",
-                len(new_embeddings), len(image_bytes_list), name,
-                " | ".join(quality_errors),
-            )
 
         return person_id, new_embeddings, _t0, faces_detected
 
@@ -638,6 +716,7 @@ async def analyze_enrollment_images(image_bytes_list: list) -> dict:
         fa      = _get_insight_app()
         results = []
 
+        ref_embedding = None
         for idx, img_bytes in enumerate(image_bytes_list):
             entry = {
                 "photo":     idx + 1,
@@ -655,7 +734,7 @@ async def analyze_enrollment_images(image_bytes_list: list) -> dict:
 
                 if not faces:
                     entry["reason"] = (
-                        "No face detected. Ensure your face is clearly visible and well-lit."
+                        "Không phát hiện thấy khuôn mặt. Vui lòng chụp chính diện, đủ sáng và không che mặt."
                     )
                     results.append(entry)
                     continue
@@ -668,7 +747,19 @@ async def analyze_enrollment_images(image_bytes_list: list) -> dict:
                 entry["det_score"] = round(float(face.det_score), 3)
                 entry["face_size"] = [int(face_w), int(face_h)]
 
-                ok, reason      = _check_face_quality(face, w, h)
+                ok, reason      = _check_face_quality(face, w, h, bgr)
+                if ok and float(np.std(bgr)) > 0.0:
+                    emb = np.array(face.embedding, dtype=np.float32)
+                    if ref_embedding is None:
+                        ref_embedding = emb
+                    else:
+                        sim = _cosine_similarity(emb, ref_embedding)
+                        if sim < 0.52:
+                            ok = False
+                            reason = (
+                                f"Khuôn mặt không đồng nhất với ảnh chuẩn ban đầu "
+                                f"(độ khớp {sim*100:.0f}% — nghi vấn bị che khuất hoặc khác người)."
+                            )
                 entry["ok"]     = ok
                 entry["reason"] = reason
 

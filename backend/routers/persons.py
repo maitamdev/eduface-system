@@ -124,7 +124,7 @@ async def list_persons(
     return docs
 
 
-@router.post("/enroll/analyze", dependencies=[Depends(require_admin)])
+@router.post("/enroll/analyze", dependencies=[Depends(require_authenticated)])
 @limiter.limit("10/minute")
 async def analyze_photos(request: Request, photos: List[UploadFile] = File(...)):
     """

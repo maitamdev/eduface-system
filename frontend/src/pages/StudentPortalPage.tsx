@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Camera, CheckCircle2, SwitchCamera, Trash2, Upload } from "lucide-react";
-import { authApi, personsApi } from "@/api/client";
+import { authApi, personsApi, type EnrollmentAnalysisReport } from "@/api/client";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast } from "@/context/ToastContext";
@@ -38,6 +38,8 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
   const [source, setSource] = useState<"camera" | "upload">("camera");
   const [photos, setPhotos] = useState<Photo[]>([]);
   const photosRef = useRef(photos);
+  const [analysis, setAnalysis] = useState<EnrollmentAnalysisReport | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
   const [capturing, setCapturing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [enrollError, setEnrollError] = useState<string | null>(null);
@@ -67,6 +69,21 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
       .forEach((photo) => URL.revokeObjectURL(photo.url));
     photosRef.current = next;
     setPhotos(next);
+    setAnalysis(null);
+  };
+
+  const analyzePhotos = async () => {
+    if (!photos.length || analyzing || submitting || capturing) return;
+    setAnalyzing(true);
+    setEnrollError(null);
+    try {
+      const report = await personsApi.analyzePhotos(photos.map((p) => p.blob));
+      setAnalysis(report);
+    } catch (err) {
+      setEnrollError(errorMessage(err));
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const addFiles = (files: FileList | null) => {
@@ -257,7 +274,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                   "Once enrolled, simply look at the instructor's camera in class to be automatically marked present."
                 )}
               </p>
-              <button className="primary-button" type="submit" disabled={submitting || capturing || !photos.length}>
+              <button className="primary-button" type="submit" disabled={submitting || capturing || analyzing || !photos.length || (analysis != null && analysis.invalid > 0)}>
                 {submitting
                   ? t("Đang trích xuất khuôn mặt AI…", "Enrolling AI face profile…")
                   : t("Hoàn tất đăng ký hồ sơ & khuôn mặt", "Complete registration")}
@@ -351,7 +368,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                       <button
                         className="icon-button"
                         type="button"
-                        disabled={submitting}
+                        disabled={submitting || analyzing}
                         aria-label={t(`Xóa ảnh ${index + 1}`, `Remove photo ${index + 1}`)}
                         onClick={() => changePhotos(photos.filter((_, item) => item !== index))}
                       >
@@ -359,6 +376,31 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                       </button>
                     </figure>
                   ))}
+                </div>
+              )}
+
+              <button
+                className="secondary-button quality-button"
+                type="button"
+                disabled={!photos.length || submitting || capturing || analyzing}
+                onClick={analyzePhotos}
+              >
+                {analyzing ? t("Đang kiểm tra…", "Checking…") : t("Kiểm tra chất lượng ảnh", "Check photo quality")}
+              </button>
+
+              {analysis && (
+                <div className="quality-results">
+                  <p>{t(`${analysis.valid}/${analysis.total} ảnh đạt chất lượng`, `${analysis.valid}/${analysis.total} photos passed`)}</p>
+                  {analysis.results.map((item) => (
+                    <div key={item.photo} className={item.ok ? "attendance-status" : "warning-text"}>
+                      {t("Ảnh", "Photo")} {item.photo}: {item.ok ? t("Đạt", "Passed") : item.reason}
+                    </div>
+                  ))}
+                  {analysis.invalid > 0 && (
+                    <p className="warning-text">
+                      {t("Vui lòng xóa ảnh không đạt chất lượng trước khi lưu hồ sơ.", "Please remove photos that failed the quality check before saving.")}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
