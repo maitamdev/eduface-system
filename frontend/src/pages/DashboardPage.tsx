@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { appPath } from "@/lib/format";
+import { appPath, timeOnly } from "@/lib/format";
 import { Plus, ArrowRight, RefreshCw, CheckCircle2, AlertCircle, Search, X } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import {
@@ -36,7 +36,7 @@ export const DashboardPage: React.FC<{ previewData?: DashboardSnapshot; previewR
   const [updatedAt, setUpdatedAt] = useState<Date | null>(previewData ? new Date() : null);
   const requestRef = useRef(0);
   const locale = lang === "vi" ? "vi-VN" : "en-GB";
-  const time = (value: string | Date) => new Date(value).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  const time = (value: string | Date) => timeOnly(value, lang);
 
   const fetchDashboard = useCallback(async (silent = false) => {
     if (previewData) { setData(previewData); setUpdatedAt(new Date()); return; }

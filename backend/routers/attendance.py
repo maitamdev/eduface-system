@@ -8,7 +8,7 @@ import io
 import json
 import logging
 import os
-from datetime import date, datetime, timedelta, UTC
+from datetime import date, datetime, timedelta, timezone, UTC
 from typing import List, Optional
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -173,7 +173,8 @@ async def list_attendance(
     if person_id:
         match["person_id"] = person_id
     if date_filter:
-        day_start = datetime.combine(date_filter, datetime.min.time())
+        vn_tz     = timezone(timedelta(hours=7))
+        day_start = datetime.combine(date_filter, datetime.min.time(), tzinfo=vn_tz).astimezone(UTC)
         day_end   = day_start + timedelta(days=1)
         match["marked_at"] = {"$gte": day_start, "$lt": day_end}
     if status_filter:
@@ -225,18 +226,21 @@ async def export_csv(
         "marked_at", "confidence", "status"
     ])
     writer.writeheader()
+    vn_tz = timezone(timedelta(hours=7))
     for r in records:
+        marked_dt = r.marked_at if r.marked_at.tzinfo else r.marked_at.replace(tzinfo=UTC)
+        marked_vn = marked_dt.astimezone(vn_tz).strftime("%Y-%m-%d %H:%M:%S")
         writer.writerow({key: _safe_csv_cell(value) for key, value in {
             "id":            r.id,
             "person_name":   r.person_name,
             "department":    r.department or "",
             "session_label": r.session_label,
-            "marked_at":     r.marked_at.isoformat(),
+            "marked_at":     marked_vn,
             "confidence":    r.confidence if r.confidence is not None else "",
             "status":        r.status,
         }.items()})
     output.seek(0)
-    filename = f"attendance_{date.today().isoformat()}.csv"
+    filename = f"attendance_{datetime.now(vn_tz).date().isoformat()}.csv"
     return StreamingResponse(
         iter(["\ufeff" + output.getvalue()]),
         media_type="text/csv",

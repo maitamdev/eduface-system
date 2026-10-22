@@ -2,7 +2,7 @@
 routers/reports.py - MongoDB version
 """
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query
@@ -15,18 +15,22 @@ from core.auth import require_admin
 router = APIRouter()
 
 
+VN_TZ = timezone(timedelta(hours=7))
+
+
 @router.get("/daily", response_model=List[DailyAttendanceStat], dependencies=[Depends(require_admin)])
 async def daily_stats(
     days: int = Query(30, ge=1, le=365),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
-    since = datetime.combine(date.today() - timedelta(days=days), datetime.min.time())
+    today_vn = datetime.now(VN_TZ).date()
+    since = datetime.combine(today_vn - timedelta(days=days), datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
 
-    # Present counts per day
+    # Present counts per day (Vietnam local day +07:00)
     pipeline = [
         {"$match": {"marked_at": {"$gte": since}, "status": "present"}},
         {"$group": {
-            "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$marked_at"}},
+            "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$marked_at", "timezone": "+07:00"}},
             "present": {"$addToSet": "$person_id"},
         }},
     ]
@@ -34,11 +38,11 @@ async def daily_stats(
     async for doc in db.attendance.aggregate(pipeline):
         present_map[doc["_id"]] = len(doc["present"])
 
-    # Sessions per day
+    # Sessions per day (Vietnam local day +07:00)
     sess_pipeline = [
         {"$match": {"started_at": {"$gte": since}}},
         {"$group": {
-            "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$started_at"}},
+            "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$started_at", "timezone": "+07:00"}},
             "count": {"$sum": 1},
         }},
     ]
@@ -50,7 +54,7 @@ async def daily_stats(
 
     stats = []
     for i in range(days):
-        d = (date.today() - timedelta(days=days - i - 1)).isoformat()
+        d = (today_vn - timedelta(days=days - i - 1)).isoformat()
         present = present_map.get(d, 0)
         rate = round((present / total_enrolled) * 100, 1)
         stats.append(DailyAttendanceStat(
@@ -101,9 +105,10 @@ async def heatmap(
     days: int = Query(14, ge=1, le=60),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
-    since = datetime.combine(date.today() - timedelta(days=days), datetime.min.time())
+    today_vn = datetime.now(VN_TZ).date()
+    since = datetime.combine(today_vn - timedelta(days=days), datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
     date_range = [
-        (date.today() - timedelta(days=days - i - 1)).isoformat()
+        (today_vn - timedelta(days=days - i - 1)).isoformat()
         for i in range(days)
     ]
 
@@ -112,7 +117,7 @@ async def heatmap(
         {"$project": {
             "person_id": 1,
             "status":    1,
-            "day": {"$dateToString": {"format": "%Y-%m-%d", "date": "$marked_at"}},
+            "day": {"$dateToString": {"format": "%Y-%m-%d", "date": "$marked_at", "timezone": "+07:00"}},
         }},
     ]
     att_map: dict = {}

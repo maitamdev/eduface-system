@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 MONGO_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
 DB_NAME   = os.getenv("MONGODB_DB_NAME", "attendance_db")
+VN_TZ     = timezone(timedelta(hours=7))
 
 _client: Optional[AsyncIOMotorClient] = None
 
@@ -32,6 +33,7 @@ def get_client() -> AsyncIOMotorClient:
             connectTimeoutMS=30000,
             socketTimeoutMS=30000,
             tlsAllowInvalidCertificates=False,
+            tz_aware=True,
         )
     return _client
 
@@ -187,7 +189,8 @@ async def count_persons(db: AsyncIOMotorDatabase) -> int:
 
 
 async def count_sessions_today(db: AsyncIOMotorDatabase) -> int:
-    today_start = datetime.combine(date.today(), datetime.min.time())
+    today_vn = datetime.now(VN_TZ).date()
+    today_start = datetime.combine(today_vn, datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
     today_end   = today_start + timedelta(days=1)
     return await db.sessions.count_documents({
         "started_at": {"$gte": today_start, "$lt": today_end}
@@ -195,7 +198,8 @@ async def count_sessions_today(db: AsyncIOMotorDatabase) -> int:
 
 
 async def count_present_today(db: AsyncIOMotorDatabase) -> int:
-    today_start = datetime.combine(date.today(), datetime.min.time())
+    today_vn = datetime.now(VN_TZ).date()
+    today_start = datetime.combine(today_vn, datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
     today_end   = today_start + timedelta(days=1)
     return await db.attendance.count_documents({
         "marked_at": {"$gte": today_start, "$lt": today_end},
@@ -222,7 +226,7 @@ async def get_recent_activity(db: AsyncIOMotorDatabase, limit: int = 8) -> list:
             "person_name":   "$person.name",
             "department":    "$person.department",
             "session_label": "$session.label",
-            "marked_at":     {"$dateToString": {"format": "%Y-%m-%dT%H:%M:%S", "date": "$marked_at"}},
+            "marked_at":     {"$dateToString": {"format": "%Y-%m-%dT%H:%M:%SZ", "date": "$marked_at"}},
             "confidence":    1,
             "status":        1,
         }},
