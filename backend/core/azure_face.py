@@ -454,13 +454,13 @@ async def ensure_person_group() -> None:
     logger.info("InsightFace backend ready.")
 
 
-async def enroll_person(name: str, image_bytes_list: list) -> str:
+async def enroll_person(name: str, image_bytes_list: list, existing_person_id: str | None = None) -> str:
     loop = asyncio.get_event_loop()
 
     def _encode_all():
         _t0            = time.perf_counter()
         fa             = _get_insight_app()
-        person_id      = str(uuid.uuid4())
+        person_id      = existing_person_id or str(uuid.uuid4())
         new_embeddings = []
         quality_errors = []
         faces_detected = 0

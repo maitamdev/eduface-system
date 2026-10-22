@@ -188,29 +188,18 @@ async def enroll_person(
         logger.exception("InsightFace setup failed")
         raise HTTPException(503, "Face service setup error. Please try again.")
 
-    # ── 1. Name-level duplicate check (fast DB check before face analysis) ──
-    # Catches the most common case: operator accidentally submits the same
-    # person twice with the same name.
+    # ── 1. Check if a person with the same name is already enrolled ──────────
+    # If the admin submits the exact same name again, we allow re-enrolling
+    # (updating their face embeddings and metadata in-place) as long as the
+    # face doesn't belong to a DIFFERENT already-enrolled person.
     existing_name = await db.persons.find_one(
         {"name": {"$regex": f"^{re.escape(name.strip())}$", "$options": "i"}, "is_active": True}
     )
-    if existing_name:
-        raise HTTPException(
-            409,
-            f"A person named '{existing_name['name']}' is already enrolled "
-            f"(enrolled {existing_name.get('enrolled_at', 'unknown date')}). "
-            "Use a different name or delete the existing record first."
-        )
 
     # ── 2. Face-level duplicate check (FATAL — never silently skip) ──────────
-    # Previously this was non-fatal: any exception would be swallowed and
-    # enrollment would proceed. Now any failure here aborts enrollment.
     try:
         duplicate = await azure_face.check_duplicate_face(image_bytes_list)
     except Exception:
-        # The check itself failed — we must BLOCK enrollment, not allow it.
-        # Allowing enrollment when we can't verify uniqueness defeats the
-        # entire purpose of the duplicate check.
         logger.exception("Duplicate face check error (blocking enrollment)")
         raise HTTPException(
             503,
@@ -219,20 +208,24 @@ async def enroll_person(
         )
 
     if duplicate:
-        raise HTTPException(
-            409,
-            f"This face is already enrolled as '{duplicate['name']}' "
-            f"(similarity: {duplicate['confidence']*100:.1f}% matched on photo {duplicate['matched_on_photo']}). "
-            "Delete the existing record first if you want to re-enroll."
-        )
+        if not existing_name or duplicate.get("person_id") != existing_name["_id"]:
+            raise HTTPException(
+                409,
+                f"Khuôn mặt này đã được đăng ký dưới tên '{duplicate['name']}' "
+                f"(độ khớp: {duplicate['confidence']*100:.1f}% ở ảnh {duplicate['matched_on_photo']}). "
+                f"Nếu muốn cập nhật lại ảnh cho hồ sơ này, hãy nhập đúng họ tên '{duplicate['name']}' "
+                "hoặc xóa hồ sơ cũ tại mục Lớp & Sinh viên."
+            )
 
     # ── 3. Enroll (includes per-photo quality gate inside azure_face) ────────
     try:
-        azure_id = await azure_face.enroll_person(name, image_bytes_list)
+        if existing_name:
+            azure_id = await azure_face.enroll_person(
+                name.strip(), image_bytes_list, existing_person_id=existing_name["_id"]
+            )
+        else:
+            azure_id = await azure_face.enroll_person(name, image_bytes_list)
     except ValueError as e:
-        # Deliberate, application-generated validation message (e.g. "no
-        # face detected in photo 2") — safe to show as-is, not an internal
-        # exception leak.
         raise HTTPException(422, str(e))
     except Exception:
         logger.exception("Enrollment failed")
@@ -248,29 +241,44 @@ async def enroll_person(
 
     enrolled_by = get_user_id_from_request(request)
     clean_mssv = student_id.strip().upper() if student_id and student_id.strip() else None
-    person_doc = {
-        "_id":         azure_id,
-        "name":        name.strip(),
-        "student_id":  clean_mssv,
-        "email":       email,
-        "department":  department,
-        "photo_url":   photo_url or None,
-        "enrolled_at": datetime.now(UTC),
-        "is_active":   True,
-        "enrolled_by": enrolled_by,
-    }
-    try:
-        await db.persons.insert_one(person_doc)
-    except Exception as e:
-        logger.error("Person insert failed after embedding was written — rolling back: %s", e)
+
+    if existing_name:
+        update_fields = {
+            "name":        name.strip(),
+            "student_id":  clean_mssv or existing_name.get("student_id"),
+            "email":       email if email else existing_name.get("email"),
+            "department":  department if department else existing_name.get("department"),
+            "photo_url":   photo_url or existing_name.get("photo_url"),
+            "enrolled_at": datetime.now(UTC),
+            "is_active":   True,
+            "enrolled_by": enrolled_by or existing_name.get("enrolled_by"),
+        }
+        await db.persons.update_one({"_id": azure_id}, {"$set": update_fields})
+        person_doc = {**existing_name, **update_fields, "_id": azure_id}
+    else:
+        person_doc = {
+            "_id":         azure_id,
+            "name":        name.strip(),
+            "student_id":  clean_mssv,
+            "email":       email,
+            "department":  department,
+            "photo_url":   photo_url or None,
+            "enrolled_at": datetime.now(UTC),
+            "is_active":   True,
+            "enrolled_by": enrolled_by,
+        }
         try:
-            await azure_face.delete_person(azure_id)
-        except Exception as cleanup_err:
-            logger.critical(
-                "Rollback FAILED — orphaned embedding for azure_id=%s: %s",
-                azure_id, cleanup_err,
-            )
-        raise HTTPException(503, "Enrollment could not be completed. Please try again.")
+            await db.persons.insert_one(person_doc)
+        except Exception as e:
+            logger.error("Person insert failed after embedding was written — rolling back: %s", e)
+            try:
+                await azure_face.delete_person(azure_id)
+            except Exception as cleanup_err:
+                logger.critical(
+                    "Rollback FAILED — orphaned embedding for azure_id=%s: %s",
+                    azure_id, cleanup_err,
+                )
+            raise HTTPException(503, "Enrollment could not be completed. Please try again.")
 
     if student_username and student_username.strip():
         uname = student_username.strip()
