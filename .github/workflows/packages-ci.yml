@@ -20,15 +20,15 @@ jobs:
 
       - name: Install Monorepo Dependencies
         run: |
-          npm install
-          npx --yes typescript --version
+          npm ci
+          npx --no-install tsc --version
 
       - name: Typecheck & Build Packages
         run: |
           for pkg in packages/*; do
             if [ -f "$pkg/tsconfig.json" ]; then
               echo "Building $pkg..."
-              npx typescript -p "$pkg/tsconfig.json"
+              npx --no-install tsc -p "$pkg/tsconfig.json"
             fi
           done
 
@@ -53,3 +53,11 @@ jobs:
               (cd "$pkg" && npm pack --dry-run)
             fi
           done
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test Python matching package
+        run: |
+          pip install -e packages/python/face-matching-core
+          python -m unittest discover -s packages/python/face-matching-core/tests -v

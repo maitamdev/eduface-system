@@ -13,6 +13,7 @@ azure_face.identify_faces so no model or database is required.
 """
 
 from datetime import datetime
+from types import SimpleNamespace
 
 import pytest
 from bson import ObjectId
@@ -66,6 +67,10 @@ class FakeAttendanceCollection:
 
 
 class FakeSimpleCollection:
+    async def update_one(self, query, update):
+        doc = await self.find_one(query)
+        return SimpleNamespace(matched_count=int(doc is not None))
+
     """Generic find_one-only fake for `persons` and `sessions`."""
 
     def __init__(self, docs):
@@ -99,11 +104,13 @@ def test_client(monkeypatch, session_and_person):
     fake_db = FakeDB(persons=[person_doc], sessions=[session_doc])
 
     # One identified face per call, matching the enrolled person above.
-    async def fake_identify_faces(image_bytes, confidence_threshold=None):
+    async def fake_identify_faces(image_bytes, confidence_threshold=None, probe_image_bytes=None):
+        assert probe_image_bytes is not None
         return [{
             "azure_person_id": "azure-person-1",
             "name": "Alice",
             "confidence": 0.91,
+            "is_live": True,
             "face_box": {"left": 0, "top": 0, "width": 10, "height": 10},
         }]
 
@@ -128,7 +135,7 @@ def test_client(monkeypatch, session_and_person):
 def _mark(client, session_oid):
     return client.post(
         f"/api/attendance/mark/{session_oid}",
-        files={"frame": ("frame.jpg", b"irrelevant-bytes", "image/jpeg")},
+        files={"probe_frame": ("probe.jpg", b"probe", "image/jpeg"), "frame": ("frame.jpg", b"irrelevant-bytes", "image/jpeg")},
     )
 
 
@@ -167,7 +174,7 @@ def test_mark_rejects_malformed_session_id(test_client):
     client, _fake_db, _session_oid = test_client
     resp = client.post(
         "/api/attendance/mark/not-a-valid-object-id",
-        files={"frame": ("frame.jpg", b"irrelevant-bytes", "image/jpeg")},
+        files={"probe_frame": ("probe.jpg", b"probe", "image/jpeg"), "frame": ("frame.jpg", b"irrelevant-bytes", "image/jpeg")},
     )
     assert resp.status_code == 400
 

@@ -15,10 +15,13 @@ This module provides:
     it back as an `X-Request-ID` response header (so a frontend/operator can
     report "request abc123 failed" and it's directly greppable)
 
-Usage (wired in main.py):
-    from core.logging_context import RequestIDMiddleware, install_request_id_filter
+Usage:
+    from core.logging_context import install_request_id_filter
     install_request_id_filter()
-    app.add_middleware(RequestIDMiddleware)
+
+CorsFastAPI (core/http_app.py) wraps the entire HTTP stack in
+RequestIDMiddleware so even preflight, startup failures and unexpected 500
+responses have a correlation ID.
 
 Then any existing `logging.getLogger(__name__)` call anywhere in the codebase
 automatically gets `request_id` in its formatted output — no per-call-site
@@ -26,11 +29,12 @@ changes needed in routers/persons.py, routers/attendance.py, etc.
 """
 
 import logging
+import re
 import uuid
 from contextvars import ContextVar, copy_context
 
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
+from starlette.datastructures import Headers, MutableHeaders
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 _request_id_ctx: ContextVar[str] = ContextVar("request_id", default="-")
 
@@ -76,20 +80,31 @@ async def run_in_executor_ctx(loop, func, *args):
     return await loop.run_in_executor(None, lambda: ctx.run(func, *args))
 
 
-class RequestIDMiddleware(BaseHTTPMiddleware):
+class RequestIDMiddleware:
     """
     Generates a short correlation ID per request, makes it available to every
     logger via the contextvar above, and echoes it back as X-Request-ID so
     operators/clients can reference a specific request when reporting issues.
     """
 
-    async def dispatch(self, request: Request, call_next):
-        incoming = request.headers.get("x-request-id")
-        req_id = incoming or uuid.uuid4().hex[:12]
+    def __init__(self, app: ASGIApp):
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        incoming = Headers(scope=scope).get("x-request-id", "")
+        req_id = incoming if re.fullmatch(r"[A-Za-z0-9._-]{1,64}", incoming) else uuid.uuid4().hex[:12]
+        scope.setdefault("state", {})["request_id"] = req_id
         token = _request_id_ctx.set(req_id)
+
+        async def send_with_request_id(message: Message):
+            if message["type"] == "http.response.start":
+                MutableHeaders(scope=message)["X-Request-ID"] = req_id
+            await send(message)
+
         try:
-            response = await call_next(request)
+            await self.app(scope, receive, send_with_request_id)
         finally:
             _request_id_ctx.reset(token)
-        response.headers["X-Request-ID"] = req_id
-        return response

@@ -1,0 +1,3 @@
+usage: create_user.py [-h] --username USERNAME [--password PASSWORD]
+                      [--role {operator,admin}]
+create_user.py: error: Username must be 3–50 characters and password 12–128 characters

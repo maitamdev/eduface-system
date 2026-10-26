@@ -1,3 +1,5 @@
+> Tài liệu trước đợt sửa 27/10/2026; một số mô tả kiến trúc/AI/quyền có thể đã cũ. Đối chiếu [README hiện hành](../README.md) và [hướng dẫn nâng cấp](../docs/UPGRADE_2026_10.md). Không coi các số accuracy/latency cũ là kết quả nghiệm thu.
+
 # 🚀 Deployment, DevOps & Health Monitoring
 
 SmartAttend is designed for flexible deployment across containers, serverless frontends, and managed application platforms.

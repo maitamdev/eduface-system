@@ -1,0 +1,11 @@
+usage: create_user.py [-h] --username USERNAME --password PASSWORD
+                      [--role {operator,admin}]
+
+Create a user for Smart Attendance System.
+
+options:
+  -h, --help            show this help message and exit
+  --username USERNAME   Unique username
+  --password PASSWORD   Plaintext password
+  --role {operator,admin}
+                        User role

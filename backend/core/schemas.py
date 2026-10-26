@@ -56,12 +56,14 @@ class PersonOut(BaseModel):
 
 # ── Session ───────────────────────────────────────────────────────────────────
 class SessionCreate(BaseModel):
+    course_id: Optional[str] = None
     label:              str = Field(..., min_length=2, max_length=200)
     department:         Optional[str] = None
     late_after_minutes: Optional[int] = Field(15, ge=0, le=240)
 
 
 class SessionOut(BaseModel):
+    course_id: Optional[str] = None
     id:                 str
     label:              str
     department:         Optional[str]
@@ -157,7 +159,7 @@ class UserLogin(BaseModel):
 
 class UserCreate(BaseModel):
     username:  str = Field(..., min_length=3, max_length=50)
-    password:  str = Field(..., min_length=6, max_length=128)
+    password:  str = Field(..., min_length=12, max_length=128)
     role:      str = Field("operator", pattern="^(operator|admin|student)$")
     person_id: Optional[str] = None
 
@@ -165,7 +167,7 @@ class UserCreate(BaseModel):
 class UserUpdate(BaseModel):
     role:      Optional[str] = Field(None, pattern="^(operator|admin|student)$")
     is_active: Optional[bool] = None
-    password:  Optional[str] = Field(None, min_length=6, max_length=128)
+    password:  Optional[str] = Field(None, min_length=12, max_length=128)
     person_id: Optional[str] = None
 
 
@@ -240,6 +242,7 @@ class CourseOut(BaseModel):
 
 
 class GradeUpsert(BaseModel):
+    course_id: Optional[str] = None
     person_id:     str = Field(..., min_length=1)
     midterm_score: Optional[float] = Field(None, ge=0.0, le=10.0)
     final_score:   Optional[float] = Field(None, ge=0.0, le=10.0)
@@ -248,6 +251,10 @@ class GradeUpsert(BaseModel):
 
 
 class StudentGradeRow(BaseModel):
+    course_id: Optional[str] = None
+    course_name: Optional[str] = None
+    semester: Optional[str] = None
+    credits: int = 0
     person_id:        str
     name:             str
     student_id:       Optional[str] = None
@@ -327,4 +334,9 @@ class BulkStudentRow(BaseModel):
 class BulkStudentImportPayload(BaseModel):
     students:              List[BulkStudentRow]
     create_login_accounts: bool = True
-    default_password:      str = Field("123456", min_length=6, max_length=64)
+    default_password: Optional[str] = None  # Deprecated: each new account gets an independent random password.
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(..., min_length=1, max_length=128)
+    new_password: str = Field(..., min_length=12, max_length=128)

@@ -17,18 +17,21 @@ from routers import attendance
 def socket_client(monkeypatch):
     session_id = str(ObjectId())
     find = AsyncMock(return_value={"_id": ObjectId(session_id), "is_active": True})
-    db = SimpleNamespace(sessions=SimpleNamespace(find_one=find))
+    account = {"_id": ObjectId(), "username": "operator", "role": "operator", "is_active": True}
+    users = SimpleNamespace(find_one=AsyncMock(return_value=account))
+    db = SimpleNamespace(sessions=SimpleNamespace(find_one=find), users=users)
     monkeypatch.setattr(attendance, "get_database", lambda: db)
     monkeypatch.setattr(attendance, "_ws_limiter", SimpleNamespace(hit=lambda *args: True))
     identify = AsyncMock(return_value=[])
     monkeypatch.setattr(attendance.azure_face, "identify_faces", identify)
     app = FastAPI()
     app.include_router(attendance.router, prefix="/api/attendance")
+    app.state.test_account = account
     return TestClient(app), session_id, find, identify
 
 
-def _authenticate(socket):
-    token, _ = create_access_token("preview-user", "operator", "operator")
+def _authenticate(socket, client):
+    token, _ = create_access_token(str(client.app.state.test_account["_id"]), "operator", "operator")
     socket.send_json({"type": "auth", "authorization": f"Bearer {token}", "confidence": 0.6})
     assert socket.receive_json()["status"] == 200
 
@@ -57,7 +60,7 @@ def test_authenticated_frame_is_validated_and_uses_threshold(socket_client):
     image = io.BytesIO()
     Image.new("RGB", (100, 100)).save(image, format="JPEG")
     with client.websocket_connect(f"/api/attendance/ws/{session_id}") as socket:
-        _authenticate(socket)
+        _authenticate(socket, client)
         socket.send_bytes(image.getvalue())
         assert socket.receive_json()["matches"] == []
     identify.assert_awaited_once_with(image.getvalue(), 0.6)
@@ -66,7 +69,7 @@ def test_authenticated_frame_is_validated_and_uses_threshold(socket_client):
 def test_invalid_frame_does_not_reach_recognition(socket_client):
     client, session_id, _, identify = socket_client
     with client.websocket_connect(f"/api/attendance/ws/{session_id}") as socket:
-        _authenticate(socket)
+        _authenticate(socket, client)
         socket.send_bytes(b"not an image")
         assert socket.receive_json()["status"] == 400
     identify.assert_not_awaited()
@@ -76,9 +79,41 @@ def test_rate_limit_blocks_recognition(socket_client, monkeypatch):
     client, session_id, _, identify = socket_client
     monkeypatch.setattr(attendance, "_ws_limiter", SimpleNamespace(hit=lambda *args: False))
     with client.websocket_connect(f"/api/attendance/ws/{session_id}") as socket:
-        _authenticate(socket)
+        _authenticate(socket, client)
         socket.send_bytes(b"frame")
         assert socket.receive_json()["status"] == 429
+    identify.assert_not_awaited()
+
+
+@pytest.mark.parametrize("change", ["disabled", "student", "password_reset"])
+def test_live_account_changes_stop_existing_socket_before_recognition(socket_client, change):
+    client, session_id, _, identify = socket_client
+    with client.websocket_connect(f"/api/attendance/ws/{session_id}") as socket:
+        _authenticate(socket, client)
+        account = client.app.state.test_account
+        if change == "disabled":
+            account["is_active"] = False
+        elif change == "student":
+            account["role"] = "student"
+        else:
+            account["auth_version"] = 1
+        socket.send_bytes(b"frame")
+        with pytest.raises(WebSocketDisconnect) as error:
+            socket.receive_json()
+        assert error.value.code == 1008
+    identify.assert_not_awaited()
+
+
+def test_disabled_account_cannot_open_socket(socket_client):
+    client, session_id, find, identify = socket_client
+    client.app.state.test_account["is_active"] = False
+    token, _ = create_access_token(str(client.app.state.test_account["_id"]), "operator", "operator")
+    with client.websocket_connect(f"/api/attendance/ws/{session_id}") as socket:
+        socket.send_json({"type": "auth", "authorization": f"Bearer {token}"})
+        with pytest.raises(WebSocketDisconnect) as error:
+            socket.receive_json()
+        assert error.value.code == 1008
+    find.assert_not_awaited()
     identify.assert_not_awaited()
 
 

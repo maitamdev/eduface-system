@@ -1,0 +1,782 @@
+﻿[
+    {
+        "id":  "a01-g01",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  1101006,
+        "transcript_sha256":  "f85c0bcf32ddc252fdf56266dcc52a557ef8af46dd3500247fe77ed8faccd69f",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "a01-g01.wav"
+    },
+    {
+        "id":  "a01-g02",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  1164138,
+        "transcript_sha256":  "645da7ac4ccc0a16dcfc8544f62b8d3eda3ccfd4ac0ffa30f3cc4bb3676eb107",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "a01-g02.wav"
+    },
+    {
+        "id":  "a01-g03",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  1069486,
+        "transcript_sha256":  "e36e5475ae289d38b45ff90728e82d4b10c119af5c5d0667e77d9d9433033185",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "a01-g03.wav"
+    },
+    {
+        "id":  "a01-g04",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  1161966,
+        "transcript_sha256":  "ae087aa06dc0dade5e0cd2582bac29a1d7004fb65418b0090df513ca36154fd9",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "a01-g04.wav"
+    },
+    {
+        "id":  "a01-g05",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  1120458,
+        "transcript_sha256":  "68062addb65048e20e647636e93f07dfedd0a384cd85bf99e9a4b89bf7e6a8fd",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "a01-g05.wav"
+    },
+    {
+        "id":  "b01-q01",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  380526,
+        "transcript_sha256":  "3b3729fdc13a8f2a36a97d810d94f20ce6e1ea55704282ec4c884b41b4b2c87d",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b01-q01.wav"
+    },
+    {
+        "id":  "b01-q02",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  368458,
+        "transcript_sha256":  "5f3268b9eff5de0b6c12175cddae9a811649169dd2404ce3727aeac60233f48c",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b01-q02.wav"
+    },
+    {
+        "id":  "b01-q03",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  383726,
+        "transcript_sha256":  "663787627315f93a21b0eb8278117ad8967c07c1042fbc3f87358a9c3f5299ff",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b01-q03.wav"
+    },
+    {
+        "id":  "b01-q04",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  407726,
+        "transcript_sha256":  "06834d917280d6093b0b6ff11e2e7832ba94722ad354e6ad50a9898f960642bd",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b01-q04.wav"
+    },
+    {
+        "id":  "b01-q05",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  382606,
+        "transcript_sha256":  "6a92ef6dd41c9abec6a45ea7393c2f4ce735da4e63ef52f76b6953d9b0875cf6",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b01-q05.wav"
+    },
+    {
+        "id":  "b01-q06",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  373006,
+        "transcript_sha256":  "4460266acc0ed569959333894a36ec46bd2c2e453cdfd17aedc0b6046ef1ce58",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b01-q06.wav"
+    },
+    {
+        "id":  "b01-q07",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  386766,
+        "transcript_sha256":  "3b359b9dfb84763d1bcbaf77d6a9def6960198d11b054a100f7bc1e73e7af76e",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b01-q07.wav"
+    },
+    {
+        "id":  "b01-q08",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  404846,
+        "transcript_sha256":  "31c447bf081af922fd9298894d5134a9ec1a31769cad29dab32fd4fbfad60d12",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b01-q08.wav"
+    },
+    {
+        "id":  "b02-q01",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  360046,
+        "transcript_sha256":  "1d3695d91501607397ce8fbf98ccd09174862e8233430058668986c8deabb4a0",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q01.wav"
+    },
+    {
+        "id":  "b02-q02",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  319566,
+        "transcript_sha256":  "b8a492cb4d24bc2af053dacb14452d6a1aa1ed62c70bd6007e4ae8032f93fc13",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q02.wav"
+    },
+    {
+        "id":  "b02-q03",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  338926,
+        "transcript_sha256":  "1697f6ceaa012e0aa9e1e62194778b2fc16c4cdcf255f7989d8b5b2d9e4d4e8d",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q03.wav"
+    },
+    {
+        "id":  "b02-q04",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  384778,
+        "transcript_sha256":  "90d9a89084cbb6706f26a8784c2cba23ac1dbc7780b546f0880f880a6cd5d1be",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q04.wav"
+    },
+    {
+        "id":  "b02-q05",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  340206,
+        "transcript_sha256":  "2c0a206f4eb5dfeb25438ef29016e0c545c8a7124ffb32804ffb8cd2515e88bc",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q05.wav"
+    },
+    {
+        "id":  "b02-q06",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  371246,
+        "transcript_sha256":  "e7f24ef0a99d1087ed9339dca4649c7a4d5c72dd74fdecef2e28c3ee6b5428a9",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q06.wav"
+    },
+    {
+        "id":  "b02-q07",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  341966,
+        "transcript_sha256":  "2bbfbecd5a97e862958c3cf0a87c461d3dc2eba43576e5903852bcaf93f9683f",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q07.wav"
+    },
+    {
+        "id":  "b02-q08",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  326766,
+        "transcript_sha256":  "4a08f7027ad5ef2ad66146ad7563e61f051943def8c8842765ecef2fcf65dc16",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q08.wav"
+    },
+    {
+        "id":  "b02-q09",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  355406,
+        "transcript_sha256":  "3fdf422c6beec1ed53b22b3be798714ecabad62a0470c5e4a87fd0fa51210e16",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q09.wav"
+    },
+    {
+        "id":  "b02-q10",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  372206,
+        "transcript_sha256":  "8a3da498aa20b77db701043da9bc2bc6848c3c68d8a7c93ed30996c0d37bbdf0",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q10.wav"
+    },
+    {
+        "id":  "b02-q11",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  346286,
+        "transcript_sha256":  "5babac9d02046b02e1000667c40e1fe530e137b433fd3ce42a4a4ae84dc7e44f",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q11.wav"
+    },
+    {
+        "id":  "b02-q12",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  389646,
+        "transcript_sha256":  "0d883d1e3050794fe598137dce030b4d60716054d31b7125974fcfd39b52523c",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "b02-q12.wav"
+    },
+    {
+        "id":  "f01-q01",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  312686,
+        "transcript_sha256":  "f6cb5d6d2728dc2db947770331dc855094ca31d117c70fae76b0d7ec281e6085",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q01.wav"
+    },
+    {
+        "id":  "f01-q02",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  314286,
+        "transcript_sha256":  "2aa19129a29038eec984963fec63535481c4ee09bc7d34e29ab6678cf422d6a7",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q02.wav"
+    },
+    {
+        "id":  "f01-q03",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  332526,
+        "transcript_sha256":  "dc33018281f3c811ad4615553443c601c242937b33d7eb6f490f1d710869e71b",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q03.wav"
+    },
+    {
+        "id":  "f01-q04",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  322126,
+        "transcript_sha256":  "9fbbe48a3a6e4fa3146ce60dea9107ce39fb579428e19cddad73b152d6f90a56",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q04.wav"
+    },
+    {
+        "id":  "f01-q05",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  343086,
+        "transcript_sha256":  "69b39837de78199fe2df752c3d0b4ccd626e634fa0d2e5c2090106d13328b7c0",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q05.wav"
+    },
+    {
+        "id":  "f01-q06",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  313166,
+        "transcript_sha256":  "45d0445a12c936075a6f9262f188e4554ddefa54c1c56b46ddf5cf3d25002175",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q06.wav"
+    },
+    {
+        "id":  "f01-q07",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  303406,
+        "transcript_sha256":  "a9031e87c39a7f2d6dfa4a92426ceba194fae2ba1ff39eaf2a8b2dcbeb3d8f13",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q07.wav"
+    },
+    {
+        "id":  "f01-q08",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  298126,
+        "transcript_sha256":  "3beaf2add2ccf13552774e43a2b2782d4b42eee20b52197b4757da805c59ccb2",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q08.wav"
+    },
+    {
+        "id":  "f01-q09",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  346606,
+        "transcript_sha256":  "948b0fd4d312e52a8eccb12dba836b2b5bef62508b4be47d2303159d8dca0f10",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q09.wav"
+    },
+    {
+        "id":  "f01-q10",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  298926,
+        "transcript_sha256":  "ff744ef77e422fd27d39ddd0d4b6369f1d8a4532b6a9905436536ba8f89b2ece",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "f01-q10.wav"
+    },
+    {
+        "id":  "i01-q01",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  393166,
+        "transcript_sha256":  "9caffb0decc6bc7df89e8da5f0fad6ce9cd0ad2682bbf332fce52da4bebd9c0c",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q01.wav"
+    },
+    {
+        "id":  "i01-q02",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  374446,
+        "transcript_sha256":  "640258c530390a4ab559c7cd82077274a45aed87a1d05e1cf25abde458b74628",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q02.wav"
+    },
+    {
+        "id":  "i01-q03",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  350126,
+        "transcript_sha256":  "2311a89a07d62ae85f56e6187668bae53b1fbe2db8d65eb6b54a7d90839ade3f",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q03.wav"
+    },
+    {
+        "id":  "i01-q04",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  387726,
+        "transcript_sha256":  "7ff4d19ef8679eac4e2a725bd437f15631a5f5887ffa3d1b24df0e593ecef9ef",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q04.wav"
+    },
+    {
+        "id":  "i01-q05",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  446286,
+        "transcript_sha256":  "8fdd518e9952471f1704b9c3cdc182a1d3d19423dd83fadc18a0bb1312225178",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q05.wav"
+    },
+    {
+        "id":  "i01-q06",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  357966,
+        "transcript_sha256":  "e7f99068e5a472ecd092a48006e238b5ff3b7025713453d67eb6da06eb4167dc",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q06.wav"
+    },
+    {
+        "id":  "i01-q07",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  388526,
+        "transcript_sha256":  "4600e03c0ce0d8018c134a397ba02c841981d10fd9c64eb8cd5cd0d29f0ce28a",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q07.wav"
+    },
+    {
+        "id":  "i01-q08",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  383726,
+        "transcript_sha256":  "75b92e746ce5c330740dcd61f50a8949ceeda843d826b4a6e447730787a7e63c",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q08.wav"
+    },
+    {
+        "id":  "i01-q09",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  427566,
+        "transcript_sha256":  "46bc323bc47c769f5555ebda6ae0a1a7b81b959428eb95d2ee48eb5cebfc6db0",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q09.wav"
+    },
+    {
+        "id":  "i01-q10",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  393006,
+        "transcript_sha256":  "93880194f7bf6660045f03a99e045f19e5187d66b68503e8fa6c18fe498a2608",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i01-q10.wav"
+    },
+    {
+        "id":  "i02-g01",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  723886,
+        "transcript_sha256":  "6896586943d2ba124dac187964a913afaaa5b75abc76b99d05d6c052fd4cc9f6",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i02-g01.wav"
+    },
+    {
+        "id":  "i02-g02",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  719566,
+        "transcript_sha256":  "de4d984fd954bacaaeef79c7852dd42850e66bbcd85176a6611124a5c50b5906",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i02-g02.wav"
+    },
+    {
+        "id":  "i02-g03",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  619406,
+        "transcript_sha256":  "72dcf449691025d50656f105abf5eb1e1968a75c4c6a85a9456928017d589e58",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i02-g03.wav"
+    },
+    {
+        "id":  "i02-g04",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  729486,
+        "transcript_sha256":  "740fcb7e3a54f29c5c1080662105bb1d6412f34c3cc5ada8fda87a46051d5826",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i02-g04.wav"
+    },
+    {
+        "id":  "i02-g05",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  658606,
+        "transcript_sha256":  "9eaa27b6b3adb46e079b21697c9b7d2fc5842d34f0edce6c1656d32adbf15f70",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i02-g05.wav"
+    },
+    {
+        "id":  "i02-g06",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  691086,
+        "transcript_sha256":  "b027319f8054144d8aa34006142a59d34ea1db4d04640e2ff0a32a29ee13c236",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i02-g06.wav"
+    },
+    {
+        "id":  "i02-g07",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  670766,
+        "transcript_sha256":  "5613fc23134e3a53599ddf4a08932d1165f02bea13a632de198cf235ad86adb2",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "i02-g07.wav"
+    },
+    {
+        "id":  "u01-g01",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  632206,
+        "transcript_sha256":  "0c8e0917cc2c2c6aa578d6ea6345b1c54c30de85aac3dd4a1bea180d4c798554",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u01-g01.wav"
+    },
+    {
+        "id":  "u01-g02",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  693486,
+        "transcript_sha256":  "0da27d68185a8ff4f946fee1ced2f522420e11e3193e27663465bbea8efa4176",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u01-g02.wav"
+    },
+    {
+        "id":  "u01-g03",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  627726,
+        "transcript_sha256":  "5fd3c15ba262ab6c4e45c43900d49c797af96a7aad4463e7bbc03ad841378ac4",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u01-g03.wav"
+    },
+    {
+        "id":  "u01-g04",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  675498,
+        "transcript_sha256":  "d664ef1bf60b2e6afa615458d376b12a4d451831c23a741624d91d34d6dd0f28",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u01-g04.wav"
+    },
+    {
+        "id":  "u01-g05",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  654766,
+        "transcript_sha256":  "dd96c944e672dea19cf5437d801ebc325ce1b92267433cd3ec0af6aa78395b0e",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u01-g05.wav"
+    },
+    {
+        "id":  "u01-g06",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  683406,
+        "transcript_sha256":  "9ec9c4f6f3173426c31b036b158d421dacf5d357eed1d7e11f38607cc19c27fb",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u01-g06.wav"
+    },
+    {
+        "id":  "u01-g07",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  637646,
+        "transcript_sha256":  "36ca33892155be0b495afc83c9ecf0ddc9271b89f137c9c4d9a4ce2a120d4a3b",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u01-g07.wav"
+    },
+    {
+        "id":  "u02-g01",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  774126,
+        "transcript_sha256":  "aea0602061503f486c7dd5c77fc7930bd60f884acc1af8b472a6aebba7f3f390",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u02-g01.wav"
+    },
+    {
+        "id":  "u02-g02",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  776366,
+        "transcript_sha256":  "c4f6e4995380e69d9b531761870d7d4da2c774fe9ba14d20bc90d970e051eabf",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u02-g02.wav"
+    },
+    {
+        "id":  "u02-g03",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  737326,
+        "transcript_sha256":  "2d23567878f17630fd143d00d343525be0d693089f68f7975cc5f6754c0fed2f",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u02-g03.wav"
+    },
+    {
+        "id":  "u02-g04",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  698698,
+        "transcript_sha256":  "544e7b01af8f647f3958f17ee87520b937bf578dc2ff4e6e44de372a8750b8f7",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u02-g04.wav"
+    },
+    {
+        "id":  "u02-g05",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  799566,
+        "transcript_sha256":  "5cab39f0b2069f6bf0a4e73baaf692b6235c4eb5aacfe3af1d200bfd455474ac",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u02-g05.wav"
+    },
+    {
+        "id":  "u02-g06",
+        "voices":  [
+                       "Microsoft David Desktop",
+                       "Microsoft Zira Desktop"
+                   ],
+        "bytes":  844366,
+        "transcript_sha256":  "90a63432366540f91d6f67350d773ee72a731c9ca784b67148442da1cab4bd7c",
+        "sample_rate":  16000,
+        "synthetic":  true,
+        "file":  "u02-g06.wav"
+    }
+]

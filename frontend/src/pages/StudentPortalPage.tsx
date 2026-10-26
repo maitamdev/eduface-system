@@ -146,30 +146,33 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
     sessions: [],
   });
 
+  const [consent, setConsent] = useState(false);
+  const [courseId, setCourseId] = useState("");
   const gradeLoader = useCallback(
-    () => academicApi.getMyGrade(selectedPersonId || undefined).catch(() => null),
-    [selectedPersonId]
+    () => academicApi.getMyGrade(selectedPersonId || undefined, courseId || undefined),
+    [selectedPersonId, courseId]
   );
+  const transcript = useResource(useCallback(() => academicApi.getTranscript(selectedPersonId || undefined), [selectedPersonId]), { courses: [], credits_graded: 0, weighted_gpa: null });
   const myGrade = useResource<StudentGradeRow | null>(gradeLoader, null);
 
-  const leavesLoader = useCallback(() => academicApi.listLeaves().catch(() => []), []);
+  const leavesLoader = useCallback(() => academicApi.listLeaves(), []);
   const myLeaves = useResource<LeaveRequestOut[]>(leavesLoader, []);
 
   const announcementsLoader = useCallback(
-    () => academicApi.listAnnouncements(portal.data.person?.department || undefined).catch(() => []),
+    () => academicApi.listAnnouncements(portal.data.person?.department || undefined),
     [portal.data.person?.department]
   );
   const announcements = useResource<AnnouncementOut[]>(announcementsLoader, []);
 
   const coursesLoader = useCallback(
-    () => academicApi.listCourses(portal.data.person?.department || undefined).catch(() => []),
+    () => academicApi.listCourses(portal.data.person?.department || undefined),
     [portal.data.person?.department]
   );
   const courses = useResource<CourseOut[]>(coursesLoader, []);
 
   // State cho biểu mẫu xin nghỉ phép trực tuyến
   const [leaveSessionId, setLeaveSessionId] = useState("");
-  const [leaveDate, setLeaveDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [leaveDate, setLeaveDate] = useState(() => new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10));
   const [leaveReason, setLeaveReason] = useState("");
   const [submittingLeave, setSubmittingLeave] = useState(false);
 
@@ -217,6 +220,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
     setEnrollError(null);
     try {
       await personsApi.selfEnroll({
+        consent,
         name: fullName.trim(),
         student_id: studentId.trim().toUpperCase(),
         department: department.trim(),
@@ -279,6 +283,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
           onClick={() => {
             void portal.reload();
             void myGrade.reload();
+            void transcript.reload();
             void myLeaves.reload();
             void announcements.reload();
             void courses.reload();
@@ -288,6 +293,11 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
       </PageHeader>
 
       <ErrorNotice message={portal.error} retry={portal.reload} />
+      <ErrorNotice message={transcript.error} retry={transcript.reload} />
+      <ErrorNotice message={myGrade.error} retry={myGrade.reload} />
+      <ErrorNotice message={myLeaves.error} retry={myLeaves.reload} />
+      <ErrorNotice message={announcements.error} retry={announcements.reload} />
+      <ErrorNotice message={courses.error} retry={courses.reload} />
 
       {role === "admin" && people.data.length > 0 && (
         <Section
@@ -316,11 +326,11 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         </Section>
       )}
 
-      {!portal.loading && (!person || showReenroll) && (
+      {role === "student" && !portal.loading && (!person || showReenroll) && (
         <Section
           title={
             person
-              ? t("Cập nhật thông tin & Chụp lại khuôn mặt AI", "Update student profile & re-capture AI face")
+              ? t("Chụp lại khuôn mặt AI (giữ hồ sơ học vụ)", "Re-capture face (academic profile preserved)")
               : t("Khai báo thông tin sinh viên & Đăng ký khuôn mặt lần đầu", "First-time student profile & face registration")
           }
           description={t(
@@ -338,9 +348,11 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
           <ErrorNotice message={enrollError || camera.error} />
           <form onSubmit={handleSelfEnroll} className="enrollment-grid">
             <div className="stack-form">
-              <Field id="self-name" label={t("Họ và tên sinh viên *", "Full name *")}>
+              <label className="checkbox-label"><input type="checkbox" checked={consent} required onChange={(e) => setConsent(e.target.checked)} />{t("Tôi xác nhận có sự đồng ý xử lý mẫu khuôn mặt cho mục đích điểm danh. Có thể yêu cầu quản trị viên xóa mẫu.", "I confirm consent to process face templates for attendance. Template deletion can be requested from an administrator.")}</label>
+        <Field id="self-name" label={t("Họ và tên sinh viên *", "Full name *")}>
                 <input
                   id="self-name"
+                  readOnly={!!person}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder={t("VD: Nguyễn Văn A", "e.g. Nguyen Van A")}
@@ -351,6 +363,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
               <Field id="self-mssv" label={t("Mã số sinh viên (MSSV) *", "Student ID (MSSV) *")}>
                 <input
                   id="self-mssv"
+                  readOnly={!!person}
                   value={studentId}
                   onChange={(e) => setStudentId(e.target.value)}
                   placeholder={t("VD: 2305CT2070", "e.g. 2305CT2070")}
@@ -361,6 +374,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
               <Field id="self-dept" label={t("Lớp / Học phần *", "Class / Course *")}>
                 <input
                   id="self-dept"
+                  readOnly={!!person}
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                   placeholder={t("VD: KTCN", "e.g. KTCN")}
@@ -371,6 +385,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
               <Field id="self-email" label="Email">
                 <input
                   id="self-email"
+                  readOnly={!!person}
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -539,14 +554,14 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
       {person && (
         <Section
           title={t("Hồ sơ học vụ & sinh trắc học", "Academic & biometric profile")}
-          action={
+          action={role === "student" ? (
             <button type="button" className="secondary-button" onClick={openReenrollForm}>
               <Camera size={14} />
               {showReenroll
                 ? t("Ẩn khung chụp lại", "Hide re-capture")
-                : t("Chụp lại khuôn mặt / Sửa hồ sơ", "Re-capture face / Edit profile")}
+                : t("Đăng ký / Chụp lại khuôn mặt", "Enroll / Re-capture face")}
             </button>
-          }
+          ) : undefined}
         >
           <dl className="config-grid">
             <div>
@@ -564,10 +579,10 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
               <dd>{person.email || user?.username || "–"}</dd>
             </div>
             <div>
-              <dt>{t("Trạng thái khuôn mặt AI", "Face recognition status")}</dt>
+              <dt>{t("Trạng thái hồ sơ", "Profile status")}</dt>
               <dd className="attendance-status">
                 <CheckCircle2 size={13} />
-                {t("Đã đăng ký · Sẵn sàng quét", "Enrolled · Ready for scan")}
+                {t("Đã có hồ sơ sinh viên", "Student profile created")}
               </dd>
             </div>
           </dl>
@@ -583,7 +598,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         <div>
           <dt>{t("Số buổi có mặt", "Sessions present")}</dt>
           <dd>{portal.loading ? "…" : present_count}</dd>
-          <p>{t("đã xác thực khuôn mặt AI", "verified by AI camera")}</p>
+          <p>{t("có mặt, đi muộn hoặc có phép", "present, late or excused")}</p>
         </div>
         <div>
           <dt>{t("Số buổi vắng mặt", "Sessions absent")}</dt>
@@ -597,7 +612,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
           </dd>
           <p className={is_defaulter ? "warning-text" : "attendance-status"}>
             {!person
-              ? t("Hoàn tất đăng ký khuôn mặt ở trên để kích hoạt", "Complete face registration above to activate")
+              ? t("Chưa có hồ sơ để tính chuyên cần", "Select or link a student profile to view attendance")
               : present_count + absent_count === 0
                 ? t("Chưa có buổi được đánh giá", "No assessed sessions yet")
                 : is_defaulter
@@ -607,6 +622,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         </div>
       </dl>
 
+      {person && <Section title={t("Điểm theo học phần", "Course grades")}><p className="field-hint">{t("GPA theo tín chỉ đã có điểm", "Credit-weighted GPA")}: <strong>{transcript.loading ? "…" : transcript.data.weighted_gpa?.toFixed(2) ?? "–"}</strong> · {transcript.data.credits_graded} {t("tín chỉ", "credits")}</p><Field id="student-grade-course" label={t("Chọn học phần / Học kỳ", "Select course / semester")}><select id="student-grade-course" value={courseId} onChange={(e) => setCourseId(e.target.value)}><option value="">{t("Dữ liệu cũ chưa gắn học phần", "Legacy unassigned grades")}</option>{courses.data.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.name} · {c.semester}</option>)}</select></Field></Section>}
       {person && myGrade.data && (
         <Section
           title={t("Bảng điểm Học vụ & Xét điều kiện dự thi cá nhân", "Personal Academic Gradebook & Exam Eligibility")}
@@ -653,7 +669,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                   ? t("Đủ điều kiện dự thi", "Eligible for Final Exam")
                   : t("Cấm thi (< 75%)", "Ineligible (< 75%)")}
               </dd>
-              <p>{myGrade.data.note || t("Quy chế đào tạo tín chỉ đại học", "University credit regulation")}</p>
+              <p>{myGrade.data.note || t("Chính sách điểm đang cấu hình", "Configured grading policy")}</p>
             </div>
           </dl>
         </Section>
@@ -830,8 +846,8 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
       <Section
         title={t("Chi tiết điểm danh theo từng buổi học", "Session-by-session attendance log")}
         description={t(
-          "Danh sách toàn bộ các buổi học của lớp/học phần và thời gian camera ghi nhận bạn có mặt.",
-          "All sessions for your class/course and the exact time the camera recorded your check-in."
+          "Lịch sử các buổi học thuộc hồ sơ. Tỷ lệ chuyên cần tính trên các buổi đã đánh giá, theo ngày bắt đầu buổi học.",
+          "Shows the profile’s session history. Attendance totals include assessed sessions, grouped by session start date."
         )}
         action={
           <div className="chart-range" aria-label={t("Lọc trạng thái", "Filter status")}>
@@ -874,7 +890,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
               <th>{t("Thời gian mở lớp", "Session time")}</th>
               <th>{t("Trạng thái điểm danh", "Attendance status")}</th>
               <th>{t("Giờ quét mặt", "Check-in time")}</th>
-              <th className="align-right">{t("Độ khớp AI", "AI confidence")}</th>
+              <th className="align-right">{t("Tương đồng cosine", "Cosine similarity")}</th>
             </tr>
           </thead>
           <tbody>
@@ -912,7 +928,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                   {session.marked_at ? dateTime(session.marked_at, lang) : "–"}
                 </td>
                 <td className="align-right numeric-cell">
-                  {session.confidence != null ? `${Math.round(session.confidence * 100)}%` : "–"}
+                  {session.confidence != null ? session.confidence.toFixed(3) : "–"}
                 </td>
               </tr>
             ))}

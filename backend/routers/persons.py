@@ -8,11 +8,11 @@ import re
 from typing import List, Optional
 from datetime import datetime, UTC
 
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Form, Query, status
+from fastapi import BackgroundTasks, APIRouter, Depends, HTTPException, Request, UploadFile, File, Form, Query, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from bson import ObjectId
-from core.database import get_db
+from core.database import get_db, get_write_db
 from core.schemas import PersonOut, PersonUpdate
 from core import azure_face
 from core.auth import require_admin, require_operator, require_authenticated, get_user_id_from_request, hash_password, AuthenticatedUser
@@ -155,6 +155,20 @@ async def analyze_photos(request: Request, photos: List[UploadFile] = File(...))
     return report
 
 
+
+async def _store_enrollment_photo(person_id: str, image: bytes):
+    """Optional image upload runs only after the profile transaction commits."""
+    from core.database import get_database
+    try:
+        url = await azure_face.upload_photo_to_blob(person_id, image, "enrollment.jpg")
+        if not url: return
+        db = get_database()
+        updated = await db.persons.update_one({"_id": person_id, "is_active": True}, {"$set": {"photo_url": url}})
+        if not updated.matched_count:
+            await db.biometric_cleanup.update_one({"_id": person_id}, {"$set": {"status": "pending", "has_photo": True, "created_at": datetime.now(UTC)}}, upsert=True)
+    except Exception:
+        logger.exception("Optional enrollment photo upload failed")
+
 @router.post(
     "/enroll",
     response_model=PersonOut,
@@ -163,16 +177,22 @@ async def analyze_photos(request: Request, photos: List[UploadFile] = File(...))
 )
 @limiter.limit("10/minute")
 async def enroll_person(
+    background_tasks: BackgroundTasks,
     request:          Request,
     name:             str              = Form(...),
     student_id:       str              = Form(None),
     email:            str              = Form(None),
     department:       str              = Form(None),
+    person_id:        str              = Form(None),
     student_username: str              = Form(None),
     student_password: str              = Form(None),
+    consent: bool = Form(False),
     photos:           List[UploadFile] = File(...),
-    db: AsyncIOMotorDatabase           = Depends(get_db),
+    db: AsyncIOMotorDatabase           = Depends(get_write_db, scope="function"),
 ):
+    if not consent:
+        raise HTTPException(422, "Cần xác nhận cho phép xử lý mẫu khuôn mặt để điểm danh.")
+
     if len(photos) < 1:
         raise HTTPException(400, "At least 1 photo is required.")
     if len(photos) > 10:
@@ -188,13 +208,25 @@ async def enroll_person(
         logger.exception("InsightFace setup failed")
         raise HTTPException(503, "Face service setup error. Please try again.")
 
-    # ── 1. Check if a person with the same name is already enrolled ──────────
-    # If the admin submits the exact same name again, we allow re-enrolling
-    # (updating their face embeddings and metadata in-place) as long as the
-    # face doesn't belong to a DIFFERENT already-enrolled person.
-    existing_name = await db.persons.find_one(
-        {"name": {"$regex": f"^{re.escape(name.strip())}$", "$options": "i"}, "is_active": True}
-    )
+    clean_mssv = student_id.strip().upper() if student_id and student_id.strip() else None
+    if len(name.strip()) < 2:
+        raise HTTPException(422, "Họ tên phải có ít nhất 2 ký tự.")
+    existing_name = None
+    if person_id:
+        existing_name = await db.persons.find_one({"_id": person_id, "is_active": True})
+        if not existing_name:
+            raise HTTPException(404, "Không tìm thấy hồ sơ cần cập nhật.")
+    if clean_mssv:
+        owner = await db.persons.find_one({"student_id": {"$regex": f"^{re.escape(clean_mssv)}$", "$options": "i"}, "is_active": True})
+        if owner and person_id and owner["_id"] != person_id:
+            raise HTTPException(409, "Mã sinh viên đã thuộc hồ sơ khác.")
+        existing_name = existing_name or owner
+    if student_username and student_username.strip():
+        raw_pw = (student_password or "").strip()
+        if len(student_username.strip()) < 3 or len(raw_pw) < 12:
+            raise HTTPException(422, "Tài khoản mới cần tên ít nhất 3 ký tự và mật khẩu ít nhất 12 ký tự.")
+        if await db.users.find_one({"username": student_username.strip()}):
+            raise HTTPException(409, "Tài khoản đã tồn tại. Liên kết hồ sơ bằng trang quản trị tài khoản.")
 
     # ── 2. Face-level duplicate check (FATAL — never silently skip) ──────────
     try:
@@ -213,7 +245,7 @@ async def enroll_person(
                 409,
                 f"Khuôn mặt này đã được đăng ký dưới tên '{duplicate['name']}' "
                 f"(độ khớp: {duplicate['confidence']*100:.1f}% ở ảnh {duplicate['matched_on_photo']}). "
-                f"Nếu muốn cập nhật lại ảnh cho hồ sơ này, hãy nhập đúng họ tên '{duplicate['name']}' "
+                f"Nếu muốn cập nhật lại ảnh cho hồ sơ này, hãy chọn đúng mã sinh viên / hồ sơ '{duplicate['name']}' "
                 "hoặc xóa hồ sơ cũ tại mục Lớp & Sinh viên."
             )
 
@@ -232,12 +264,6 @@ async def enroll_person(
         raise HTTPException(503, "Enrollment service temporarily unavailable.")
 
     photo_url = ""
-    try:
-        photo_url = await azure_face.upload_photo_to_blob(
-            azure_id, image_bytes_list[0], photos[0].filename or "photo.jpg"
-        )
-    except Exception as e:
-        logger.warning("Blob upload failed (non-critical): %s", e)
 
     enrolled_by = get_user_id_from_request(request)
     clean_mssv = student_id.strip().upper() if student_id and student_id.strip() else None
@@ -249,7 +275,7 @@ async def enroll_person(
             "email":       email if email else existing_name.get("email"),
             "department":  department if department else existing_name.get("department"),
             "photo_url":   photo_url or existing_name.get("photo_url"),
-            "enrolled_at": datetime.now(UTC),
+            "face_updated_at": datetime.now(UTC),
             "is_active":   True,
             "enrolled_by": enrolled_by or existing_name.get("enrolled_by"),
         }
@@ -281,28 +307,17 @@ async def enroll_person(
             raise HTTPException(503, "Enrollment could not be completed. Please try again.")
 
     if student_username and student_username.strip():
-        uname = student_username.strip()
-        raw_pw = (student_password or "").strip() or "123456"
-        if len(uname) >= 3 and len(raw_pw) >= 6 and hasattr(db, "users"):
-            try:
-                existing_user = await db.users.find_one({"username": uname})
-                if existing_user:
-                    await db.users.update_one(
-                        {"_id": existing_user["_id"]},
-                        {"$set": {"person_id": azure_id, "is_active": True}},
-                    )
-                else:
-                    await db.users.insert_one({
-                        "username": uname,
-                        "password_hash": hash_password(raw_pw),
-                        "role": "student",
-                        "person_id": azure_id,
-                        "is_active": True,
-                        "created_at": datetime.now(UTC),
-                    })
-            except Exception as user_err:
-                logger.warning("Could not auto-create student account '%s': %s", uname, user_err)
+        import asyncio
+        await db.users.insert_one({
+            "username": student_username.strip(),
+            "password_hash": await asyncio.to_thread(hash_password, student_password.strip()),
+            "role": "student", "person_id": azure_id, "is_active": True,
+            "created_at": datetime.now(UTC),
+        })
 
+    consent_record = {"version": "2026-10", "recorded_at": datetime.now(UTC), "actor_id": get_user_id_from_request(request)}
+    await db.persons.update_one({"_id": azure_id}, {"$set": {"biometric_consent": consent_record}})
+    background_tasks.add_task(_store_enrollment_photo, azure_id, image_bytes_list[0])
     return PersonOut(**_doc_to_person(person_doc))
 
 
@@ -319,9 +334,13 @@ async def self_enroll_student(
     student_id: str              = Form(...),
     department: str              = Form(...),
     email:      str              = Form(None),
+    consent: bool = Form(False),
     photos:     List[UploadFile] = File(...),
-    db: AsyncIOMotorDatabase     = Depends(get_db),
+    db: AsyncIOMotorDatabase     = Depends(get_write_db, scope="function"),
 ):
+    if not consent:
+        raise HTTPException(422, "Cần xác nhận cho phép xử lý mẫu khuôn mặt để điểm danh.")
+
     """Cho phép sinh viên đăng nhập lần đầu tự khai báo Họ tên, MSSV, Lớp và đăng ký khuôn mặt."""
     user = getattr(request.state, "user", None)
     if not isinstance(user, AuthenticatedUser):
@@ -347,13 +366,21 @@ async def self_enroll_student(
         logger.exception("InsightFace setup failed")
         raise HTTPException(503, "Face service setup error. Please try again.")
 
-    own_person = None
-    if user.person_id:
-        own_person = await db.persons.find_one({"_id": user.person_id, "is_active": True})
-    if not own_person and clean_email:
-        own_person = await db.persons.find_one(
-            {"email": {"$regex": f"^{re.escape(clean_email)}$", "$options": "i"}, "is_active": True}
-        )
+    if user.role != "student" or user.auth_type != "jwt" or not ObjectId.is_valid(user.id):
+        raise HTTPException(403, "Cần đăng nhập bằng tài khoản sinh viên cá nhân.")
+    account = await db.users.find_one({"_id": ObjectId(user.id), "is_active": True})
+    if not account:
+        raise HTTPException(401, "Tài khoản không còn hoạt động.")
+    linked_id = account.get("person_id")
+    own_person = await db.persons.find_one({"_id": linked_id, "is_active": True}) if linked_id else None
+    if linked_id and not own_person:
+        raise HTTPException(409, "Hồ sơ đã liên kết không còn hoạt động. Liên hệ quản trị viên.")
+    if own_person:
+        # A face refresh cannot rewrite registrar-controlled identity/class data.
+        clean_name = own_person["name"]
+        clean_mssv = own_person.get("student_id") or clean_mssv
+        clean_dept = own_person.get("department") or clean_dept
+        clean_email = own_person.get("email")
 
     existing_mssv = await db.persons.find_one(
         {"student_id": {"$regex": f"^{re.escape(clean_mssv)}$", "$options": "i"}, "is_active": True}
@@ -395,7 +422,7 @@ async def self_enroll_student(
             "student_id":  clean_mssv,
             "email":       clean_email or own_person.get("email"),
             "department":  clean_dept,
-            "enrolled_at": datetime.now(UTC),
+            "face_updated_at": datetime.now(UTC),
             "is_active":   True,
         }
         await db.persons.update_one({"_id": azure_id}, {"$set": update_fields})
@@ -420,6 +447,8 @@ async def self_enroll_student(
             {"$set": {"person_id": azure_id, "display_name": clean_name}},
         )
 
+    consent_record = {"version": "2026-10", "recorded_at": datetime.now(UTC), "actor_id": get_user_id_from_request(request)}
+    await db.persons.update_one({"_id": azure_id}, {"$set": {"biometric_consent": consent_record}})
     return PersonOut(**_doc_to_person(person_doc))
 
 
@@ -434,8 +463,9 @@ async def get_person(person_id: str, db: AsyncIOMotorDatabase = Depends(get_db))
 @router.patch("/{person_id}", response_model=PersonOut, dependencies=[Depends(require_operator)])
 async def update_person(
     person_id: str,
+    request: Request,
     body: PersonUpdate,
-    db: AsyncIOMotorDatabase = Depends(get_db),
+    db: AsyncIOMotorDatabase = Depends(get_write_db, scope="function"),
 ):
     doc = await db.persons.find_one({"_id": person_id, "is_active": True})
     if not doc:
@@ -444,14 +474,6 @@ async def update_person(
     updates: dict = {}
     if body.name is not None and body.name.strip():
         clean_name = body.name.strip()
-        if clean_name.lower() != doc["name"].lower():
-            dup = await db.persons.find_one({
-                "_id": {"$ne": person_id},
-                "name": {"$regex": f"^{re.escape(clean_name)}$", "$options": "i"},
-                "is_active": True,
-            })
-            if dup:
-                raise HTTPException(409, f"Hồ sơ mang tên '{clean_name}' đã tồn tại.")
         updates["name"] = clean_name
     if body.student_id is not None:
         clean_mssv = body.student_id.strip().upper() or None
@@ -474,9 +496,11 @@ async def update_person(
             updates[field_name] = val.strip() or None
 
     if updates:
+        request.state.audit_metadata = {"before": {k: doc.get(k) for k in updates}, "after": updates}
         await db.persons.update_one({"_id": person_id}, {"$set": updates})
         if "name" in updates and hasattr(db, "face_encodings"):
             await db.face_encodings.update_one({"_id": person_id}, {"$set": {"name": updates["name"]}})
+            azure_face.invalidate_cache()
         doc.update(updates)
 
     return PersonOut(**_doc_to_person(doc))
@@ -487,7 +511,7 @@ async def update_person(
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(require_admin)],
 )
-async def delete_person(person_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def delete_person(person_id: str, db: AsyncIOMotorDatabase = Depends(get_write_db, scope="function")):
     doc = await db.persons.find_one({"_id": person_id})
     if not doc:
         raise HTTPException(404, "Person not found.")
@@ -496,4 +520,5 @@ async def delete_person(person_id: str, db: AsyncIOMotorDatabase = Depends(get_d
     except Exception:
         logger.exception("Azure delete error")
         raise HTTPException(503, "Delete failed. Please try again.")
-    await db.persons.update_one({"_id": person_id}, {"$set": {"is_active": False}})
+    await db.persons.update_one({"_id": person_id}, {"$set": {"is_active": False, "photo_url": None, "biometric_deleted_at": datetime.now(UTC)}})
+    await db.biometric_cleanup.update_one({"_id": person_id}, {"$set": {"status": "pending", "has_photo": bool(doc.get("photo_url")), "requested_at": datetime.now(UTC)}}, upsert=True)

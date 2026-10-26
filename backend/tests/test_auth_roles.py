@@ -8,8 +8,6 @@ Covers the operator/admin role split (Remediation Plan item #14):
   - a role with no key configured fails closed (503), not open
 """
 
-import importlib
-
 import pytest
 from fastapi import HTTPException
 
@@ -33,16 +31,11 @@ def _route(router, path: str, method: str):
 
 @pytest.fixture
 def auth_module(monkeypatch):
-    """Reload core.auth per test so ADMIN_API_KEYS/OPERATOR_API_KEYS reflect
-    whatever env vars this test sets (they're read once at import time)."""
-    monkeypatch.setenv("API_KEY_ADMIN", "admin-secret-1,admin-secret-2")
-    monkeypatch.setenv("API_KEY_OPERATOR", "operator-secret-1")
-    monkeypatch.delenv("API_KEY", raising=False)
-
+    """Patch key sets without replacing the class used by router imports."""
     from core import auth as auth_mod
-    importlib.reload(auth_mod)
-    yield auth_mod
-    importlib.reload(auth_mod)  # restore normal env-driven state for later tests
+    monkeypatch.setattr(auth_mod, "ADMIN_API_KEYS", {"admin-secret-1", "admin-secret-2"})
+    monkeypatch.setattr(auth_mod, "OPERATOR_API_KEYS", {"operator-secret-1"})
+    return auth_mod
 
 
 @pytest.mark.asyncio
@@ -91,40 +84,29 @@ async def test_missing_key_rejected(auth_module):
 async def test_unconfigured_role_fails_closed_not_open(monkeypatch):
     """If no key is configured for a role at all, the dependency must refuse
     every request with 503 — it must never silently allow access through."""
-    monkeypatch.delenv("API_KEY_ADMIN", raising=False)
-    monkeypatch.delenv("API_KEY_OPERATOR", raising=False)
-    monkeypatch.delenv("API_KEY", raising=False)
-
     from core import auth as auth_mod
-    importlib.reload(auth_mod)
-    try:
-        with pytest.raises(HTTPException) as exc_info:
-            await auth_mod.require_admin(x_api_key="anything")
-        assert exc_info.value.status_code == 503
+    monkeypatch.setattr(auth_mod, "ADMIN_API_KEYS", set())
+    monkeypatch.setattr(auth_mod, "OPERATOR_API_KEYS", set())
+    with pytest.raises(HTTPException) as exc_info:
+        await auth_mod.require_admin(x_api_key="anything")
+    assert exc_info.value.status_code == 503
 
-        with pytest.raises(HTTPException) as exc_info:
-            await auth_mod.require_operator(x_api_key="anything")
-        assert exc_info.value.status_code == 503
-    finally:
-        importlib.reload(auth_mod)
+    with pytest.raises(HTTPException) as exc_info:
+        await auth_mod.require_operator(x_api_key="anything")
+    assert exc_info.value.status_code == 503
 
 
 @pytest.mark.asyncio
 async def test_legacy_api_key_still_works_as_admin_key(monkeypatch):
     """Backward compatibility: a Phase-0-style deployment with only the
     legacy API_KEY set should still authenticate as admin."""
+    from core import auth as auth_mod
     monkeypatch.setenv("API_KEY", "legacy-secret")
     monkeypatch.delenv("API_KEY_ADMIN", raising=False)
-    monkeypatch.delenv("API_KEY_OPERATOR", raising=False)
-
-    from core import auth as auth_mod
-    importlib.reload(auth_mod)
-    try:
-        assert await auth_mod.require_admin(x_api_key="legacy-secret") is True
-        # Admin (including the legacy key) still satisfies operator endpoints.
-        assert await auth_mod.require_operator(x_api_key="legacy-secret") is True
-    finally:
-        importlib.reload(auth_mod)
+    monkeypatch.setattr(auth_mod, "ADMIN_API_KEYS", auth_mod._load_keys("API_KEY_ADMIN", "API_KEY"))
+    monkeypatch.setattr(auth_mod, "OPERATOR_API_KEYS", set())
+    assert await auth_mod.require_admin(x_api_key="legacy-secret") is True
+    assert await auth_mod.require_operator(x_api_key="legacy-secret") is True
 
 
 # ─── Regression: previously-unauthenticated routes must now require a role ──

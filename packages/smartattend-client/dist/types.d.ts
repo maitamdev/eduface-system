@@ -1,19 +1,22 @@
-export type UserRole = "operator" | "admin";
+export type UserRole = "operator" | "admin" | "student";
 export interface User {
     id: string;
     username: string;
-    email: string | null;
+    person_id?: string | null;
+    display_name?: string | null;
     role: UserRole;
     is_active: boolean;
     created_at: string;
 }
 export interface AuthToken {
+    expires_in: number;
     access_token: string;
     token_type: string;
     role: UserRole;
     username: string;
 }
 export interface Person {
+    student_id?: string | null;
     id: string;
     name: string;
     email: string | null;
@@ -23,6 +26,8 @@ export interface Person {
     is_active: boolean;
 }
 export interface Session {
+    course_id?: string | null;
+    late_after_minutes?: number;
     id: string;
     label: string;
     department: string | null;
@@ -42,8 +47,8 @@ export interface AttendanceRecord {
     status: string;
 }
 export interface FaceBoundingBox {
-    x: number;
-    y: number;
+    left: number;
+    top: number;
     width: number;
     height: number;
     [key: string]: unknown;
@@ -54,6 +59,9 @@ export interface IdentifyResult {
     confidence: number;
     face_box: FaceBoundingBox | Record<string, number>;
     already_marked?: boolean;
+    is_live: boolean;
+    liveness_score?: number | null;
+    spoof_reason?: string | null;
 }
 export interface MarkAttendanceResponse {
     session_id: string;
@@ -78,27 +86,34 @@ export interface ActivityItem {
 export interface DailyAttendanceStat {
     date: string;
     total_sessions: number;
-    total_attendees: number;
-    avg_attendance_rate: number;
+    total_present: number;
+    attendance_rate: number;
 }
 export interface PersonAttendanceRate {
     person_id: string;
-    person_name: string;
+    name: string;
     department: string | null;
     total_sessions: number;
-    attended_sessions: number;
-    rate: number;
+    present_count: number;
+    attendance_rate: number;
+    is_defaulter: boolean;
 }
-export interface HeatmapItem {
-    date: string;
-    hour: number;
-    count: number;
+export interface HeatmapResponse {
+    dates: string[];
+    persons: {
+        person_id: string;
+        name: string;
+        department: string | null;
+        data: (number | null)[];
+    }[];
 }
+/** @deprecated use HeatmapResponse for the endpoint response. */
+export type HeatmapItem = HeatmapResponse["persons"][number];
 export interface SystemDiagnostics {
     status: string;
     version?: string;
-    model_loaded: boolean;
-    database_connected: boolean;
+    model: boolean;
+    database: boolean;
     [key: string]: unknown;
 }
 export interface StorageAdapter {

@@ -13,13 +13,20 @@ Features:
 
 import hashlib
 import logging
+import math
 import os
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Tuple
 
 import jwt
-from fastapi import Header, HTTPException, Request, status
+from bson import ObjectId
+from fastapi import Depends, Header, HTTPException, Request, status
+from fastapi.params import Depends as DependsParameter
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.errors import PyMongoError
+
+from core.database import get_db, get_database
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +85,7 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = int(os.environ.get("JWT_EXPIRY_HOURS", "12"))
 
 
-def create_access_token(user_id: str, username: str, role: str) -> Tuple[str, int]:
+def create_access_token(user_id: str, username: str, role: str, auth_version: int = 0) -> Tuple[str, int]:
     """Issue a signed JWT containing user ID and role claim."""
     expires_in = JWT_EXPIRY_HOURS * 3600
     expire = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
@@ -86,6 +93,7 @@ def create_access_token(user_id: str, username: str, role: str) -> Tuple[str, in
         "sub": user_id,
         "username": username,
         "role": role,
+        "auth_version": auth_version,
         "exp": expire,
         "iat": datetime.now(timezone.utc),
     }
@@ -96,13 +104,25 @@ def create_access_token(user_id: str, username: str, role: str) -> Tuple[str, in
 def decode_access_token(token: str) -> dict:
     """Decode and validate a JWT access token."""
     try:
-        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(
+            token, JWT_SECRET, algorithms=[JWT_ALGORITHM],
+            options={"require": ["sub", "username", "role", "exp", "iat"]},
+        )
+        if (
+            any(not isinstance(payload.get(key), str) or not payload[key].strip() for key in ("sub", "username"))
+            or payload.get("role") not in ("admin", "operator", "student")
+            or any(type(payload[key]) not in (int, float) or not math.isfinite(payload[key]) for key in ("exp", "iat"))
+            or type(payload.get("auth_version", 0)) is not int
+            or payload.get("auth_version", 0) < 0
+        ):
+            raise jwt.InvalidTokenError("Invalid identity claims")
+        return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Authentication token has expired. Please log in again.",
         )
-    except jwt.InvalidTokenError:
+    except (jwt.InvalidTokenError, ValueError, TypeError, OverflowError):
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Invalid authentication token.",
@@ -112,11 +132,12 @@ def decode_access_token(token: str) -> dict:
 # ── Authenticated User Context ────────────────────────────────────────────────
 
 class AuthenticatedUser:
-    def __init__(self, id: str, username: str, role: str, auth_type: str = "jwt"):
+    def __init__(self, id: str, username: str, role: str, auth_type: str = "jwt", auth_version: int = 0):
         self.id = id
         self.username = username
         self.role = role
         self.auth_type = auth_type
+        self.auth_version = auth_version
 
     def __bool__(self):
         return True
@@ -176,13 +197,14 @@ def _authenticate(
         if isinstance(auth_hdr, str) and auth_hdr.lower().startswith("bearer "):
             bearer_token = auth_hdr[7:].strip()
 
-    if bearer_token:
+    if bearer_token is not None:
         payload = decode_access_token(bearer_token)
         user = AuthenticatedUser(
             id=payload["sub"],
-            username=payload.get("username", "user"),
-            role=payload.get("role", "operator"),
+            username=payload["username"],
+            role=payload["role"],
             auth_type="jwt",
+            auth_version=payload.get("auth_version", 0),
         )
         if request is not None and hasattr(request, "state"):
             request.state.user = user
@@ -220,15 +242,53 @@ def _authenticate(
     return None, no_keys_configured
 
 
+async def authenticate_live_user(
+    request: Optional[Request],
+    x_api_key: str,
+    authorization: Optional[str],
+    db: Optional[AsyncIOMotorDatabase] = None,
+) -> Tuple[Optional[AuthenticatedUser], bool]:
+    """Resolve JWT identity against current account state, retaining legacy keys.
+
+    Token roles are historical claims. Every request/frame uses the role and
+    active state in MongoDB, so disabling/removing/demoting an account takes
+    effect without waiting for the token to expire.
+    """
+    user, no_keys = _authenticate(request, x_api_key, authorization)
+    if user and user.auth_type == "jwt":
+        if not ObjectId.is_valid(user.id):
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid authentication token.")
+        if db is None or isinstance(db, DependsParameter):
+            db = get_database()
+        try:
+            doc = await db.users.find_one({"_id": ObjectId(user.id)})
+        except PyMongoError:
+            logger.warning("Account verification database unavailable")
+            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Account verification is temporarily unavailable.") from None
+        if (
+            not doc or doc.get("is_active") is not True
+            or doc.get("role") not in ("admin", "operator", "student")
+            or not isinstance(doc.get("username"), str) or not doc["username"].strip()
+            or type(doc.get("auth_version", 0)) is not int
+            or user.auth_version != doc.get("auth_version", 0)
+        ):
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Account is unavailable or the session has been revoked. Please log in again.")
+        user = AuthenticatedUser(str(doc["_id"]), doc["username"], doc["role"], auth_version=doc.get("auth_version", 0))
+        if request is not None:
+            request.state.user = user
+    return user, no_keys
+
+
 # ── RBAC Route Dependencies ───────────────────────────────────────────────────
 
 async def require_admin(
     request: Request = None,
     x_api_key: str = Header(default="", alias="X-API-Key"),
     authorization: Optional[str] = Header(default=None, alias="Authorization"),
+    db: AsyncIOMotorDatabase = Depends(get_db),
 ) -> bool:
     """FastAPI dependency: admin-only endpoints."""
-    user, no_keys = _authenticate(request, x_api_key, authorization)
+    user, no_keys = await authenticate_live_user(request, x_api_key, authorization, db)
 
     if not ADMIN_API_KEYS and (not user or user.auth_type == "api_key"):
         raise HTTPException(
@@ -250,10 +310,11 @@ async def require_operator(
     request: Request = None,
     x_api_key: str = Header(default="", alias="X-API-Key"),
     authorization: Optional[str] = Header(default=None, alias="Authorization"),
+    db: AsyncIOMotorDatabase = Depends(get_db),
 ) -> bool:
     """FastAPI dependency: operator endpoints (create/end sessions, mark attendance).
     An admin key or admin token is also accepted here."""
-    user, no_keys = _authenticate(request, x_api_key, authorization)
+    user, no_keys = await authenticate_live_user(request, x_api_key, authorization, db)
 
     if no_keys and (not user or user.auth_type == "api_key"):
         raise HTTPException(
@@ -275,9 +336,10 @@ async def require_authenticated(
     request: Request = None,
     x_api_key: str = Header(default="", alias="X-API-Key"),
     authorization: Optional[str] = Header(default=None, alias="Authorization"),
+    db: AsyncIOMotorDatabase = Depends(get_db),
 ) -> bool:
     """FastAPI dependency: any authenticated user (student, operator, or admin)."""
-    user, no_keys = _authenticate(request, x_api_key, authorization)
+    user, no_keys = await authenticate_live_user(request, x_api_key, authorization, db)
 
     if no_keys and (not user or user.auth_type == "api_key"):
         raise HTTPException(

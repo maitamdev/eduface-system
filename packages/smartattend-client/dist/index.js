@@ -30,7 +30,7 @@ export class SmartAttendClient {
     options;
     fetchFn;
     constructor(options = {}) {
-        this.baseUrl = (options.baseUrl ?? "http://localhost:8000").replace(/\/+$/, "");
+        this.baseUrl = (options.baseUrl ?? "http://localhost:8000").replace(/\/+$/, "").replace(/\/api$/i, "");
         this.options = options;
         this.fetchFn = options.fetch ?? (typeof fetch !== "undefined" ? fetch.bind(globalThis) : undefined);
         if (!this.fetchFn) {
@@ -109,6 +109,7 @@ export class SmartAttendClient {
         const res = await this.fetchFn(url, {
             ...init,
             headers,
+            signal: init.signal ?? AbortSignal.timeout(45000),
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({ detail: res.statusText }));
@@ -153,7 +154,7 @@ export class SmartAttendClient {
     // ── Persons Module ──────────────────────────────────────────────────────────
     persons = {
         list: async (params) => {
-            return this.request("/api/persons/", { method: "GET" }, params);
+            return this.request("/api/persons", { method: "GET" }, params);
         },
         get: async (id) => {
             return this.request(`/api/persons/${id}`, { method: "GET" });
@@ -161,6 +162,11 @@ export class SmartAttendClient {
         enroll: async (data) => {
             const formData = new FormData();
             formData.append("name", data.name);
+            formData.append("consent", String(data.consent));
+            if (data.student_id)
+                formData.append("student_id", data.student_id);
+            if (data.person_id)
+                formData.append("person_id", data.person_id);
             if (data.email)
                 formData.append("email", data.email);
             if (data.department)
@@ -180,10 +186,10 @@ export class SmartAttendClient {
     // ── Sessions Module ─────────────────────────────────────────────────────────
     sessions = {
         list: async (params) => {
-            return this.request("/api/sessions/", { method: "GET" }, params);
+            return this.request("/api/sessions", { method: "GET" }, params);
         },
         create: async (data) => {
-            return this.request("/api/sessions/", {
+            return this.request("/api/sessions", {
                 method: "POST",
                 body: JSON.stringify(data),
             });
@@ -199,7 +205,7 @@ export class SmartAttendClient {
     attendance = {
         identify: async (photo) => {
             const formData = new FormData();
-            formData.append("photo", photo);
+            formData.append("frame", photo);
             return this.request("/api/attendance/identify", {
                 method: "POST",
                 body: formData,
@@ -207,18 +213,18 @@ export class SmartAttendClient {
         },
         mark: async (data) => {
             const formData = new FormData();
-            formData.append("session_id", data.session_id);
-            formData.append("photo", data.photo);
-            return this.request("/api/attendance/mark", {
+            formData.append("frame", data.photo);
+            formData.append("probe_frame", data.probe_frame);
+            return this.request(`/api/attendance/mark/${encodeURIComponent(data.session_id)}`, {
                 method: "POST",
                 body: formData,
             });
         },
         list: async (params) => {
-            return this.request("/api/attendance/", { method: "GET" }, params);
+            return this.request("/api/attendance", { method: "GET" }, params);
         },
         exportCsv: async (sessionId) => {
-            return this.request("/api/attendance/export", { method: "GET" }, sessionId ? { session_id: sessionId } : undefined);
+            return this.request("/api/attendance/export/csv", { method: "GET" }, sessionId ? { session_id: sessionId } : undefined);
         },
     };
     // ── Dashboard Module ────────────────────────────────────────────────────────
@@ -236,7 +242,7 @@ export class SmartAttendClient {
             return this.request("/api/reports/daily", { method: "GET" }, { days });
         },
         getRates: async (params) => {
-            return this.request("/api/reports/rates", { method: "GET" }, params);
+            return this.request("/api/reports/persons", { method: "GET" }, params);
         },
         getHeatmap: async (days = 30) => {
             return this.request("/api/reports/heatmap", { method: "GET" }, { days });

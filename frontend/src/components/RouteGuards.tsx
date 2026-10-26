@@ -22,7 +22,7 @@ export const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children 
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (role === "student" && location.pathname !== "/student") {
+  if (role === "student" && !["/student", "/toeic"].includes(location.pathname.replace(/\/$/, ""))) {
     return <Navigate to="/student" replace />;
   }
 

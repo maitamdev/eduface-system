@@ -1,3 +1,5 @@
+> Tài liệu trước đợt sửa 27/10/2026; một số mô tả kiến trúc/AI/quyền có thể đã cũ. Đối chiếu [README hiện hành](../README.md) và [hướng dẫn nâng cấp](../docs/UPGRADE_2026_10.md). Không coi các số accuracy/latency cũ là kết quả nghiệm thu.
+
 # 👁️ Biometric Vision & Quality Pipeline
 
 SmartAttend leverages local neural networks to identify multiple subjects in unconstrained camera frames without cloud dependencies, backed by strict mathematical quality gates and privacy guarantees.

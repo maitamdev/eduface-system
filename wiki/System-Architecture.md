@@ -1,3 +1,5 @@
+> Tài liệu trước đợt sửa 27/10/2026; một số mô tả kiến trúc/AI/quyền có thể đã cũ. Đối chiếu [README hiện hành](../README.md) và [hướng dẫn nâng cấp](../docs/UPGRADE_2026_10.md). Không coi các số accuracy/latency cũ là kết quả nghiệm thu.
+
 # 🏗️ System Architecture & Compute Engine
 
 SmartAttend is engineered as an asynchronous, decoupled client-server architecture balancing compute-heavy computer vision tasks with high-throughput I/O persistence and a suite of standalone modular packages.

@@ -7,12 +7,14 @@ const RAW_BASE_URL =
   import.meta.env.VITE_API_URL ||
   (import.meta.env.PROD ? "https://eduface-system.onrender.com" : "http://localhost:8000");
 export const API_BASE_URL = RAW_BASE_URL.replace(/\/+$/, "").replace(/\/api$/i, "");
-const FALLBACK_API_KEY = import.meta.env.VITE_API_KEY || "";
+const FALLBACK_API_KEY = import.meta.env.DEV ? import.meta.env.VITE_API_KEY || "" : "";
 
 const TOKEN_STORAGE_KEY = "aura_attend_jwt_token";
+// Remove the previous persistent copy during the storage migration.
+if (typeof window !== "undefined") window.localStorage.removeItem(TOKEN_STORAGE_KEY);
 
 let inMemoryToken: string | null =
-  typeof window !== "undefined" ? window.localStorage.getItem(TOKEN_STORAGE_KEY) : null;
+  typeof window !== "undefined" ? window.sessionStorage.getItem(TOKEN_STORAGE_KEY) : null;
 
 export function getStoredToken(): string | null {
   return inMemoryToken;
@@ -22,9 +24,9 @@ export function setStoredToken(token: string | null): void {
   inMemoryToken = token;
   if (typeof window !== "undefined") {
     if (token) {
-      window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      window.sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
     } else {
-      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+      window.sessionStorage.removeItem(TOKEN_STORAGE_KEY);
     }
   }
 }
@@ -51,7 +53,7 @@ function buildAuthHeaders(): Record<string, string> {
   return headers;
 }
 
-async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (import.meta.env.DEV && /^\/design-preview(?:\/|$)/.test(window.location.pathname)) {
     const { previewRequest } = await import("@/preview/mockApi");
     return previewRequest(path, init) as Promise<T>;
@@ -76,6 +78,10 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
     let message = errBody?.detail || `HTTP ${response.status}`;
     if (Array.isArray(message)) {
       message = message.map((item: any) => item?.msg || JSON.stringify(item)).join("; ");
+    }
+    const requestId = response.headers.get("X-Request-ID") || errBody?.request_id;
+    if (response.status >= 500 && typeof requestId === "string" && /^[A-Za-z0-9._-]{1,64}$/.test(requestId)) {
+      message = `${message} (Mã yêu cầu: ${requestId})`;
     }
     throw new ApiClientError(response.status, String(message), errBody);
   }
@@ -180,6 +186,10 @@ export interface CourseOut {
 }
 
 export interface StudentGradeRow {
+  course_id?: string | null;
+  course_name?: string | null;
+  semester?: string | null;
+  credits?: number;
   person_id: string;
   name: string;
   student_id?: string | null;
@@ -241,6 +251,7 @@ export interface EnrollmentAnalysisReport {
 }
 
 export interface SessionOut {
+  course_id?: string | null;
   id: string;
   label: string;
   department: string | null;
@@ -379,20 +390,12 @@ export function getSocketAuthentication() {
   return inMemoryToken ? { authorization: `Bearer ${inMemoryToken}` } : { api_key: FALLBACK_API_KEY };
 }
 
-const DEFAULT_GOOGLE_CLIENT_ID =
-  "839148608863-iv1en34namc76757touqsf36u1950ou2.apps.googleusercontent.com";
-
 export const authApi = {
-  googleConfig: async () => {
-    const envClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID).trim();
-    try {
-      const cfg = await apiFetch<{ enabled: boolean; client_id: string }>("/api/auth/google/config");
-      if (cfg.enabled && cfg.client_id) return cfg;
-    } catch {
-      // ignore if backend not updated yet
-    }
-    return { enabled: envClientId.length >= 15, client_id: envClientId };
+  changePassword: async (current: string, next: string) => {
+    const result = await apiFetch<TokenResponse>("/api/auth/password", { method: "POST", body: JSON.stringify({ current_password: current, new_password: next }) });
+    setStoredToken(result.access_token); return result;
   },
+  googleConfig: () => apiFetch<{ enabled: boolean; client_id: string }>("/api/auth/google/config"),
   googleExchange: async (accessToken: string) => {
     const response = await apiFetch<TokenResponse>("/api/auth/google", {
       method: "POST",
@@ -484,6 +487,8 @@ export const personsApi = {
     });
   },
   enroll: (params: {
+    person_id?: string;
+    consent: boolean;
     name: string;
     student_id?: string;
     email?: string;
@@ -493,6 +498,8 @@ export const personsApi = {
     photos: (Blob | File)[];
   }) => {
     const fd = new FormData();
+    fd.append("consent", String(params.consent));
+    if (params.person_id) fd.append("person_id", params.person_id);
     fd.append("name", params.name.trim());
     if (params.student_id?.trim()) fd.append("student_id", params.student_id.trim());
     if (params.email?.trim()) fd.append("email", params.email.trim());
@@ -506,6 +513,7 @@ export const personsApi = {
     });
   },
   selfEnroll: (params: {
+    consent: boolean;
     name: string;
     student_id: string;
     department: string;
@@ -513,6 +521,7 @@ export const personsApi = {
     photos: (Blob | File)[];
   }) => {
     const fd = new FormData();
+    fd.append("consent", String(params.consent));
     fd.append("name", params.name.trim());
     fd.append("student_id", params.student_id.trim());
     fd.append("department", params.department.trim());
@@ -532,20 +541,29 @@ export const personsApi = {
 };
 
 export const sessionsApi = {
-  list: (active?: boolean, limit = 50) => {
+  listAll: async (active?: boolean): Promise<SessionOut[]> => {
+    const all: SessionOut[] = [];
+    for (let offset = 0;; offset += 200) {
+      const page = await sessionsApi.list(active, 200, offset); all.push(...page);
+      if (page.length < 200) return all;
+    }
+  },
+  list: (active?: boolean, limit = 50, offset = 0) => {
     const qs = new URLSearchParams();
     if (active !== undefined) qs.set("active", String(active));
     qs.set("limit", String(limit));
+    qs.set("offset", String(offset));
     return apiFetch<SessionOut[]>(`/api/sessions?${qs.toString()}`);
   },
   get: (id: string) => apiFetch<SessionOut>(`/api/sessions/${id}`),
-  create: (label: string, department?: string, lateAfterMinutes = 15) =>
+  create: (label: string, department?: string, lateAfterMinutes = 15, courseId?: string) =>
     apiFetch<SessionOut>("/api/sessions", {
       method: "POST",
       body: JSON.stringify({
         label: label.trim(),
         department: department?.trim() || undefined,
         late_after_minutes: lateAfterMinutes,
+        course_id: courseId,
       }),
     }),
   end: (id: string) =>
@@ -555,6 +573,13 @@ export const sessionsApi = {
 };
 
 export const attendanceApi = {
+  listAll: async (filters: { session_id?: string; date?: string; status?: string } = {}): Promise<AttendanceOut[]> => {
+    const all: AttendanceOut[] = [];
+    for (let offset = 0;; offset += 1000) {
+      const page = await attendanceApi.list({ ...filters, limit: 1000, offset }); all.push(...page);
+      if (page.length < 1000) return all;
+    }
+  },
   identify: (frameBlob: Blob | File, confidence = 0.4) => {
     const fd = new FormData();
     fd.append("frame", frameBlob, "frame.jpg");
@@ -583,6 +608,7 @@ export const attendanceApi = {
     date?: string;
     status?: string;
     limit?: number;
+    offset?: number;
   }) => {
     const qs = new URLSearchParams();
     if (filters?.session_id) qs.set("session_id", filters.session_id);
@@ -590,6 +616,7 @@ export const attendanceApi = {
     if (filters?.date) qs.set("date", filters.date);
     if (filters?.status) qs.set("status", filters.status);
     if (filters?.limit) qs.set("limit", String(filters.limit));
+    if (filters?.offset) qs.set("offset", String(filters.offset));
     const queryStr = qs.toString();
     return apiFetch<AttendanceOut[]>(`/api/attendance${queryStr ? `?${queryStr}` : ""}`);
   },
@@ -666,6 +693,7 @@ export const reportsApi = {
 };
 
 export const academicApi = {
+  getTranscript: (personId?: string) => apiFetch<{ courses: StudentGradeRow[]; credits_graded: number; weighted_gpa: number | null }>(`/api/academic/my-transcript${personId ? `?person_id=${encodeURIComponent(personId)}` : ""}`),
   listCourses: (department?: string) => {
     const qs = new URLSearchParams();
     if (department) qs.set("department", department);
@@ -689,17 +717,20 @@ export const academicApi = {
     apiFetch<void>(`/api/academic/courses/${encodeURIComponent(id)}`, {
       method: "DELETE",
     }),
-  listGrades: (department?: string) => {
+  listGrades: (department?: string, courseId?: string) => {
     const qs = new URLSearchParams();
+    if (courseId) qs.set("course_id", courseId);
     if (department) qs.set("department", department);
     return apiFetch<StudentGradeRow[]>(`/api/academic/grades${qs.toString() ? `?${qs.toString()}` : ""}`);
   },
-  getMyGrade: (personId?: string) => {
+  getMyGrade: (personId?: string, courseId?: string) => {
     const qs = new URLSearchParams();
+    if (courseId) qs.set("course_id", courseId);
     if (personId) qs.set("person_id", personId);
     return apiFetch<StudentGradeRow | null>(`/api/academic/my-grade${qs.toString() ? `?${qs.toString()}` : ""}`);
   },
   upsertGrade: (payload: {
+    course_id: string;
     person_id: string;
     midterm_score?: number | null;
     final_score?: number | null;
@@ -776,6 +807,7 @@ export const academicApi = {
       updated: number;
       accounts_created: number;
       total_processed: number;
+      credentials: { username: string; password: string; student_id: string }[];
     }>("/api/academic/import-students", {
       method: "POST",
       body: JSON.stringify(payload),

@@ -1,0 +1,2061 @@
+{
+  "version": "dhv-toeic-2026.10-v1",
+  "notice": "Học liệu tự biên soạn, không phải đề ETS. Mục tiêu 900 là định hướng học, không bảo đảm kết quả. ‘Từ 0’ nghĩa là bắt đầu từ nền tảng; điểm TOEIC L&R chính thức là 10–990. Âm thanh là giọng tổng hợp; Part 1 dùng hình minh họa.",
+  "stages": [
+    {
+      "id": 0,
+      "title": "Bắt đầu từ nền tảng",
+      "range": "Nền tảng → 250",
+      "focus": "Âm, từ loại, cấu trúc câu và thông tin ngắn",
+      "weeks": "4–8 tuần gợi ý"
+    },
+    {
+      "id": 1,
+      "title": "Xây nền vững",
+      "range": "250 → 450",
+      "focus": "Mô tả hình, câu hỏi thường gặp, thì và email",
+      "weeks": "4–6 tuần gợi ý"
+    },
+    {
+      "id": 2,
+      "title": "Kết nối ý nghĩa",
+      "range": "450 → 650",
+      "focus": "Paraphrase, hội thoại, bị động và đoạn văn",
+      "weeks": "4–6 tuần gợi ý"
+    },
+    {
+      "id": 3,
+      "title": "Đọc sâu · nghe chắc",
+      "range": "650 → 800",
+      "focus": "Suy luận, mục đích người nói, từ vựng ngữ cảnh",
+      "weeks": "4–8 tuần gợi ý"
+    },
+    {
+      "id": 4,
+      "title": "Hướng đến 900",
+      "range": "800 → 900",
+      "focus": "Nối nhiều văn bản, ý ngầm, độ chính xác và tốc độ",
+      "weeks": "6–10 tuần gợi ý"
+    }
+  ],
+  "sources": [
+    {
+      "id": "ets",
+      "title": "ETS · Preparation materials",
+      "url": "https://www.ets.org/toeic/test-takers/prepare.html",
+      "provider": "ETS",
+      "access": "Mẫu miễn phí / khóa học có phí",
+      "stage": "Mọi chặng",
+      "usage": "Dẫn link chính thức; không tái phân phối đề hoặc audio ETS."
+    },
+    {
+      "id": "iig",
+      "title": "IIG · English Discoveries & TOEIC OLPC",
+      "url": "https://toeic.iigvietnam.com/on-luyen/",
+      "provider": "IIG Việt Nam",
+      "access": "Có phí; xem giá tại nhà cung cấp",
+      "stage": "Nền tảng đến luyện thi",
+      "usage": "Tham khảo khóa học chính thống. Không mua hay tích hợp tài khoản trả phí tự động."
+    },
+    {
+      "id": "iig-academy",
+      "title": "IIG Academy · Các chương trình đào tạo",
+      "url": "https://iigacademy.edu.vn/",
+      "provider": "IIG Academy",
+      "access": "Khóa đào tạo có phí",
+      "stage": "Theo đánh giá đầu vào",
+      "usage": "Liên hệ nhà cung cấp để chọn lớp; không cam kết đầu ra thay họ."
+    },
+    {
+      "id": "bc-grammar",
+      "title": "British Council · A1–A2 grammar",
+      "url": "https://learnenglish.britishcouncil.org/free-resources/grammar/a1-a2",
+      "provider": "British Council",
+      "access": "Bài học công khai",
+      "stage": "Nền tảng / 250–450",
+      "usage": "Học bổ trợ trên trang gốc; nội dung không được chép vào ứng dụng."
+    },
+    {
+      "id": "bc-listening",
+      "title": "British Council · A1 listening",
+      "url": "https://learnenglish.britishcouncil.org/free-resources/listening/a1",
+      "provider": "British Council",
+      "access": "Bài học công khai",
+      "stage": "Nền tảng",
+      "usage": "Bổ sung giọng người thật. Học trên trang của nhà cung cấp."
+    },
+    {
+      "id": "cambridge",
+      "title": "Cambridge English · Learning activities",
+      "url": "https://www.cambridgeenglish.org/learning-english/activities-for-learners/",
+      "provider": "Cambridge English",
+      "access": "Hoạt động miễn phí",
+      "stage": "Lọc theo trình độ",
+      "usage": "Luyện kỹ năng tiếng Anh tổng quát, không phải ngân hàng TOEIC."
+    },
+    {
+      "id": "format",
+      "title": "IIBC · Cấu trúc TOEIC L&R",
+      "url": "https://www.iibc-global.org/english/toeic/test/lr/about/format.html",
+      "provider": "IIBC",
+      "access": "Thông tin chính thức",
+      "stage": "Làm quen bài thi",
+      "usage": "200 câu, nghe khoảng 45 phút và đọc 75 phút; xem nguồn khi có thay đổi."
+    },
+    {
+      "id": "fsrs",
+      "title": "Py-FSRS · Lịch ôn cách quãng",
+      "url": "https://github.com/open-spaced-repetition/py-fsrs",
+      "provider": "Open Spaced Repetition",
+      "access": "Mã nguồn MIT",
+      "stage": "Ôn từ mỗi ngày",
+      "usage": "Thư viện được tích hợp ở server để lên lịch ôn riêng từng người."
+    }
+  ],
+  "lessons": [
+    {
+      "id": "f01",
+      "stage": 0,
+      "title": "Nghe số, giờ và từ để hỏi",
+      "part": 2,
+      "minutes": 25,
+      "objectives": [
+        "Phân biệt thirteen/thirty và các mốc giờ",
+        "Xác định câu hỏi hỏi ai, ở đâu hay khi nào"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Nghe từ để hỏi trước khi cố hiểu mọi từ. Who hỏi người, where hỏi nơi chốn, when hỏi thời điểm; how long hỏi khoảng thời gian. Mười ba (thirteen) thường nhấn âm cuối, ba mươi (thirty) nhấn âm đầu. Nghe thêm danh từ đi sau để hiểu số tiền, số lượng hay giờ."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "When does the meeting start? — At half past nine. Half past nine là 9:30.\nHow long is the tour? — About two hours. Đây là khoảng thời gian, không phải một giờ trên đồng hồ.\nWho handles invoices? — Mina in accounting. Phòng kế toán là ngữ cảnh; Mina mới là người được hỏi."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Nghe lần 1 và chọn ý chính. Nghe lần 2 để ghi số hoặc cụm từ khóa. Sau khi nộp mới mở transcript, gạch chân thông tin quyết định. Đọc theo từng cụm 3–5 từ, không đọc từng chữ."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 10
+    },
+    {
+      "id": "f02",
+      "stage": 0,
+      "title": "Dựng câu: chủ ngữ, động từ, từ loại",
+      "part": 5,
+      "minutes": 25,
+      "objectives": [
+        "Nhìn ra động từ chính của câu",
+        "Chọn danh từ, tính từ, trạng từ theo vị trí"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Một câu đơn thường có chủ ngữ + động từ + phần bổ sung. Danh từ làm chủ ngữ/tân ngữ; tính từ bổ nghĩa danh từ; trạng từ bổ nghĩa động từ hoặc tính từ. Sau a/an/the thường cần một cụm danh từ. Sau can/must/should dùng động từ nguyên mẫu không to."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "The assistant checks the schedule. Assistant là chủ ngữ, checks là động từ.\nPlease read the instructions carefully. Carefully mô tả cách đọc nên là trạng từ.\nThe report is accurate. Sau be có thể là tính từ chỉ đặc điểm."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Trước khi nhìn đáp án, ghi loại từ cần điền. Loại các đáp án sai chức năng rồi mới kiểm tra nghĩa. Không chọn chỉ vì nhìn thấy hậu tố quen thuộc: position và ngữ cảnh quyết định."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 12
+    },
+    {
+      "id": "f03",
+      "stage": 0,
+      "title": "Từ vựng văn phòng và cụm từ tự nhiên",
+      "part": 5,
+      "minutes": 25,
+      "objectives": [
+        "Nhận biết các vật dụng và việc văn phòng",
+        "Học cụm từ thay vì dịch từng từ"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Collocation là những từ thường đi cùng nhau: make an appointment, meet a deadline, attend a meeting. Một từ có thể có nhiều nghĩa: file có thể là hồ sơ hoặc động từ lưu hồ sơ. Hãy đọc cả câu để xác định vai trò và nghĩa."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Please attach the receipt to your claim. Attach là đính kèm; receipt là biên lai.\nWe need to meet the deadline. Không dịch meet thành gặp người trong cụm này.\nThe printer is out of paper. Out of nghĩa là hết, không phải ở ngoài."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Mỗi thẻ học theo ba bước: đọc từ, tự nhớ nghĩa, rồi đặt câu tương tự với công việc của mình. Chỉ bấm Dễ khi nhớ được cả nghĩa lẫn cách dùng; quên thì chọn Học lại để FSRS lên lịch gần hơn."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 10
+    },
+    {
+      "id": "f04",
+      "stage": 0,
+      "title": "Đọc biển báo và tin nhắn ngắn",
+      "part": 7,
+      "minutes": 25,
+      "objectives": [
+        "Tìm người nhận, hành động và thời hạn",
+        "Phân biệt thông tin có trong bài với suy đoán"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Đọc tiêu đề và các từ khóa như closed, until, before, available trước. Câu hỏi What/When/Where thường cần một chi tiết rõ ràng. Before Friday không tự động đồng nghĩa on Friday. Khi thông tin không được nêu, đừng chọn một đáp án chỉ vì nó có vẻ hợp lý."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Closed for repairs until Monday: cửa hàng chưa mở trong thời gian sửa chữa, không phải đóng cửa vĩnh viễn.\nBring your employee ID: yêu cầu mang thẻ nhân viên, không phải danh thiếp.\nCall before visiting: cần gọi trước, không có nghĩa chỉ được liên hệ bằng điện thoại."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Giới hạn 45–60 giây cho một tin ngắn. Gạch chân một câu bằng chứng cho đáp án. Sau bài, viết lại thông báo bằng một câu tiếng Việt để kiểm tra mình hiểu đúng yêu cầu."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 12
+    },
+    {
+      "id": "b01",
+      "stage": 1,
+      "title": "Part 1 · Hành động và vị trí trong hình",
+      "part": 1,
+      "minutes": 25,
+      "objectives": [
+        "Phân biệt hành động đang diễn ra và trạng thái",
+        "Dùng giới từ vị trí chính xác"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Với người, chú ý động từ đang diễn ra: is carrying, is typing. Với đồ vật, phân biệt trạng thái với hành động: are stacked khác are being stacked. Kiểm tra chủ thể, động từ và vị trí; chỉ một chi tiết sai cũng đủ loại đáp án. Bài này dùng hình minh họa tự tạo để luyện mô tả, không phải ảnh đề thi."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "A woman is carrying a box: có người đang mang hộp.\nChairs are arranged around a table: mô tả cách xếp ghế, không nói ai đang xếp.\nA bicycle is leaning against a wall: xe đạp tựa vào tường, không phải nằm dưới bàn."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Nhìn hình 5 giây và tự nói một câu trước khi nghe. Sau khi nộp, so sánh động từ và giới từ ở từng lựa chọn. Với đề thật, tiếp tục luyện trên ảnh và audio mẫu ở nguồn ETS."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 8
+    },
+    {
+      "id": "b02",
+      "stage": 1,
+      "title": "Part 2 · Yêu cầu, đề nghị và câu hỏi lựa chọn",
+      "part": 2,
+      "minutes": 25,
+      "objectives": [
+        "Trả lời đúng chức năng giao tiếp",
+        "Không mắc bẫy từ lặp và âm gần giống"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Could you…? thường là lời nhờ, nên câu trả lời có thể nhận lời hoặc giải thích vì sao chưa làm được. Would you like…? là đề nghị. Câu hỏi A or B có thể được trả lời bằng Neither/Either hoặc một lựa chọn. Đáp án đúng không nhất thiết lặp từ khóa trong câu hỏi."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Could you print this? — Certainly, how many copies?\nWould you prefer tea or coffee? — Tea, please.\nWhy is the room locked? — The cleaning team is still inside. Câu trả lời là lý do chứ không phải Yes/No."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Tự phân loại từng câu thành hỏi thông tin / nhờ / đề nghị / lựa chọn. Nếu sai vì nghe âm, nghe lại cả cụm. Nếu sai vì nghĩa, viết một câu đáp tương đương bằng từ khác."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 12
+    },
+    {
+      "id": "b03",
+      "stage": 1,
+      "title": "Thì, hòa hợp chủ vị và dấu hiệu thời gian",
+      "part": 5,
+      "minutes": 25,
+      "objectives": [
+        "Chọn thì từ mốc thời gian",
+        "Nhận ra chủ ngữ thật giữa các cụm bổ nghĩa"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Hiện tại đơn diễn tả thói quen; quá khứ đơn gắn với mốc đã kết thúc; hiện tại hoàn thành nối quá khứ với hiện tại. Since đi với mốc bắt đầu, for đi với khoảng thời gian. Đừng để danh từ gần động từ trong cụm of/with đánh lạc hướng hòa hợp chủ vị."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "The list of suppliers is on my desk. Chủ ngữ là list, không phải suppliers.\nWe shipped the order yesterday. Yesterday là mốc đã kết thúc.\nShe has worked here since 2022. Trạng thái bắt đầu trước và vẫn còn hiện nay."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Khoanh chủ ngữ và gạch chân mốc thời gian trước. Giải thích vì sao ba dạng còn lại không phù hợp. Khi gặp hiện tại hoàn thành và quá khứ đơn, hỏi: mốc thời gian có đóng lại không?"
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 12
+    },
+    {
+      "id": "b04",
+      "stage": 1,
+      "title": "Email: mục đích, người nhận và việc cần làm",
+      "part": 7,
+      "minutes": 25,
+      "objectives": [
+        "Đọc nhanh subject, opening và closing",
+        "Nhận ra yêu cầu được diễn đạt gián tiếp"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Email thường có mục đích chính: xác nhận, yêu cầu, xin lỗi, thông báo hoặc mời. Subject gợi chủ đề nhưng câu hành động mới cho biết người nhận phải làm gì. Please let me know by… yêu cầu phản hồi trước hạn. Thank you for… thường nhắc một việc đã xảy ra."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Could you send the revised quote? là yêu cầu báo giá đã sửa, không phải hóa đơn.\nWe have received your application xác nhận nhận hồ sơ, chưa phải tuyển dụng.\nPlease ignore the earlier schedule: lịch cũ bị thay thế."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Đọc câu hỏi trước, tìm bằng chứng trong email, rồi đối chiếu paraphrase. Luôn kiểm tra thì: has been sent khác will be sent. Không tự suy ra một cuộc hẹn đã được xác nhận nếu email chỉ đề xuất."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 12
+    },
+    {
+      "id": "i01",
+      "stage": 2,
+      "title": "Part 2 · Câu đáp gián tiếp và ý ngầm",
+      "part": 2,
+      "minutes": 35,
+      "objectives": [
+        "Hiểu câu trả lời không dùng yes/no",
+        "Theo dõi thay đổi kế hoạch và trách nhiệm"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Câu đáp gián tiếp vẫn giải quyết mục đích câu hỏi: Do you have the key? — Try the front desk. Đáp án này gợi nơi lấy chìa khóa. Trong câu hỏi phủ định và tag question, đừng chỉ đếm yes/no; phải hiểu mệnh đề mà người nói xác nhận."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Can we use the large room? — It's booked until noon. Hàm ý chưa dùng được trước trưa.\nWho is driving? — I haven't brought my car. Hàm ý người này không lái.\nHas the courier arrived? — There's a parcel at reception. Có bằng chứng gián tiếp việc giao hàng."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Với mỗi lựa chọn, hỏi: câu này giúp giải quyết việc người hỏi đang cần không? Tránh chọn chỉ vì có từ cùng chủ đề. Sau bài, viết nghĩa hàm ý bằng tiếng Việt rồi diễn đạt lại bằng một câu ngắn tiếng Anh."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 10
+    },
+    {
+      "id": "i02",
+      "stage": 2,
+      "title": "Part 3 · Theo dõi hội thoại công việc",
+      "part": 3,
+      "minutes": 35,
+      "objectives": [
+        "Xác định vấn đề, giải pháp và bước tiếp theo",
+        "Phân biệt người nói và thông tin được sửa lại"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Một hội thoại có thể đổi hướng: đề xuất đầu tiên bị từ chối, giải pháp sau mới là kết luận. Đọc ba câu hỏi trước để biết cần nghe địa điểm, lý do hay hành động. Giữ mốc tên người và vai trò; thông tin cuối thường chốt trách nhiệm."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "We could meet at nine. — I have a call then. How about ten? Cuộc gặp chuyển sang 10 giờ.\nI'll ask the technician: người nói hứa liên hệ kỹ thuật viên, chưa hứa sửa được ngay.\nBecause the supplier is late nêu nguyên nhân, không phải đề xuất."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Nghe một lượt không dừng, trả lời cả nhóm câu hỏi rồi mới nghe lại. Vẽ chuỗi vấn đề → giải pháp → ai làm gì. Các câu trong cùng hội thoại phải dựa trên cùng đoạn, không cộng thông tin từ hội thoại khác."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 21
+    },
+    {
+      "id": "i03",
+      "stage": 2,
+      "title": "Bị động, mệnh đề quan hệ và liên từ",
+      "part": 5,
+      "minutes": 35,
+      "objectives": [
+        "Nhận ra đối tượng nhận hành động",
+        "Phân biệt liên từ và giới từ theo cấu trúc"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Bị động dùng be + quá khứ phân từ khi chủ ngữ nhận hành động. Which/that thay vật, who thay người, whose chỉ sở hữu. Because đi với mệnh đề; because of đi với cụm danh từ. Although và despite cùng diễn tả tương phản nhưng không dùng cùng cấu trúc."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "The forms must be signed today: mẫu đơn được ký.\nThe designer who joined yesterday is in Room 2: who làm chủ ngữ mệnh đề quan hệ.\nDespite the rain, the tour continued; although it rained, the tour continued."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Đánh dấu chỗ trống cần một mệnh đề hay cụm danh từ. Với bị động, tìm người/vật thực hiện hành động nếu có by. Không cứ thấy by là chọn bị động: by Friday có thể chỉ thời hạn."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 10
+    },
+    {
+      "id": "i04",
+      "stage": 2,
+      "title": "Part 6 · Mạch đoạn văn và câu nối",
+      "part": 6,
+      "minutes": 35,
+      "objectives": [
+        "Giải chỗ trống bằng cả ngữ pháp lẫn ngữ cảnh",
+        "Dùng từ chỉ ngược để chọn câu nối"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Trong Part 6, câu kế tiếp có thể quyết định đáp án câu trước. This change, these items, therefore và however cần một ý được nhắc phù hợp. Đọc lướt toàn đoạn để xác định văn phong và thời gian trước khi điền. Một câu đúng ngữ pháp vẫn có thể sai mạch ý."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "The entrance will move to the east side. Signs will direct visitors there. There chỉ east side.\nDemand has risen. Therefore, we will extend opening hours. Therefore nối kết quả.\nThe service is free. However, registration is required: điều kiện bổ sung trái với kỳ vọng miễn phí là không cần thủ tục."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Làm cả bốn câu trong một đoạn. Sau khi điền, đọc lại đoạn liền mạch; kiểm tra đại từ và từ nối có đối tượng tham chiếu rõ không. Giữ khoảng 30–45 giây cho câu ngữ pháp, thêm thời gian cho câu chèn."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 12
+    },
+    {
+      "id": "u01",
+      "stage": 3,
+      "title": "Part 3 · Suy luận có bằng chứng",
+      "part": 3,
+      "minutes": 35,
+      "objectives": [
+        "Hiểu lời đề nghị gián tiếp",
+        "Suy luận đúng mức, không thêm chi tiết"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Câu What does the speaker imply? cần suy luận từ câu nói và tình huống liền trước. Không chọn một ý khẳng định mạnh hơn bằng chứng. Có thể suy ra cần thêm thời gian từ We still have fifty packages to label, nhưng không suy ra chắc chắn sẽ trễ nếu chưa biết thời hạn."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "The store closes in ten minutes thường ngụ ý cần quyết định nhanh.\nWe have already paid the deposit có thể là lý do nên giữ đặt chỗ, không có nghĩa đã thanh toán toàn bộ.\nI'll check whether… là lời hứa kiểm tra, chưa xác nhận kết quả."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Viết riêng hai cột: điều nghe rõ và điều suy ra. Với đáp án suy luận, nối nó với một câu bằng chứng cụ thể. Tập nhận biết mức độ chắc chắn: might, should, will, definitely."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 21
+    },
+    {
+      "id": "u02",
+      "stage": 3,
+      "title": "Part 4 · Thông báo và tin nhắn thoại",
+      "part": 4,
+      "minutes": 35,
+      "objectives": [
+        "Theo dõi mục đích và trình tự của bài nói",
+        "Tách lý do, chi tiết và lời kêu gọi hành động"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Bài nói một người thường có mở đầu xác định ngữ cảnh, thân bài nêu thay đổi và kết thúc bằng hành động. Với thông báo địa điểm, nghe old/new và các từ instead, now, relocated. Với voicemail, chú ý người gọi muốn được gọi lại hay muốn người nhận làm việc khác."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "This is a reminder… báo nhắc lại, không phải lời mời mới.\nDue to maintenance… đưa nguyên nhân thay đổi.\nYou do not need to reply… loại đáp án yêu cầu gọi lại dù cuối bài có số điện thoại."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Xem trước câu hỏi và dự đoán dạng thông tin. Nghe một lượt rồi nộp nhóm câu. Sau đó chép 20–30 giây khó nhất; so transcript để tìm nối âm hoặc từ chức năng bị bỏ sót."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 18
+    },
+    {
+      "id": "u03",
+      "stage": 3,
+      "title": "Từ vựng nâng cao, điều kiện và sắc thái",
+      "part": 5,
+      "minutes": 35,
+      "objectives": [
+        "Chọn từ theo logic và cụm cố định",
+        "Phân biệt điều kiện thật, giả định và ngoại lệ"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Unless tương đương if not; provided that đặt điều kiện. Câu điều kiện về tương lai thường dùng hiện tại đơn ở mệnh đề if. Cẩn thận với nearly, hardly, still và already vì chúng thay đổi sắc thái. Những cặp từ như economic/economical hay complimentary/complementary khác nghĩa."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Unless payment arrives, the order will remain on hold: chưa thanh toán thì chưa xử lý.\nThe hotel offers complimentary breakfast: bữa sáng miễn phí, không phải bổ sung lẫn nhau.\nHad we known earlier, we would have acted: đảo ngữ điều kiện trái quá khứ."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Sau khi xác định cấu trúc, đọc toàn câu để kiểm tra logic. Ghi sổ lỗi theo nguyên nhân: từ loại, collocation, điều kiện, hoặc sắc thái. Dùng lại từ sai trong một câu do mình viết."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 10
+    },
+    {
+      "id": "u04",
+      "stage": 3,
+      "title": "Part 7 · Đọc đơn văn bản có chiều sâu",
+      "part": 7,
+      "minutes": 35,
+      "objectives": [
+        "Tìm mục đích và thái độ trong bài dài hơn",
+        "Xử lý điều kiện, ngoại lệ và mốc thời gian"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Skim để xác định loại văn bản, rồi scan theo câu hỏi. Các từ only, except, at least, no later than giới hạn phạm vi thông tin. Đọc kỹ câu trước/sau vị trí tìm được; một từ trùng đáp án không đủ làm bằng chứng."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Applications received after Friday will be considered next month: vẫn xét, nhưng ở tháng sau.\nMembers may bring one guest: chỉ một khách, không phải cả gia đình.\nA trial has been extended: chương trình đang tiếp tục thử nghiệm, chưa chắc đã áp dụng vĩnh viễn."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Làm nhóm câu trong 4–5 phút. Tìm câu bằng chứng cho mỗi đáp án, nhất là câu NOT/EXCEPT. Nếu chưa chắc, đánh dấu và đi tiếp; quay lại sau khi hoàn thành các câu chi tiết."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 15
+    },
+    {
+      "id": "a01",
+      "stage": 4,
+      "title": "Part 4 · Ý định, paraphrase và chi tiết nhỏ",
+      "part": 4,
+      "minutes": 35,
+      "objectives": [
+        "Nhận ra cách nói khác của cùng một ý",
+        "Phân biệt ưu tiên, điều kiện và thông tin nền"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Ở mức nâng cao, đáp án có thể dùng nghĩa tương đương thay vì từ nghe được: get in touch = contact, at no additional cost = free of extra charge. Một chi tiết nhỏ như unless, only hoặc before có thể đảo nghĩa toàn lựa chọn. Giọng tổng hợp trong bộ này hỗ trợ luyện cấu trúc; hãy bổ sung giọng người thật ở nguồn chính thức."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "The opening is provisional: lịch khai trương chưa chốt.\nWe can accommodate the request provided that…: có thể đáp ứng nếu đủ điều kiện.\nThe fee will be waived: được miễn phí đó, không phải hoãn đóng."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Nghe không dừng để ghi ba ý: mục đích, thay đổi quan trọng, hành động. Sau lời giải, liệt kê một cặp paraphrase cho mỗi đáp án. Đừng coi việc nhớ transcript sau nhiều lần nghe là năng lực thi lần đầu."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 15
+    },
+    {
+      "id": "a02",
+      "stage": 4,
+      "title": "Part 6 · Liên kết và lựa chọn câu chính xác",
+      "part": 6,
+      "minutes": 35,
+      "objectives": [
+        "Theo dõi tham chiếu qua nhiều câu",
+        "Chọn câu bổ sung đúng lập luận"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Câu chèn đúng phải nối được cả câu trước và câu sau. Tìm cụm tham chiếu such an arrangement, this exception, both options. Mỗi lựa chọn cần đúng ngữ pháp, đúng chủ đề và không mâu thuẫn với chi tiết còn lại. Ý cùng chủ đề nhưng sai vai trò không phải đáp án."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Một câu nêu cách đăng ký phải xuất hiện trước This registration is required.\nNếu đoạn đang nói về hoàn tiền, câu về quà tặng không tự nhiên chỉ vì cùng có customers.\nNevertheless giữ ý đối lập; consequently nêu hệ quả."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Đọc đoạn hoàn chỉnh sau khi làm. Diễn giải mạch: thông tin → điều kiện → hệ quả → hướng dẫn. Tập trả lời lý do ba câu còn lại không nối được đại từ hoặc quan hệ logic."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 8
+    },
+    {
+      "id": "a03",
+      "stage": 4,
+      "title": "Part 7 · Nối hai văn bản",
+      "part": 7,
+      "minutes": 35,
+      "objectives": [
+        "Đối chiếu hai nguồn có thời điểm khác nhau",
+        "Tìm đáp án cần kết hợp nhiều chi tiết"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Xác định vai trò từng văn bản: quảng cáo đặt điều kiện, email xác nhận giao dịch; lịch nêu kế hoạch, tin nhắn nêu thay đổi. Nếu hai mốc khác nhau, nguồn cập nhật sau thường giải thích thay đổi nhưng chỉ áp dụng cho nội dung nó nói. Không tự cho mọi điều kiện cũ đều bị hủy."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Thông báo ghi giảm 10% cho đơn trước ngày 12; email đặt ngày 10 → có thể áp dụng nếu đủ các điều kiện khác.\nEmail nói chỉ đổi địa điểm → thời gian cũ vẫn giữ.\nCâu According to both documents yêu cầu kiểm tra thật sự cả hai nguồn."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Tạo bảng nhỏ ai / việc gì / ngày nào / điều kiện. Với câu cross-reference, chỉ ra một bằng chứng ở mỗi văn bản. Giới hạn khoảng 6 phút cho nhóm năm câu rồi phân tích lỗi sau."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 20
+    },
+    {
+      "id": "a04",
+      "stage": 4,
+      "title": "Part 7 · Ba văn bản và chiến lược 900",
+      "part": 7,
+      "minutes": 35,
+      "objectives": [
+        "Liên kết yêu cầu, xác nhận và cập nhật cuối",
+        "Giữ độ chính xác khi quản lý 75 phút đọc"
+      ],
+      "sections": [
+        {
+          "title": "Hiểu bản chất",
+          "body": "Với ba văn bản, ghi nhanh chức năng và ngày của từng nguồn. Theo dõi những điều được giữ lại và được thay đổi. Mục tiêu 900 cần hiệu suất ổn định ở cả nghe lẫn đọc; kết quả một bài luyện nội bộ không dự đoán chắc điểm thi. Đề 200 câu của ứng dụng có thể tái sử dụng câu đã học nên không dùng làm đánh giá độc lập."
+        },
+        {
+          "title": "Ví dụ có phân tích",
+          "body": "Yêu cầu đặt 40 phần ăn; xác nhận gồm 5 phần chay; cập nhật cuối tăng 2 phần chay → kiểm tra đó là tăng tổng hay thay thế trước khi cộng.\nRefund issued khác refund requested.\nMột văn bản nói closed on Monday không loại trừ phục vụ trực tuyến nếu nguồn khác nêu rõ."
+        },
+        {
+          "title": "Cách luyện hôm nay",
+          "body": "Luyện theo đợt: làm có giờ → thống kê lỗi → học lại nhóm yếu → làm một đề mới có nguồn hợp lệ. Chia ngân sách đọc gợi ý 10–12 phút Part5, 8–10 phút Part6, còn lại Part7; điều chỉnh theo kết quả của mình. Giữ thời gian điền mọi đáp án."
+        }
+      ],
+      "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
+      "question_count": 20
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "f01-v01",
+      "lesson_id": "f01",
+      "term": "appointment",
+      "meaning": "cuộc hẹn",
+      "example": "My appointment is at half past nine."
+    },
+    {
+      "id": "f01-v02",
+      "lesson_id": "f01",
+      "term": "schedule",
+      "meaning": "lịch trình",
+      "example": "Please check the schedule before leaving."
+    },
+    {
+      "id": "f01-v03",
+      "lesson_id": "f01",
+      "term": "quarter",
+      "meaning": "một phần tư; mười lăm phút",
+      "example": "The train leaves at a quarter to ten."
+    },
+    {
+      "id": "f01-v04",
+      "lesson_id": "f01",
+      "term": "receipt",
+      "meaning": "biên lai",
+      "example": "Keep the receipt for your records."
+    },
+    {
+      "id": "f01-v05",
+      "lesson_id": "f01",
+      "term": "reception",
+      "meaning": "quầy tiếp tân",
+      "example": "Your visitor is waiting at reception."
+    },
+    {
+      "id": "f01-v06",
+      "lesson_id": "f01",
+      "term": "duration",
+      "meaning": "khoảng thời gian kéo dài",
+      "example": "The duration of the tour is two hours."
+    },
+    {
+      "id": "f01-v07",
+      "lesson_id": "f01",
+      "term": "address",
+      "meaning": "địa chỉ",
+      "example": "Could you repeat the delivery address?"
+    },
+    {
+      "id": "f01-v08",
+      "lesson_id": "f01",
+      "term": "extension",
+      "meaning": "số máy lẻ",
+      "example": "Call extension thirty-two for help."
+    },
+    {
+      "id": "f01-v09",
+      "lesson_id": "f01",
+      "term": "available",
+      "meaning": "có sẵn; rảnh",
+      "example": "The manager is available after lunch."
+    },
+    {
+      "id": "f01-v10",
+      "lesson_id": "f01",
+      "term": "colleague",
+      "meaning": "đồng nghiệp",
+      "example": "A colleague will show you the meeting room."
+    },
+    {
+      "id": "f02-v01",
+      "lesson_id": "f02",
+      "term": "assistant",
+      "meaning": "trợ lý",
+      "example": "The assistant checks every appointment."
+    },
+    {
+      "id": "f02-v02",
+      "lesson_id": "f02",
+      "term": "accurate",
+      "meaning": "chính xác",
+      "example": "We need an accurate list of names."
+    },
+    {
+      "id": "f02-v03",
+      "lesson_id": "f02",
+      "term": "carefully",
+      "meaning": "một cách cẩn thận",
+      "example": "Read the instructions carefully."
+    },
+    {
+      "id": "f02-v04",
+      "lesson_id": "f02",
+      "term": "instruction",
+      "meaning": "chỉ dẫn",
+      "example": "Each instruction describes one step."
+    },
+    {
+      "id": "f02-v05",
+      "lesson_id": "f02",
+      "term": "organize",
+      "meaning": "sắp xếp; tổ chức",
+      "example": "We organize the files by date."
+    },
+    {
+      "id": "f02-v06",
+      "lesson_id": "f02",
+      "term": "monthly",
+      "meaning": "hằng tháng",
+      "example": "The monthly report is ready."
+    },
+    {
+      "id": "f02-v07",
+      "lesson_id": "f02",
+      "term": "efficient",
+      "meaning": "hiệu quả, ít lãng phí",
+      "example": "The new process is more efficient."
+    },
+    {
+      "id": "f02-v08",
+      "lesson_id": "f02",
+      "term": "employee",
+      "meaning": "nhân viên",
+      "example": "Each employee has a personal badge."
+    },
+    {
+      "id": "f02-v09",
+      "lesson_id": "f02",
+      "term": "prepare",
+      "meaning": "chuẩn bị",
+      "example": "Please prepare the room for visitors."
+    },
+    {
+      "id": "f02-v10",
+      "lesson_id": "f02",
+      "term": "responsible",
+      "meaning": "chịu trách nhiệm",
+      "example": "Nina is responsible for the equipment."
+    },
+    {
+      "id": "f03-v01",
+      "lesson_id": "f03",
+      "term": "attach",
+      "meaning": "đính kèm",
+      "example": "Attach the invoice to your email."
+    },
+    {
+      "id": "f03-v02",
+      "lesson_id": "f03",
+      "term": "deadline",
+      "meaning": "hạn chót",
+      "example": "The team met the Friday deadline."
+    },
+    {
+      "id": "f03-v03",
+      "lesson_id": "f03",
+      "term": "printer",
+      "meaning": "máy in",
+      "example": "The printer is out of paper."
+    },
+    {
+      "id": "f03-v04",
+      "lesson_id": "f03",
+      "term": "supplies",
+      "meaning": "vật tư",
+      "example": "Office supplies are stored downstairs."
+    },
+    {
+      "id": "f03-v05",
+      "lesson_id": "f03",
+      "term": "appointment book",
+      "meaning": "sổ ghi lịch hẹn",
+      "example": "The appointment book is on the counter."
+    },
+    {
+      "id": "f03-v06",
+      "lesson_id": "f03",
+      "term": "invoice",
+      "meaning": "hóa đơn yêu cầu thanh toán",
+      "example": "The invoice includes the delivery fee."
+    },
+    {
+      "id": "f03-v07",
+      "lesson_id": "f03",
+      "term": "file",
+      "meaning": "hồ sơ; lưu hồ sơ",
+      "example": "Please file these documents by month."
+    },
+    {
+      "id": "f03-v08",
+      "lesson_id": "f03",
+      "term": "stationery",
+      "meaning": "văn phòng phẩm",
+      "example": "We ordered stationery for the new office."
+    },
+    {
+      "id": "f03-v09",
+      "lesson_id": "f03",
+      "term": "attend",
+      "meaning": "tham dự",
+      "example": "All supervisors will attend the meeting."
+    },
+    {
+      "id": "f03-v10",
+      "lesson_id": "f03",
+      "term": "reimburse",
+      "meaning": "hoàn trả khoản đã chi",
+      "example": "The company will reimburse travel costs."
+    },
+    {
+      "id": "f04-v01",
+      "lesson_id": "f04",
+      "term": "entrance",
+      "meaning": "lối vào",
+      "example": "Use the entrance beside the bookstore."
+    },
+    {
+      "id": "f04-v02",
+      "lesson_id": "f04",
+      "term": "repair",
+      "meaning": "sửa chữa",
+      "example": "The elevator is closed for repair."
+    },
+    {
+      "id": "f04-v03",
+      "lesson_id": "f04",
+      "term": "notice",
+      "meaning": "thông báo",
+      "example": "A notice explains the new opening hours."
+    },
+    {
+      "id": "f04-v04",
+      "lesson_id": "f04",
+      "term": "visitor",
+      "meaning": "khách đến thăm",
+      "example": "Every visitor must sign in."
+    },
+    {
+      "id": "f04-v05",
+      "lesson_id": "f04",
+      "term": "permit",
+      "meaning": "giấy phép; cho phép",
+      "example": "A parking permit is required here."
+    },
+    {
+      "id": "f04-v06",
+      "lesson_id": "f04",
+      "term": "delivery",
+      "meaning": "việc giao hàng",
+      "example": "Today's delivery will arrive at noon."
+    },
+    {
+      "id": "f04-v07",
+      "lesson_id": "f04",
+      "term": "counter",
+      "meaning": "quầy",
+      "example": "Collect your order at the service counter."
+    },
+    {
+      "id": "f04-v08",
+      "lesson_id": "f04",
+      "term": "temporarily",
+      "meaning": "tạm thời",
+      "example": "The west entrance is temporarily closed."
+    },
+    {
+      "id": "f04-v09",
+      "lesson_id": "f04",
+      "term": "reserve",
+      "meaning": "đặt trước",
+      "example": "Reserve your seat before Thursday."
+    },
+    {
+      "id": "f04-v10",
+      "lesson_id": "f04",
+      "term": "cancel",
+      "meaning": "hủy",
+      "example": "Please call if you need to cancel."
+    },
+    {
+      "id": "b01-v01",
+      "lesson_id": "b01",
+      "term": "carry",
+      "meaning": "mang; vác",
+      "example": "A worker is carrying a box."
+    },
+    {
+      "id": "b01-v02",
+      "lesson_id": "b01",
+      "term": "stack",
+      "meaning": "xếp chồng",
+      "example": "The trays are stacked on a shelf."
+    },
+    {
+      "id": "b01-v03",
+      "lesson_id": "b01",
+      "term": "lean against",
+      "meaning": "tựa vào",
+      "example": "A bicycle is leaning against the wall."
+    },
+    {
+      "id": "b01-v04",
+      "lesson_id": "b01",
+      "term": "arrange",
+      "meaning": "sắp xếp",
+      "example": "The chairs are arranged around a table."
+    },
+    {
+      "id": "b01-v05",
+      "lesson_id": "b01",
+      "term": "shelf",
+      "meaning": "kệ",
+      "example": "The books are on the top shelf."
+    },
+    {
+      "id": "b01-v06",
+      "lesson_id": "b01",
+      "term": "ladder",
+      "meaning": "thang",
+      "example": "The painter is standing beside a ladder."
+    },
+    {
+      "id": "b01-v07",
+      "lesson_id": "b01",
+      "term": "cross",
+      "meaning": "băng qua",
+      "example": "Two pedestrians are crossing the street."
+    },
+    {
+      "id": "b01-v08",
+      "lesson_id": "b01",
+      "term": "water",
+      "meaning": "tưới nước",
+      "example": "A gardener is watering the plants."
+    },
+    {
+      "id": "b01-v09",
+      "lesson_id": "b01",
+      "term": "beside",
+      "meaning": "bên cạnh",
+      "example": "The cart is beside the entrance."
+    },
+    {
+      "id": "b01-v10",
+      "lesson_id": "b01",
+      "term": "reflection",
+      "meaning": "hình phản chiếu",
+      "example": "The window shows a reflection of the trees."
+    },
+    {
+      "id": "b02-v01",
+      "lesson_id": "b02",
+      "term": "prefer",
+      "meaning": "thích hơn",
+      "example": "Would you prefer a seat near the window?"
+    },
+    {
+      "id": "b02-v02",
+      "lesson_id": "b02",
+      "term": "copy",
+      "meaning": "bản sao",
+      "example": "I need three copies of the form."
+    },
+    {
+      "id": "b02-v03",
+      "lesson_id": "b02",
+      "term": "request",
+      "meaning": "yêu cầu",
+      "example": "We received your request this morning."
+    },
+    {
+      "id": "b02-v04",
+      "lesson_id": "b02",
+      "term": "borrow",
+      "meaning": "mượn",
+      "example": "May I borrow your stapler?"
+    },
+    {
+      "id": "b02-v05",
+      "lesson_id": "b02",
+      "term": "return",
+      "meaning": "trả lại; quay lại",
+      "example": "Please return the key before six."
+    },
+    {
+      "id": "b02-v06",
+      "lesson_id": "b02",
+      "term": "confirm",
+      "meaning": "xác nhận",
+      "example": "Could you confirm the room number?"
+    },
+    {
+      "id": "b02-v07",
+      "lesson_id": "b02",
+      "term": "reschedule",
+      "meaning": "đổi lịch",
+      "example": "We need to reschedule the interview."
+    },
+    {
+      "id": "b02-v08",
+      "lesson_id": "b02",
+      "term": "instead",
+      "meaning": "thay vào đó",
+      "example": "Let's meet on Tuesday instead."
+    },
+    {
+      "id": "b02-v09",
+      "lesson_id": "b02",
+      "term": "either",
+      "meaning": "một trong hai; cái nào cũng được",
+      "example": "Either room is suitable for the workshop."
+    },
+    {
+      "id": "b02-v10",
+      "lesson_id": "b02",
+      "term": "neither",
+      "meaning": "không cái nào trong hai",
+      "example": "Neither printer has enough paper."
+    },
+    {
+      "id": "b03-v01",
+      "lesson_id": "b03",
+      "term": "recently",
+      "meaning": "gần đây",
+      "example": "We have recently opened a new branch."
+    },
+    {
+      "id": "b03-v02",
+      "lesson_id": "b03",
+      "term": "since",
+      "meaning": "kể từ",
+      "example": "She has managed the store since May."
+    },
+    {
+      "id": "b03-v03",
+      "lesson_id": "b03",
+      "term": "already",
+      "meaning": "đã, trước thời điểm dự kiến",
+      "example": "The courier has already left."
+    },
+    {
+      "id": "b03-v04",
+      "lesson_id": "b03",
+      "term": "currently",
+      "meaning": "hiện tại",
+      "example": "The team is currently testing the software."
+    },
+    {
+      "id": "b03-v05",
+      "lesson_id": "b03",
+      "term": "supplier",
+      "meaning": "nhà cung cấp",
+      "example": "Our supplier sent the samples yesterday."
+    },
+    {
+      "id": "b03-v06",
+      "lesson_id": "b03",
+      "term": "shipment",
+      "meaning": "lô hàng",
+      "example": "The shipment reached the warehouse on Monday."
+    },
+    {
+      "id": "b03-v07",
+      "lesson_id": "b03",
+      "term": "annually",
+      "meaning": "hằng năm",
+      "example": "The equipment is inspected annually."
+    },
+    {
+      "id": "b03-v08",
+      "lesson_id": "b03",
+      "term": "regularly",
+      "meaning": "đều đặn",
+      "example": "Staff members regularly update the directory."
+    },
+    {
+      "id": "b03-v09",
+      "lesson_id": "b03",
+      "term": "remain",
+      "meaning": "vẫn còn; ở lại",
+      "example": "The office remains open during renovation."
+    },
+    {
+      "id": "b03-v10",
+      "lesson_id": "b03",
+      "term": "announce",
+      "meaning": "thông báo",
+      "example": "The director will announce the results tomorrow."
+    },
+    {
+      "id": "b04-v01",
+      "lesson_id": "b04",
+      "term": "application",
+      "meaning": "đơn đăng ký; hồ sơ ứng tuyển",
+      "example": "We received your application yesterday."
+    },
+    {
+      "id": "b04-v02",
+      "lesson_id": "b04",
+      "term": "quotation",
+      "meaning": "báo giá",
+      "example": "The revised quotation includes installation."
+    },
+    {
+      "id": "b04-v03",
+      "lesson_id": "b04",
+      "term": "revision",
+      "meaning": "sự chỉnh sửa; bản chỉnh sửa",
+      "example": "The final revision removes the old address."
+    },
+    {
+      "id": "b04-v04",
+      "lesson_id": "b04",
+      "term": "recipient",
+      "meaning": "người nhận",
+      "example": "Check the recipient before sending the email."
+    },
+    {
+      "id": "b04-v05",
+      "lesson_id": "b04",
+      "term": "enquiry",
+      "meaning": "yêu cầu thông tin",
+      "example": "Thank you for your enquiry about our course."
+    },
+    {
+      "id": "b04-v06",
+      "lesson_id": "b04",
+      "term": "enclose",
+      "meaning": "gửi kèm",
+      "example": "We enclose a copy of the agreement."
+    },
+    {
+      "id": "b04-v07",
+      "lesson_id": "b04",
+      "term": "regarding",
+      "meaning": "về; liên quan đến",
+      "example": "I am writing regarding your reservation."
+    },
+    {
+      "id": "b04-v08",
+      "lesson_id": "b04",
+      "term": "notify",
+      "meaning": "thông báo cho",
+      "example": "Please notify us of any dietary restrictions."
+    },
+    {
+      "id": "b04-v09",
+      "lesson_id": "b04",
+      "term": "acknowledge",
+      "meaning": "xác nhận đã nhận",
+      "example": "The office acknowledged receipt of the documents."
+    },
+    {
+      "id": "b04-v10",
+      "lesson_id": "b04",
+      "term": "postpone",
+      "meaning": "hoãn lại",
+      "example": "The event has been postponed until July."
+    },
+    {
+      "id": "i01-v01",
+      "lesson_id": "i01",
+      "term": "booked",
+      "meaning": "đã được đặt",
+      "example": "The large room is booked until noon."
+    },
+    {
+      "id": "i01-v02",
+      "lesson_id": "i01",
+      "term": "parcel",
+      "meaning": "bưu kiện",
+      "example": "A parcel is waiting at reception."
+    },
+    {
+      "id": "i01-v03",
+      "lesson_id": "i01",
+      "term": "delegate",
+      "meaning": "giao việc; đại biểu",
+      "example": "Can you delegate the task to someone else?"
+    },
+    {
+      "id": "i01-v04",
+      "lesson_id": "i01",
+      "term": "tentative",
+      "meaning": "tạm thời, chưa chốt",
+      "example": "This is a tentative schedule."
+    },
+    {
+      "id": "i01-v05",
+      "lesson_id": "i01",
+      "term": "alternative",
+      "meaning": "phương án thay thế",
+      "example": "We need an alternative meeting place."
+    },
+    {
+      "id": "i01-v06",
+      "lesson_id": "i01",
+      "term": "overlap",
+      "meaning": "trùng thời gian hoặc phạm vi",
+      "example": "The two workshops overlap by thirty minutes."
+    },
+    {
+      "id": "i01-v07",
+      "lesson_id": "i01",
+      "term": "overlook",
+      "meaning": "bỏ sót",
+      "example": "We overlooked a small error in the address."
+    },
+    {
+      "id": "i01-v08",
+      "lesson_id": "i01",
+      "term": "arrangement",
+      "meaning": "sự sắp xếp",
+      "example": "The travel arrangement has not been confirmed."
+    },
+    {
+      "id": "i01-v09",
+      "lesson_id": "i01",
+      "term": "unavailable",
+      "meaning": "không có sẵn; không rảnh",
+      "example": "The technician is unavailable this afternoon."
+    },
+    {
+      "id": "i01-v10",
+      "lesson_id": "i01",
+      "term": "handle",
+      "meaning": "xử lý; phụ trách",
+      "example": "Our support team handles urgent requests."
+    },
+    {
+      "id": "i02-v01",
+      "lesson_id": "i02",
+      "term": "replacement",
+      "meaning": "vật hoặc người thay thế",
+      "example": "A replacement cable will arrive tomorrow."
+    },
+    {
+      "id": "i02-v02",
+      "lesson_id": "i02",
+      "term": "technician",
+      "meaning": "kỹ thuật viên",
+      "example": "The technician will inspect the printer."
+    },
+    {
+      "id": "i02-v03",
+      "lesson_id": "i02",
+      "term": "reservation",
+      "meaning": "việc đặt chỗ",
+      "example": "Your reservation is for a table of six."
+    },
+    {
+      "id": "i02-v04",
+      "lesson_id": "i02",
+      "term": "maintenance",
+      "meaning": "bảo trì",
+      "example": "The elevator needs routine maintenance."
+    },
+    {
+      "id": "i02-v05",
+      "lesson_id": "i02",
+      "term": "estimate",
+      "meaning": "ước tính; báo giá dự kiến",
+      "example": "The estimate covers parts and labor."
+    },
+    {
+      "id": "i02-v06",
+      "lesson_id": "i02",
+      "term": "warehouse",
+      "meaning": "kho hàng",
+      "example": "The boxes are still at the warehouse."
+    },
+    {
+      "id": "i02-v07",
+      "lesson_id": "i02",
+      "term": "inventory",
+      "meaning": "hàng tồn; kiểm kê",
+      "example": "We check the inventory every Friday."
+    },
+    {
+      "id": "i02-v08",
+      "lesson_id": "i02",
+      "term": "venue",
+      "meaning": "địa điểm tổ chức",
+      "example": "The venue is a short walk from the station."
+    },
+    {
+      "id": "i02-v09",
+      "lesson_id": "i02",
+      "term": "refund",
+      "meaning": "hoàn tiền",
+      "example": "The refund will appear on your next statement."
+    },
+    {
+      "id": "i02-v10",
+      "lesson_id": "i02",
+      "term": "procedure",
+      "meaning": "quy trình",
+      "example": "The procedure takes about ten minutes."
+    },
+    {
+      "id": "i03-v01",
+      "lesson_id": "i03",
+      "term": "authorize",
+      "meaning": "cho phép chính thức",
+      "example": "Only a supervisor can authorize the purchase."
+    },
+    {
+      "id": "i03-v02",
+      "lesson_id": "i03",
+      "term": "requirement",
+      "meaning": "yêu cầu; điều kiện cần",
+      "example": "A valid ID is a registration requirement."
+    },
+    {
+      "id": "i03-v03",
+      "lesson_id": "i03",
+      "term": "despite",
+      "meaning": "mặc dù; theo sau bởi cụm danh từ",
+      "example": "Despite the delay, the guests remained calm."
+    },
+    {
+      "id": "i03-v04",
+      "lesson_id": "i03",
+      "term": "although",
+      "meaning": "mặc dù; theo sau bởi mệnh đề",
+      "example": "Although it rained, the tour continued."
+    },
+    {
+      "id": "i03-v05",
+      "lesson_id": "i03",
+      "term": "eligible",
+      "meaning": "đủ điều kiện",
+      "example": "Part-time staff are eligible for the discount."
+    },
+    {
+      "id": "i03-v06",
+      "lesson_id": "i03",
+      "term": "approve",
+      "meaning": "phê duyệt",
+      "example": "The manager approved the revised budget."
+    },
+    {
+      "id": "i03-v07",
+      "lesson_id": "i03",
+      "term": "inspect",
+      "meaning": "kiểm tra",
+      "example": "The machines are inspected every month."
+    },
+    {
+      "id": "i03-v08",
+      "lesson_id": "i03",
+      "term": "submit",
+      "meaning": "nộp",
+      "example": "Submit your application before Friday."
+    },
+    {
+      "id": "i03-v09",
+      "lesson_id": "i03",
+      "term": "replacement part",
+      "meaning": "linh kiện thay thế",
+      "example": "The replacement part is covered by the warranty."
+    },
+    {
+      "id": "i03-v10",
+      "lesson_id": "i03",
+      "term": "whose",
+      "meaning": "của người hoặc vật nào",
+      "example": "The employee whose badge was lost contacted security."
+    },
+    {
+      "id": "i04-v01",
+      "lesson_id": "i04",
+      "term": "therefore",
+      "meaning": "vì vậy",
+      "example": "Demand increased; therefore, we extended our hours."
+    },
+    {
+      "id": "i04-v02",
+      "lesson_id": "i04",
+      "term": "however",
+      "meaning": "tuy nhiên",
+      "example": "The service is free; however, booking is required."
+    },
+    {
+      "id": "i04-v03",
+      "lesson_id": "i04",
+      "term": "furthermore",
+      "meaning": "hơn nữa",
+      "example": "The room is larger; furthermore, it has a projector."
+    },
+    {
+      "id": "i04-v04",
+      "lesson_id": "i04",
+      "term": "otherwise",
+      "meaning": "nếu không thì",
+      "example": "Register today; otherwise, you may lose your place."
+    },
+    {
+      "id": "i04-v05",
+      "lesson_id": "i04",
+      "term": "renovation",
+      "meaning": "việc cải tạo",
+      "example": "The renovation will finish in September."
+    },
+    {
+      "id": "i04-v06",
+      "lesson_id": "i04",
+      "term": "relocate",
+      "meaning": "chuyển địa điểm",
+      "example": "The reception desk will relocate to the lobby."
+    },
+    {
+      "id": "i04-v07",
+      "lesson_id": "i04",
+      "term": "access",
+      "meaning": "quyền hoặc lối truy cập",
+      "example": "Use your badge to gain access to the building."
+    },
+    {
+      "id": "i04-v08",
+      "lesson_id": "i04",
+      "term": "restriction",
+      "meaning": "hạn chế",
+      "example": "The notice lists all parking restrictions."
+    },
+    {
+      "id": "i04-v09",
+      "lesson_id": "i04",
+      "term": "extension period",
+      "meaning": "khoảng thời gian gia hạn",
+      "example": "The extension period ends on Monday."
+    },
+    {
+      "id": "i04-v10",
+      "lesson_id": "i04",
+      "term": "arrange for",
+      "meaning": "thu xếp để",
+      "example": "We will arrange for a courier to collect the parcel."
+    },
+    {
+      "id": "u01-v01",
+      "lesson_id": "u01",
+      "term": "imply",
+      "meaning": "hàm ý",
+      "example": "Her comment implies that more staff are needed."
+    },
+    {
+      "id": "u01-v02",
+      "lesson_id": "u01",
+      "term": "priority",
+      "meaning": "việc ưu tiên",
+      "example": "Safety is our first priority."
+    },
+    {
+      "id": "u01-v03",
+      "lesson_id": "u01",
+      "term": "commitment",
+      "meaning": "cam kết; nghĩa vụ đã nhận",
+      "example": "A previous commitment prevents me from attending."
+    },
+    {
+      "id": "u01-v04",
+      "lesson_id": "u01",
+      "term": "deposit",
+      "meaning": "tiền đặt cọc",
+      "example": "We paid a deposit to reserve the room."
+    },
+    {
+      "id": "u01-v05",
+      "lesson_id": "u01",
+      "term": "feasible",
+      "meaning": "khả thi",
+      "example": "The plan is feasible within our current budget."
+    },
+    {
+      "id": "u01-v06",
+      "lesson_id": "u01",
+      "term": "contingency",
+      "meaning": "phương án cho tình huống bất ngờ",
+      "example": "We prepared a contingency plan for rain."
+    },
+    {
+      "id": "u01-v07",
+      "lesson_id": "u01",
+      "term": "backlog",
+      "meaning": "khối lượng việc tồn đọng",
+      "example": "Extra staff helped clear the backlog."
+    },
+    {
+      "id": "u01-v08",
+      "lesson_id": "u01",
+      "term": "short notice",
+      "meaning": "sự báo trước trong thời gian ngắn",
+      "example": "Thank you for coming at such short notice."
+    },
+    {
+      "id": "u01-v09",
+      "lesson_id": "u01",
+      "term": "clarify",
+      "meaning": "làm rõ",
+      "example": "Could you clarify the delivery instructions?"
+    },
+    {
+      "id": "u01-v10",
+      "lesson_id": "u01",
+      "term": "allocate",
+      "meaning": "phân bổ",
+      "example": "The manager allocated more time to testing."
+    },
+    {
+      "id": "u02-v01",
+      "lesson_id": "u02",
+      "term": "reminder",
+      "meaning": "lời nhắc",
+      "example": "This is a reminder about tomorrow's safety training."
+    },
+    {
+      "id": "u02-v02",
+      "lesson_id": "u02",
+      "term": "platform",
+      "meaning": "sân ga",
+      "example": "The express train now departs from platform four."
+    },
+    {
+      "id": "u02-v03",
+      "lesson_id": "u02",
+      "term": "due to",
+      "meaning": "do; vì",
+      "example": "The entrance is closed due to maintenance."
+    },
+    {
+      "id": "u02-v04",
+      "lesson_id": "u02",
+      "term": "designated",
+      "meaning": "được chỉ định",
+      "example": "Please use the designated waiting area."
+    },
+    {
+      "id": "u02-v05",
+      "lesson_id": "u02",
+      "term": "refreshments",
+      "meaning": "đồ ăn nhẹ và đồ uống",
+      "example": "Refreshments will be served after the presentation."
+    },
+    {
+      "id": "u02-v06",
+      "lesson_id": "u02",
+      "term": "detour",
+      "meaning": "đường vòng",
+      "example": "Follow the signs for the temporary detour."
+    },
+    {
+      "id": "u02-v07",
+      "lesson_id": "u02",
+      "term": "admission",
+      "meaning": "quyền hoặc phí vào cửa",
+      "example": "Admission is free for registered volunteers."
+    },
+    {
+      "id": "u02-v08",
+      "lesson_id": "u02",
+      "term": "enrollment",
+      "meaning": "việc ghi danh",
+      "example": "Enrollment closes at the end of the week."
+    },
+    {
+      "id": "u02-v09",
+      "lesson_id": "u02",
+      "term": "recipient department",
+      "meaning": "bộ phận nhận",
+      "example": "Write the recipient department on each package."
+    },
+    {
+      "id": "u02-v10",
+      "lesson_id": "u02",
+      "term": "in advance",
+      "meaning": "trước",
+      "example": "Book in advance to guarantee a place."
+    },
+    {
+      "id": "u03-v01",
+      "lesson_id": "u03",
+      "term": "complimentary",
+      "meaning": "miễn phí, được tặng",
+      "example": "Guests receive a complimentary breakfast."
+    },
+    {
+      "id": "u03-v02",
+      "lesson_id": "u03",
+      "term": "complementary",
+      "meaning": "bổ trợ lẫn nhau",
+      "example": "The two teams have complementary skills."
+    },
+    {
+      "id": "u03-v03",
+      "lesson_id": "u03",
+      "term": "economical",
+      "meaning": "tiết kiệm",
+      "example": "The smaller vehicle is more economical to operate."
+    },
+    {
+      "id": "u03-v04",
+      "lesson_id": "u03",
+      "term": "economic",
+      "meaning": "thuộc kinh tế",
+      "example": "The report describes recent economic trends."
+    },
+    {
+      "id": "u03-v05",
+      "lesson_id": "u03",
+      "term": "provided that",
+      "meaning": "với điều kiện là",
+      "example": "You may leave early provided that the work is finished."
+    },
+    {
+      "id": "u03-v06",
+      "lesson_id": "u03",
+      "term": "unless",
+      "meaning": "trừ khi; nếu không",
+      "example": "The order will be held unless payment is received."
+    },
+    {
+      "id": "u03-v07",
+      "lesson_id": "u03",
+      "term": "nevertheless",
+      "meaning": "tuy nhiên, dù vậy",
+      "example": "The task was difficult; nevertheless, we completed it."
+    },
+    {
+      "id": "u03-v08",
+      "lesson_id": "u03",
+      "term": "contingent on",
+      "meaning": "phụ thuộc vào điều kiện",
+      "example": "The offer is contingent on a successful inspection."
+    },
+    {
+      "id": "u03-v09",
+      "lesson_id": "u03",
+      "term": "compliance",
+      "meaning": "việc tuân thủ",
+      "example": "The audit checks compliance with safety rules."
+    },
+    {
+      "id": "u03-v10",
+      "lesson_id": "u03",
+      "term": "substantial",
+      "meaning": "đáng kể",
+      "example": "The change produced a substantial reduction in waste."
+    },
+    {
+      "id": "u04-v01",
+      "lesson_id": "u04",
+      "term": "exception",
+      "meaning": "ngoại lệ",
+      "example": "The policy allows one exception for urgent repairs."
+    },
+    {
+      "id": "u04-v02",
+      "lesson_id": "u04",
+      "term": "eligible applicant",
+      "meaning": "ứng viên đủ điều kiện",
+      "example": "Eligible applicants will receive an invitation."
+    },
+    {
+      "id": "u04-v03",
+      "lesson_id": "u04",
+      "term": "trial period",
+      "meaning": "giai đoạn thử nghiệm",
+      "example": "The trial period has been extended by two weeks."
+    },
+    {
+      "id": "u04-v04",
+      "lesson_id": "u04",
+      "term": "no later than",
+      "meaning": "không muộn hơn",
+      "example": "Return the form no later than June tenth."
+    },
+    {
+      "id": "u04-v05",
+      "lesson_id": "u04",
+      "term": "at least",
+      "meaning": "ít nhất",
+      "example": "Each group must contain at least five people."
+    },
+    {
+      "id": "u04-v06",
+      "lesson_id": "u04",
+      "term": "subject to",
+      "meaning": "tùy thuộc; chịu sự điều chỉnh",
+      "example": "All bookings are subject to availability."
+    },
+    {
+      "id": "u04-v07",
+      "lesson_id": "u04",
+      "term": "waiver",
+      "meaning": "sự miễn trừ; văn bản miễn trừ",
+      "example": "Students may request a fee waiver."
+    },
+    {
+      "id": "u04-v08",
+      "lesson_id": "u04",
+      "term": "restriction period",
+      "meaning": "thời gian áp dụng hạn chế",
+      "example": "The restriction period ends after the inspection."
+    },
+    {
+      "id": "u04-v09",
+      "lesson_id": "u04",
+      "term": "renewal",
+      "meaning": "sự gia hạn",
+      "example": "Membership renewal is available online."
+    },
+    {
+      "id": "u04-v10",
+      "lesson_id": "u04",
+      "term": "retain",
+      "meaning": "giữ lại",
+      "example": "Please retain a copy of your confirmation."
+    },
+    {
+      "id": "a01-v01",
+      "lesson_id": "a01",
+      "term": "provisional",
+      "meaning": "tạm thời, còn có thể thay đổi",
+      "example": "The opening date is provisional."
+    },
+    {
+      "id": "a01-v02",
+      "lesson_id": "a01",
+      "term": "accommodate",
+      "meaning": "đáp ứng; thu xếp chỗ cho",
+      "example": "We can accommodate your request for an earlier delivery."
+    },
+    {
+      "id": "a01-v03",
+      "lesson_id": "a01",
+      "term": "waive",
+      "meaning": "miễn một khoản hoặc yêu cầu",
+      "example": "The bank agreed to waive the service fee."
+    },
+    {
+      "id": "a01-v04",
+      "lesson_id": "a01",
+      "term": "at no additional cost",
+      "meaning": "không phát sinh phí thêm",
+      "example": "Installation is included at no additional cost."
+    },
+    {
+      "id": "a01-v05",
+      "lesson_id": "a01",
+      "term": "pending",
+      "meaning": "đang chờ xử lý hoặc quyết định",
+      "example": "The application is pending final approval."
+    },
+    {
+      "id": "a01-v06",
+      "lesson_id": "a01",
+      "term": "revised estimate",
+      "meaning": "ước tính đã điều chỉnh",
+      "example": "The revised estimate includes weekend labor."
+    },
+    {
+      "id": "a01-v07",
+      "lesson_id": "a01",
+      "term": "expedite",
+      "meaning": "đẩy nhanh",
+      "example": "The warehouse will expedite the replacement shipment."
+    },
+    {
+      "id": "a01-v08",
+      "lesson_id": "a01",
+      "term": "discretion",
+      "meaning": "quyền tự quyết theo cân nhắc",
+      "example": "Extensions may be granted at the manager's discretion."
+    },
+    {
+      "id": "a01-v09",
+      "lesson_id": "a01",
+      "term": "reassure",
+      "meaning": "trấn an; bảo đảm lại",
+      "example": "The speaker reassured customers about their bookings."
+    },
+    {
+      "id": "a01-v10",
+      "lesson_id": "a01",
+      "term": "offset",
+      "meaning": "bù đắp",
+      "example": "Lower energy costs will offset the initial expense."
+    },
+    {
+      "id": "a02-v01",
+      "lesson_id": "a02",
+      "term": "consequently",
+      "meaning": "do đó, kết quả là",
+      "example": "The room is unavailable; consequently, we must relocate."
+    },
+    {
+      "id": "a02-v02",
+      "lesson_id": "a02",
+      "term": "in contrast",
+      "meaning": "ngược lại",
+      "example": "The first option is cheaper; in contrast, the second is faster."
+    },
+    {
+      "id": "a02-v03",
+      "lesson_id": "a02",
+      "term": "such an arrangement",
+      "meaning": "một cách sắp xếp như vậy",
+      "example": "Such an arrangement would reduce waiting time."
+    },
+    {
+      "id": "a02-v04",
+      "lesson_id": "a02",
+      "term": "this provision",
+      "meaning": "điều khoản này",
+      "example": "This provision applies only to annual subscriptions."
+    },
+    {
+      "id": "a02-v05",
+      "lesson_id": "a02",
+      "term": "consolidate",
+      "meaning": "gộp; hợp nhất",
+      "example": "We will consolidate the deliveries into one shipment."
+    },
+    {
+      "id": "a02-v06",
+      "lesson_id": "a02",
+      "term": "accordingly",
+      "meaning": "theo đó; cho phù hợp",
+      "example": "The timetable has been adjusted accordingly."
+    },
+    {
+      "id": "a02-v07",
+      "lesson_id": "a02",
+      "term": "notwithstanding",
+      "meaning": "mặc dù; bất chấp",
+      "example": "The event will proceed notwithstanding the repairs nearby."
+    },
+    {
+      "id": "a02-v08",
+      "lesson_id": "a02",
+      "term": "hereby",
+      "meaning": "bằng văn bản hoặc hành động này",
+      "example": "We hereby confirm your reservation."
+    },
+    {
+      "id": "a02-v09",
+      "lesson_id": "a02",
+      "term": "subsequent",
+      "meaning": "xảy ra tiếp theo",
+      "example": "Subsequent requests will be handled next week."
+    },
+    {
+      "id": "a02-v10",
+      "lesson_id": "a02",
+      "term": "mutually beneficial",
+      "meaning": "có lợi cho cả hai bên",
+      "example": "The teams agreed on a mutually beneficial arrangement."
+    },
+    {
+      "id": "a03-v01",
+      "lesson_id": "a03",
+      "term": "cross-reference",
+      "meaning": "đối chiếu giữa các nguồn",
+      "example": "Cross-reference the email with the price list."
+    },
+    {
+      "id": "a03-v02",
+      "lesson_id": "a03",
+      "term": "amendment",
+      "meaning": "sự sửa đổi; bản bổ sung",
+      "example": "The amendment changes the delivery address only."
+    },
+    {
+      "id": "a03-v03",
+      "lesson_id": "a03",
+      "term": "qualify for",
+      "meaning": "đủ điều kiện nhận",
+      "example": "Your order qualifies for free delivery."
+    },
+    {
+      "id": "a03-v04",
+      "lesson_id": "a03",
+      "term": "itemized",
+      "meaning": "được liệt kê từng mục",
+      "example": "Please send an itemized invoice."
+    },
+    {
+      "id": "a03-v05",
+      "lesson_id": "a03",
+      "term": "inclusive of",
+      "meaning": "đã bao gồm",
+      "example": "The quoted price is inclusive of installation."
+    },
+    {
+      "id": "a03-v06",
+      "lesson_id": "a03",
+      "term": "on behalf of",
+      "meaning": "thay mặt",
+      "example": "I am writing on behalf of the organizing team."
+    },
+    {
+      "id": "a03-v07",
+      "lesson_id": "a03",
+      "term": "valid through",
+      "meaning": "có hiệu lực đến hết",
+      "example": "The discount is valid through the end of July."
+    },
+    {
+      "id": "a03-v08",
+      "lesson_id": "a03",
+      "term": "redeem",
+      "meaning": "đổi hoặc sử dụng phiếu ưu đãi",
+      "example": "You can redeem the voucher at any branch."
+    },
+    {
+      "id": "a03-v09",
+      "lesson_id": "a03",
+      "term": "reconcile",
+      "meaning": "đối chiếu để thống nhất",
+      "example": "We need to reconcile the invoice with the order."
+    },
+    {
+      "id": "a03-v10",
+      "lesson_id": "a03",
+      "term": "supersede",
+      "meaning": "thay thế văn bản hoặc quy định trước",
+      "example": "This schedule supersedes the version sent yesterday."
+    },
+    {
+      "id": "a04-v01",
+      "lesson_id": "a04",
+      "term": "finalize",
+      "meaning": "hoàn tất; chốt",
+      "example": "We will finalize the guest list on Thursday."
+    },
+    {
+      "id": "a04-v02",
+      "lesson_id": "a04",
+      "term": "outstanding balance",
+      "meaning": "số tiền còn phải trả",
+      "example": "The outstanding balance is due next week."
+    },
+    {
+      "id": "a04-v03",
+      "lesson_id": "a04",
+      "term": "respectively",
+      "meaning": "lần lượt",
+      "example": "The two rooms hold thirty and fifty guests, respectively."
+    },
+    {
+      "id": "a04-v04",
+      "lesson_id": "a04",
+      "term": "irrespective of",
+      "meaning": "bất kể",
+      "example": "The fee applies irrespective of group size."
+    },
+    {
+      "id": "a04-v05",
+      "lesson_id": "a04",
+      "term": "in lieu of",
+      "meaning": "thay cho",
+      "example": "Guests received a voucher in lieu of a refund."
+    },
+    {
+      "id": "a04-v06",
+      "lesson_id": "a04",
+      "term": "prior authorization",
+      "meaning": "sự cho phép trước",
+      "example": "Changes require prior authorization from the coordinator."
+    },
+    {
+      "id": "a04-v07",
+      "lesson_id": "a04",
+      "term": "discrepancy",
+      "meaning": "sự chênh lệch; điểm không khớp",
+      "example": "The clerk noticed a discrepancy in the quantities."
+    },
+    {
+      "id": "a04-v08",
+      "lesson_id": "a04",
+      "term": "reimbursement claim",
+      "meaning": "đề nghị hoàn trả chi phí",
+      "example": "Submit the reimbursement claim with your receipts."
+    },
+    {
+      "id": "a04-v09",
+      "lesson_id": "a04",
+      "term": "fulfillment",
+      "meaning": "việc hoàn thành hoặc xử lý đơn hàng",
+      "example": "Order fulfillment will resume after the holiday."
+    },
+    {
+      "id": "a04-v10",
+      "lesson_id": "a04",
+      "term": "turnaround time",
+      "meaning": "thời gian xử lý từ nhận đến trả kết quả",
+      "example": "The usual turnaround time is three working days."
+    }
+  ],
+  "question_count": 268,
+  "vocabulary_count": 200
+}

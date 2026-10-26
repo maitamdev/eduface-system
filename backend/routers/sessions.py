@@ -12,7 +12,8 @@ from pymongo.errors import DuplicateKeyError
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from core.database import get_db
+from core.database import get_db, get_write_db
+from core.attendance_policy import session_applies_to_person
 from core.schemas import SessionCreate, SessionOut
 from core.auth import require_operator
 
@@ -45,14 +46,15 @@ def _parse_object_id(session_id: str) -> ObjectId:
 @router.get("", response_model=List[SessionOut], dependencies=[Depends(require_operator)])
 async def list_sessions(
     active: Optional[bool] = Query(None),
-    limit:  int            = Query(50, le=200),
+    limit:  int            = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     query = {}
     if active is not None:
         query["is_active"] = active
     docs = []
-    async for doc in db.sessions.find(query).sort("started_at", -1).limit(limit):
+    async for doc in db.sessions.find(query).sort([("started_at", -1), ("_id", -1)]).skip(offset).limit(limit):
         docs.append(SessionOut(**_doc_to_session(doc)))
     return docs
 
@@ -67,7 +69,20 @@ async def create_session(
     body: SessionCreate,
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
+    if body.course_id:
+        if not ObjectId.is_valid(body.course_id):
+            raise HTTPException(422, "Mã học phần không hợp lệ.")
+        course = await db.courses.find_one({"_id": ObjectId(body.course_id)})
+        if not course:
+            raise HTTPException(404, "Học phần không tồn tại.")
+        body.department = course["department"]
+    roster_query = {"is_active": True}
+    if body.department:
+        roster_query["department"] = {"$regex": f"^{re.escape(body.department.strip())}$", "$options": "i"}
+    roster_ids = [str(p["_id"]) async for p in db.persons.find(roster_query)]
     doc = {
+        "course_id": body.course_id,
+        "roster_ids": roster_ids,
         "label":              body.label,
         "department":         body.department,
         "started_at":         datetime.now(UTC),
@@ -94,13 +109,13 @@ async def get_session(session_id: str, db: AsyncIOMotorDatabase = Depends(get_db
     response_model=SessionOut,
     dependencies=[Depends(require_operator)],
 )
-async def end_session(session_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def end_session(session_id: str, db: AsyncIOMotorDatabase = Depends(get_write_db, scope="function")):
     oid = _parse_object_id(session_id)
     doc = await db.sessions.find_one({"_id": oid})
     if not doc:
         raise HTTPException(404, "Session not found.")
     if not doc.get("is_active"):
-        raise HTTPException(400, "Session is already closed.")
+        return SessionOut(**_doc_to_session(doc))
     now = datetime.now(UTC)
     await db.sessions.update_one(
         {"_id": oid},
@@ -114,14 +129,16 @@ async def end_session(session_id: str, db: AsyncIOMotorDatabase = Depends(get_db
         try:
             person_query: dict = {"is_active": True}
             dept = (doc.get("department") or "").strip()
-            if dept:
+            if "roster_ids" in doc:
+                person_query = {"_id": {"$in": doc["roster_ids"]}}
+            elif dept:
                 person_query["department"] = {"$regex": f"^{re.escape(dept)}$", "$options": "i"}
             marked_ids = set()
             async for att in db.attendance.find({"session_id": {"$in": [oid, session_id]}}):
                 marked_ids.add(att.get("person_id"))
             async for person in db.persons.find(person_query):
                 pid = person["_id"]
-                if pid not in marked_ids:
+                if pid not in marked_ids and session_applies_to_person(doc, person):
                     try:
                         await db.attendance.insert_one({
                             "person_id":  pid,
@@ -133,7 +150,7 @@ async def end_session(session_id: str, db: AsyncIOMotorDatabase = Depends(get_db
                         })
                     except DuplicateKeyError:
                         pass
-        except Exception:
-            pass
+        except Exception as exc:
+            raise HTTPException(503, "Không thể hoàn tất đóng phiên. Vui lòng thử lại.") from exc
 
     return SessionOut(**_doc_to_session(doc))

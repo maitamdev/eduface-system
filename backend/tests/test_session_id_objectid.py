@@ -8,6 +8,7 @@ Covers Step 9: Standardize session_id as ObjectId in MongoDB
 - Migration logic converts string session_ids to ObjectId
 """
 
+from types import SimpleNamespace
 import pytest
 from bson import ObjectId
 from fastapi import FastAPI
@@ -29,6 +30,9 @@ class FakeDBForObjectId:
         self.docs = []
 
         class SimpleCol:
+            async def update_one(self, query, update):
+                return SimpleNamespace(matched_count=1)
+
             def __init__(self, doc):
                 self.doc = doc
             async def find_one(self, query):
@@ -85,11 +89,12 @@ def objectid_test_client(monkeypatch):
     pid = "azure-person-99"
     fake_db = FakeDBForObjectId(sess_oid, pid)
 
-    async def fake_identify(image_bytes, confidence_threshold=None):
+    async def fake_identify(image_bytes, confidence_threshold=None, probe_image_bytes=None):
         return [{
             "azure_person_id": pid,
             "name": "Test Person",
             "confidence": 0.95,
+            "is_live": True,
             "face_box": {"left": 0, "top": 0, "width": 10, "height": 10},
         }]
 
@@ -112,7 +117,7 @@ def objectid_test_client(monkeypatch):
 def test_mark_attendance_stores_session_id_as_objectid(objectid_test_client):
     client, sess_oid, fake_db = objectid_test_client
 
-    files = {"frame": ("photo.jpg", b"\xff\xd8\xfffake", "image/jpeg")}
+    files = {"probe_frame": ("probe.jpg", b"probe", "image/jpeg"), "frame": ("photo.jpg", b"\xff\xd8\xfffake", "image/jpeg")}
     resp = client.post(f"/api/attendance/mark/{str(sess_oid)}", files=files)
 
     assert resp.status_code == 200, resp.text

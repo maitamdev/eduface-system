@@ -24,8 +24,8 @@ test("smartattend-client: URL construction and query parameter formatting", asyn
     fetch: mockFetch,
   });
 
-  const res = await client.persons.list({ search: "Alice", department: "IT", active_only: true });
-  assert.equal(capturedUrl, "http://localhost:8000/api/api/persons/?search=Alice&department=IT&active_only=true");
+  const res = await client.persons.list({  department: "IT" });
+  assert.equal(capturedUrl, "http://localhost:8000/api/persons?department=IT");
   assert.equal(res[0].name, "Alice");
 });
 

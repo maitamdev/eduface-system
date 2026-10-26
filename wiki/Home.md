@@ -1,3 +1,5 @@
+> Tài liệu trước đợt sửa 27/10/2026; một số mô tả kiến trúc/AI/quyền có thể đã cũ. Đối chiếu [README hiện hành](../README.md) và [hướng dẫn nâng cấp](../docs/UPGRADE_2026_10.md). Không coi các số accuracy/latency cũ là kết quả nghiệm thu.
+
 # 🎓 Welcome to the SmartAttend Engineering Wiki
 
 Welcome to the official technical wiki and engineering handbook for **SmartAttend**, an enterprise-grade AI biometric facial recognition attendance and surveillance system with a decoupled modular package ecosystem.

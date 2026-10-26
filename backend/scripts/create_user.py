@@ -9,6 +9,7 @@ Usage:
 """
 
 import argparse
+import getpass
 import logging
 import os
 import sys
@@ -16,6 +17,8 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 import pymongo
 
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from core.auth import hash_password
 
 load_dotenv()
@@ -28,6 +31,10 @@ logger = logging.getLogger("create_user")
 
 
 def create_user(username: str, password: str, role: str):
+    if not 3 <= len(username.strip()) <= 50 or not 12 <= len(password) <= 128:
+        raise ValueError("Username must be 3–50 characters and password 12–128 characters")
+    if role not in {"admin", "operator"}:
+        raise ValueError("Role must be admin or operator")
     mongo_url = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
     db_name = os.getenv("MONGODB_DB_NAME", "attendance_db")
 
@@ -56,8 +63,11 @@ def create_user(username: str, password: str, role: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a user for Smart Attendance System.")
     parser.add_argument("--username", required=True, help="Unique username")
-    parser.add_argument("--password", required=True, help="Plaintext password")
+    parser.add_argument("--password", help="Password (omit for a hidden prompt)")
     parser.add_argument("--role", default="operator", choices=["operator", "admin"], help="User role")
     args = parser.parse_args()
 
-    create_user(args.username, args.password, args.role)
+    try:
+        create_user(args.username, args.password or getpass.getpass("Password: "), args.role)
+    except ValueError as exc:
+        parser.error(str(exc))

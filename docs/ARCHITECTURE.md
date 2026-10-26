@@ -1,3 +1,5 @@
+> Tài liệu trước đợt sửa 27/10/2026; một số mô tả kiến trúc/AI/quyền có thể đã cũ. Đối chiếu [README hiện hành](../README.md) và [hướng dẫn nâng cấp](UPGRADE_2026_10.md). Không coi các số accuracy/latency cũ là kết quả nghiệm thu.
+
 # SmartAttend Monorepo & Modular Packages Architecture
 
 SmartAttend is an AI-powered biometric attendance tracking ecosystem. This repository contains the full-stack FastAPI backend and React 18 frontend, alongside a suite of decoupled, standalone libraries published under the `@maitamdev` scope.

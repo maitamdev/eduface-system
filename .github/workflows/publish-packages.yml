@@ -1,8 +1,6 @@
 name: Publish Packages to GitHub Packages
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -25,14 +23,14 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm install
+          npm ci
 
       - name: Build All Packages
         run: |
           for pkg in packages/*; do
             if [ -f "$pkg/tsconfig.json" ]; then
               echo "Building $pkg..."
-              npx --yes typescript -p "$pkg/tsconfig.json"
+              npx --no-install tsc -p "$pkg/tsconfig.json"
             fi
           done
 
@@ -51,6 +49,6 @@ jobs:
           for pkg in packages/*; do
             if [ -f "$pkg/package.json" ]; then
               echo "Publishing $pkg to GitHub Packages..."
-              (cd "$pkg" && npm publish --access public || echo "Skipped or already published: $pkg")
+              (cd "$pkg" && npm publish --access public)
             fi
           done

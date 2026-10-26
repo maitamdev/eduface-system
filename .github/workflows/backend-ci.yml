@@ -1,9 +1,5 @@
 name: Backend CI
 
-# Remediation Plan item #8 — dependency scanning + basic build verification.
-# Scoped to backend/ only for this phase; a frontend workflow (npm audit,
-# lint, vitest) is tracked separately and will be added in the frontend phase.
-
 on:
   push:
     paths:
@@ -53,9 +49,9 @@ jobs:
         # errors (bad imports, missing dependencies, route registration
         # mistakes) without a multi-minute CI job.
         run: |
-          pip install fastapi uvicorn slowapi motor pymongo python-dotenv \
+          pip install "fastapi==0.156.1" uvicorn slowapi motor pymongo python-dotenv \
                       "pydantic[email]" python-multipart opencv-python-headless \
-                      numpy Pillow azure-storage-blob pyjwt
+                      numpy Pillow azure-storage-blob fsrs==6.3.2 pyjwt
 
       - name: Compile check
         run: python -m py_compile backend/main.py backend/core/*.py backend/routers/*.py
@@ -77,7 +73,7 @@ jobs:
           "
 
   unit-tests:
-    name: pytest (Remediation Plan item #11)
+    name: Unit tests and real MongoDB transactions
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -90,10 +86,13 @@ jobs:
         # Same rationale as build-check above: insightface/onnxruntime are
         # mocked out in tests/conftest.py, so they're not needed here either.
         run: |
-          pip install fastapi uvicorn slowapi motor pymongo python-dotenv \
+          pip install "fastapi==0.156.1" uvicorn slowapi motor pymongo python-dotenv \
                       "pydantic[email]" python-multipart opencv-python-headless \
-                      numpy Pillow azure-storage-blob pyjwt httpx
+                      numpy Pillow azure-storage-blob fsrs==6.3.2 pyjwt httpx
           pip install -r backend/requirements-dev.txt
+
+      - name: Validate bundled TOEIC content and media
+        run: python backend/scripts/validate_toeic.py
 
       - name: Run backend unit tests
         working-directory: backend
@@ -101,3 +100,24 @@ jobs:
           MONGODB_URL: "mongodb://localhost:27017"
           API_KEY: "ci-placeholder-key"
         run: pytest -v
+
+      - name: Start isolated MongoDB replica set
+        run: |
+          docker run -d --name eduface-test-mongo -p 127.0.0.1:27017:27017 mongo:8.0 --replSet eduface-test --bind_ip_all
+          for i in $(seq 1 30); do
+            docker exec eduface-test-mongo mongosh --quiet --eval 'db.adminCommand({ping:1})' && break
+            sleep 1
+          done
+          docker exec eduface-test-mongo mongosh --quiet --eval 'rs.initiate({_id:"eduface-test",members:[{_id:0,host:"localhost:27017"}]})'
+          for i in $(seq 1 30); do
+            docker exec eduface-test-mongo mongosh --quiet --eval 'if (!db.hello().isWritablePrimary) quit(1)' && break
+            sleep 1
+          done
+
+      - name: Test transactions, indexes, migrations and complete CSV exports
+        working-directory: backend
+        env:
+          MONGODB_URL: mongodb://localhost:27017/?replicaSet=eduface-test
+          MONGODB_INTEGRATION_URI: mongodb://localhost:27017/?replicaSet=eduface-test
+          APP_ENV: test
+        run: pytest tests/test_mongo_integration.py tests/test_toeic_integration.py -v

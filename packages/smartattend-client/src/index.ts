@@ -4,7 +4,7 @@ import type {
   AuthToken,
   DailyAttendanceStat,
   DashboardMetrics,
-  HeatmapItem,
+  HeatmapResponse,
   IdentifyResult,
   MarkAttendanceResponse,
   Person,
@@ -55,7 +55,7 @@ export class SmartAttendClient {
   private fetchFn: typeof fetch;
 
   constructor(options: SmartAttendClientOptions = {}) {
-    this.baseUrl = (options.baseUrl ?? "http://localhost:8000").replace(/\/+$/, "");
+    this.baseUrl = (options.baseUrl ?? "http://localhost:8000").replace(/\/+$/, "").replace(/\/api$/i, "");
     this.options = options;
     this.fetchFn = options.fetch ?? (typeof fetch !== "undefined" ? fetch.bind(globalThis) : (undefined as any));
 
@@ -145,6 +145,7 @@ export class SmartAttendClient {
     const res = await this.fetchFn(url, {
       ...init,
       headers,
+      signal: init.signal ?? AbortSignal.timeout(45000),
     });
 
     if (!res.ok) {
@@ -182,7 +183,7 @@ export class SmartAttendClient {
       username: string;
       password: string;
       email?: string | null;
-      role?: "operator" | "admin";
+      role?: "operator" | "admin" | "student";
     }): Promise<User> => {
       return this.request<User>("/api/auth/register", {
         method: "POST",
@@ -202,11 +203,9 @@ export class SmartAttendClient {
   // ── Persons Module ──────────────────────────────────────────────────────────
   readonly persons = {
     list: async (params?: {
-      search?: string;
       department?: string;
-      active_only?: boolean;
     }): Promise<Person[]> => {
-      return this.request<Person[]>("/api/persons/", { method: "GET" }, params);
+      return this.request<Person[]>("/api/persons", { method: "GET" }, params);
     },
 
     get: async (id: string): Promise<Person> => {
@@ -215,12 +214,18 @@ export class SmartAttendClient {
 
     enroll: async (data: {
       name: string;
+      consent: boolean;
+      student_id?: string;
+      person_id?: string;
       email?: string;
       department?: string;
       photos: (Blob | File | any)[];
     }): Promise<Person> => {
       const formData = new FormData();
       formData.append("name", data.name);
+      formData.append("consent", String(data.consent));
+      if (data.student_id) formData.append("student_id", data.student_id);
+      if (data.person_id) formData.append("person_id", data.person_id);
       if (data.email) formData.append("email", data.email);
       if (data.department) formData.append("department", data.department);
       for (const photo of data.photos) {
@@ -240,12 +245,12 @@ export class SmartAttendClient {
 
   // ── Sessions Module ─────────────────────────────────────────────────────────
   readonly sessions = {
-    list: async (params?: { active_only?: boolean }): Promise<Session[]> => {
-      return this.request<Session[]>("/api/sessions/", { method: "GET" }, params);
+    list: async (params?: { active?: boolean; limit?: number; offset?: number }): Promise<Session[]> => {
+      return this.request<Session[]>("/api/sessions", { method: "GET" }, params);
     },
 
-    create: async (data: { label: string; department?: string }): Promise<Session> => {
-      return this.request<Session>("/api/sessions/", {
+    create: async (data: { label: string; department?: string; course_id?: string; late_after_minutes?: number }): Promise<Session> => {
+      return this.request<Session>("/api/sessions", {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -264,7 +269,7 @@ export class SmartAttendClient {
   readonly attendance = {
     identify: async (photo: Blob | File | any): Promise<IdentifyResult[]> => {
       const formData = new FormData();
-      formData.append("photo", photo);
+      formData.append("frame", photo);
       return this.request<IdentifyResult[]>("/api/attendance/identify", {
         method: "POST",
         body: formData,
@@ -274,11 +279,12 @@ export class SmartAttendClient {
     mark: async (data: {
       session_id: string;
       photo: Blob | File | any;
+      probe_frame: Blob | File;
     }): Promise<MarkAttendanceResponse> => {
       const formData = new FormData();
-      formData.append("session_id", data.session_id);
-      formData.append("photo", data.photo);
-      return this.request<MarkAttendanceResponse>("/api/attendance/mark", {
+      formData.append("frame", data.photo);
+      formData.append("probe_frame", data.probe_frame);
+      return this.request<MarkAttendanceResponse>(`/api/attendance/mark/${encodeURIComponent(data.session_id)}`, {
         method: "POST",
         body: formData,
       });
@@ -289,12 +295,12 @@ export class SmartAttendClient {
       person_id?: string;
       date?: string;
     }): Promise<AttendanceRecord[]> => {
-      return this.request<AttendanceRecord[]>("/api/attendance/", { method: "GET" }, params);
+      return this.request<AttendanceRecord[]>("/api/attendance", { method: "GET" }, params);
     },
 
     exportCsv: async (sessionId?: string): Promise<string> => {
       return this.request<string>(
-        "/api/attendance/export",
+        "/api/attendance/export/csv",
         { method: "GET" },
         sessionId ? { session_id: sessionId } : undefined
       );
@@ -319,11 +325,11 @@ export class SmartAttendClient {
     },
 
     getRates: async (params?: { department?: string }): Promise<PersonAttendanceRate[]> => {
-      return this.request<PersonAttendanceRate[]>("/api/reports/rates", { method: "GET" }, params);
+      return this.request<PersonAttendanceRate[]>("/api/reports/persons", { method: "GET" }, params);
     },
 
-    getHeatmap: async (days: number = 30): Promise<HeatmapItem[]> => {
-      return this.request<HeatmapItem[]>("/api/reports/heatmap", { method: "GET" }, { days });
+    getHeatmap: async (days: number = 30): Promise<HeatmapResponse> => {
+      return this.request<HeatmapResponse>("/api/reports/heatmap", { method: "GET" }, { days });
     },
   };
 

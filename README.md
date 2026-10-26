@@ -1,147 +1,98 @@
-# EduFace — Hệ Thống Điểm Danh Sinh Trắc Học Khuôn Mặt AI
+# EduFace — Điểm danh và quản lý học vụ
 
-<p align="center">
-  <strong>Website chính thức:</strong> <a href="https://dhv-edu.tech">https://dhv-edu.tech</a> ·
-  <strong>API Docs (Swagger):</strong> <a href="https://eduface-system.onrender.com/docs">https://eduface-system.onrender.com/docs</a> ·
-  <strong>Tác giả:</strong> <a href="https://github.com/maitamdev">maitamdev</a>
-</p>
+EduFace hỗ trợ hồ sơ sinh viên, đăng ký khuôn mặt, phiên điểm danh, sổ điểm theo học phần, đơn nghỉ phép và báo cáo chuyên cần. Tác giả dự án: [maitamdev](https://github.com/maitamdev).
 
----
+Bản cập nhật cục bộ ngày 27/10/2026: xem [báo cáo khắc phục](docs/reports/2026-10-27/BAO_CAO_KHAC_PHUC.md) và [hướng dẫn nâng cấp](docs/UPGRADE_2026_10.md). Những thay đổi trong workspace này **chưa được deploy/push/publish**. Các địa chỉ website trước đây không chứng minh rằng bản đang chạy đã nhận các thay đổi này.
 
-## 1. Giới Thiệu Dự Án
+## TOEIC cùng DHV
 
-**EduFace** là nền tảng quản lý điểm danh học đường bằng công nghệ nhận diện khuôn mặt trí tuệ nhân tạo (**InsightFace `buffalo_sc` 512-D**), giúp biến bất kỳ laptop có webcam của giảng viên hoặc thiết bị di động thành trạm điểm danh sinh trắc học thời gian thực.
+Tab `/toeic` dành cho mọi tài khoản đã đăng nhập: 5 chặng học từ nền tảng đến mục tiêu 900, 20 bài, 268 câu luyện có giải thích tiếng Việt, 200 thẻ từ vựng FSRS và 65 đoạn audio có sẵn. Có khảo sát 25 câu, luyện đủ 7 Part, đề luyện 200 câu/120 phút, lưu bài đang làm và tiến độ riêng. Không cần API AI hoặc nhập học liệu vào MongoDB; dữ liệu được đóng gói trong repository.
 
-Toàn bộ dữ liệu sinh trắc học, phiên học phần và nhật ký chuyên cần được đồng bộ trực tiếp trên **MongoDB Atlas**, phục vụ đồng thời **3 nhóm người dùng** trong môi trường đại học:
-1. **Quản trị viên / Giáo vụ khoa (`Admin`)**: Quản lý danh bạ sinh viên, đăng ký khuôn mặt, theo dõi biểu đồ chuyên cần, lọc danh sách sinh viên vắng quá `25%` (cảnh báo cấm thi) và xuất báo cáo Excel/CSV.
-2. **Giảng viên (`Operator`)**: Mở ca học phần đầu giờ, bật Camera laptop quét khuôn mặt sinh viên (chế độ chụp đơn hoặc tự động quét `3.5 giây/lần`), đóng ca cuối giờ và tra cứu nhật ký điểm danh.
-3. **Sinh viên (`Student`)**: Đăng nhập nhanh bằng **Google (`@gmail.com` / `@dhv.edu.vn`)**, tự khai báo **Họ tên + Mã số sinh viên (MSSV) + Lớp học phần + Chụp ảnh khuôn mặt lần đầu**, và theo dõi tỷ lệ chuyên cần cá nhân (`%`), giờ quét mặt thực tế cùng độ tin cậy AI của từng buổi học.
+Xem [hướng dẫn chạy và mở rộng](docs/toeic/README.md), [nguồn tham khảo và khóa học](docs/toeic/SOURCES.md), [báo cáo bàn giao](docs/toeic/BAO_CAO.md). Đây là học liệu luyện tập tự biên soạn, không phải đề ETS hoặc cam kết đạt 900; audio tổng hợp và hình minh họa được ghi rõ trong ứng dụng.
 
----
+## Công nghệ và phạm vi
 
-## 2. Kiến Trúc Hệ Thống & Công Nghệ Sử Dụng
+- Frontend: React 18, TypeScript, Vite 8; giao diện Việt/Anh, sáng/tối.
+- Backend: Python 3.11, FastAPI, Motor/PyMongo, JWT và API key theo vai trò.
+- Dữ liệu: MongoDB replica set hoặc Atlas. Các luồng ghi nhiều collection dùng transaction, commit trước khi trả thành công.
+- AI: InsightFace `buffalo_sc`, ONNX Runtime, OpenCV; embedding 512 chiều và cosine similarity. Không có số liệu accuracy/FAR/FRR trên tập camera mục tiêu trong lần bàn giao này.
+- Ảnh gốc trên Azure Blob là tùy chọn, mặc định tắt; embedding vẫn cần cho nhận diện.
 
-```mermaid
-flowchart LR
-    subgraph Client["Frontend (React 19 + TypeScript + Vite 8)"]
-        Login["Đăng nhập 2 cột + Google OAuth2"]
-        Scanner["Trạm Quét Camera AI (Operator/Admin)"]
-        Student["Cổng Thông Tin Sinh Viên (/student)"]
-        Admin["Quản Trị Danh Bạ & Báo Cáo CSV"]
-    end
+## Vai trò
 
-    subgraph Server["Backend (FastAPI + Docker trên Render)"]
-        Auth["Xác thực JWT HS256 + Google Identity + RBAC"]
-        Vision["InsightFace (buffalo_sc 512-D + CLAHE + Laplacian Liveness)"]
-        APIs["REST APIs & WebSocket"]
-    end
+| Vai trò | Phạm vi |
+|---|---|
+| Admin | Quản trị tài khoản, đăng ký/xóa hồ sơ và toàn bộ vận hành |
+| Operator | Nhân viên vận hành toàn hệ thống; chưa phải vai trò giảng viên bị giới hạn theo lớp được phân công |
+| Student | Chỉ truy cập hồ sơ/học vụ được liên kết bằng `users.person_id`; không suy ra quyền từ email liên hệ |
 
-    subgraph CloudDB["Cơ Sở Dữ Liệu (MongoDB Atlas)"]
-        DB[("attendance_db\n(users, persons, face_encodings,\nsessions, attendance)")]
-    end
+Google chỉ bật khi đặt `GOOGLE_CLIENT_ID`. Tài khoản mới có vai trò student; quyền trên tài khoản đã tồn tại chỉ được nhận qua liên kết Google do admin thiết lập. Mật khẩu tài khoản tạo mới tối thiểu 12 ký tự. CSV nhập sinh viên cấp mật khẩu ngẫu nhiên riêng cho từng người; người vận hành tải thông tin cấp tài khoản một lần.
 
-    Client -- "HTTPS REST + Bearer JWT" --> Server
-    Server -- "Motor Async Driver (TLS)" --> CloudDB
-```
+## Chạy cục bộ
 
-| Tầng (Layer) | Công nghệ chính | Chi tiết kỹ thuật |
-| :--- | :--- | :--- |
-| **Frontend** | React 19, TypeScript, Vite 8, Tailwind CSS v4 | Giao diện đa ngôn ngữ (`VI` / `EN`), chế độ Sáng / Tối (`Light` / `Dark`), hỗ trợ đăng nhập Google OAuth2 (`Google Identity Services`). Triển khai trên **Vercel** tại [`https://dhv-edu.tech`](https://dhv-edu.tech). |
-| **Backend API** | Python 3.11, FastAPI, Uvicorn, SlowAPI | Kiến trúc bất đồng bộ (`async/await`), phân quyền 3 vai trò (`admin`, `operator`, `student`), giới hạn tần suất (`Rate Limiting`), kiểm tra tệp ảnh an toàn bằng Pillow. Triển khai bằng **Docker** trên **Render**. |
-| **AI Computer Vision** | InsightFace (`buffalo_sc`), ONNX Runtime, OpenCV, NumPy | Cân bằng sáng cục bộ **CLAHE**, kiểm tra độ sắc nét chống ảnh mờ bằng phương sai **Laplacian**, trích xuất vector đặc trưng **512 chiều (`float32`)** chuẩn hóa L2, so khớp tốc độ cao bằng tích vô hướng ma trận (**Cosine Similarity**). |
-| **Database** | MongoDB Atlas (`Motor` Async Driver) | Lưu trữ trên đám mây với các chỉ mục chống trùng lặp (`Unique Compound Index (person_id, session_id)` ngăn điểm danh 2 lần trong cùng một ca học). |
+Cần Python 3.11, Node.js đáp ứng Vite 8 và MongoDB replica set/Atlas. Xem hướng dẫn nâng cấp trước khi mở một DB đã có dữ liệu.
 
----
-
-## 3. Quy Trình Nghiệp Vụ Cốt Lõi
-
-### 3.1. Đăng nhập Google & Khai báo Hồ sơ Khuôn mặt lần đầu (Dành cho Sinh viên)
-- Sinh viên truy cập [`https://dhv-edu.tech/login`](https://dhv-edu.tech/login) và bấm **"Tiếp tục với Google"**.
-- Nếu là lần đầu đăng nhập, hệ thống tự động khởi tạo tài khoản `student` và mở biểu mẫu **Khai báo thông tin sinh viên & Đăng ký khuôn mặt lần đầu** ngay tại `/student`:
-  - Nhập **Họ và tên**, **Mã số sinh viên (MSSV)**, **Lớp / Học phần** (ví dụ: `KTCN`).
-  - Bật Camera chụp trực tiếp từ **1 đến 5 ảnh khuôn mặt** (hoặc tải ảnh từ thiết bị).
-- Hệ thống kiểm tra chất lượng ảnh (`det_score >= 0.60`), kiểm tra chống trùng khuôn mặt (`DUPLICATE_THRESHOLD = 0.45`), lưu vector 512 chiều và liên kết vĩnh viễn với tài khoản Google của sinh viên.
-
-### 3.2. Mở ca học phần & Điểm danh trực tiếp tại lớp (Dành cho Giảng viên)
-- Đầu buổi học, giảng viên vào mục **Phiên điểm danh (`/sessions`)** tạo ca mới (ví dụ: `Buổi 1 - Lý thuyết`, Lớp `KTCN`).
-- Mở mục **Máy quét AI trực tiếp (`/scanner`)**, chọn ca đang mở và bật Camera laptop.
-- Sinh viên lần lượt nhìn vào Camera: AI nhận diện trong `< 300ms`, tự động ghi nhận trạng thái **Có mặt (`present`)**, thời gian thực tế (`marked_at`) và độ khớp AI (`confidence`). Nếu sinh viên quét lại lần 2 trong cùng buổi học, hệ thống thông báo **"Đã điểm danh trước đó"** và không ghi trùng.
-
-### 3.3. Theo dõi chuyên cần & Cảnh báo cấm thi (Dành cho Sinh viên & Quản trị viên)
-- **Trên Cổng Sinh viên (`/student`)**: Sinh viên xem tổng số buổi học của lớp, số buổi có mặt, số buổi vắng mặt, tỷ lệ chuyên cần (`%`) và cảnh báo nếu dưới ngưỡng **75%**.
-- **Trên trang Báo cáo (`/reports`)**: Quản trị viên xem biểu đồ chuyên cần theo chuỗi 7/14/30/90 ngày, ma trận **Heatmap 14 ngày**, lọc danh sách sinh viên vắng quá `25%` (`is_defaulter`) và tải xuống file **CSV (UTF-8)** phục vụ xét điều kiện dự thi.
-
----
-
-## 4. Hướng Dẫn Chạy Thử Tại Máy Cục Bộ (Local Development)
-
-### 4.1. Khởi chạy Backend (`http://localhost:8000`)
-```bash
+```powershell
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-dev.txt
+Copy-Item .env.example .env
+# Điền MONGODB_URL, MONGODB_DB_NAME, JWT_SECRET, DEFAULT_ADMIN_PASSWORD,
+# API_KEY_ADMIN/API_KEY_OPERATOR nếu dùng tích hợp, và ALLOWED_ORIGINS.
+.\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-### 4.2. Khởi chạy Frontend (`http://localhost:5173`)
-```bash
+Ở terminal khác:
+
+```powershell
 cd frontend
-npm install
+npm ci
+$env:VITE_API_URL='http://localhost:8000'
 npm run dev
 ```
 
-### 4.3. Chạy Bộ Kiểm Thử Tự Động (Unit & Integration Tests)
-```bash
-# Kiểm thử Backend (Pytest)
+`/live` kiểm tra tiến trình; `/health` chỉ trả 200 khi MongoDB và mô hình đã sẵn sàng. Lần đầu cần tải model. Trong production, đặt secret riêng, origin chính xác và không bật `SEED_DEMO_ACCOUNTS`. Không đưa API key quản trị vào bundle frontend; bản production bỏ qua `VITE_API_KEY`.
+
+## Quy tắc dữ liệu
+
+- MSSV là định danh duy nhất trong hồ sơ đang hoạt động; trùng họ tên được phép.
+- Chụp lại cập nhật `face_updated_at`, giữ `enrolled_at` và hồ sơ giáo vụ đã liên kết.
+- Phiên mới chụp danh sách `roster_ids` khi tạo; chuyển lớp sau đó không đổi lịch sử phiên này.
+- Điểm lưu theo `(person_id, course_id)`; học phần có lớp và học kỳ. Điểm cũ chưa xác định học phần chỉ xem, không tự chuyển sang một môn giả định.
+- `present`, `late`, `excused` tính là đã tham dự. Phiên chưa đóng và chưa có bản ghi chưa tính là vắng.
+- Dashboard đếm số sinh viên hoạt động có mặt trong ngày, không đếm lặp một người qua nhiều phiên.
+- Quét để ghi điểm danh cần hai frame và các kiểm tra ảnh/chuyển động. Đây là heuristic, chưa phải PAD được kiểm định.
+- Cosine là độ tương đồng, không phải xác suất nhận đúng. Không có cam kết tốc độ <300ms hoặc độ chính xác cố định.
+
+## Kiểm thử và tích hợp
+
+```powershell
 cd backend
-pytest -q
+.\.venv\Scripts\python.exe -m pytest -q
+# Để chạy cả kiểm thử transaction trên DB thử localhost riêng:
+$env:MONGODB_INTEGRATION_URI='mongodb://127.0.0.1:27028/?replicaSet=eduface-test'
+.\.venv\Scripts\python.exe -m pytest -q
+```
 
-# Kiểm thử & Build Frontend (Vitest + TypeScript)
+Các ca integration tạo DB tên ngẫu nhiên `eduface_integration_*` và chỉ xóa DB đó. AI được mock trong bộ transaction; smoke SDK riêng đã gọi model thật bằng ảnh trống, không đánh giá độ chính xác nhận người.
+
+```powershell
 cd frontend
-npx vitest run
+npm test
 npm run build
+# Tại thư mục gốc
+npm ci
+npm run typecheck
+npm run build
+npm test
 ```
 
----
+SDK: [hướng dẫn client](packages/smartattend-client/README.md). API chính xác theo `/docs`/`/openapi.json` của backend đang chạy. Công cụ `backend/scripts/evaluate_similarity.py` tính FAR/FRR và p50/p95 từ CSV đã gán nhãn; không thay thế việc thu thập validation độc lập.
 
-## 5. Cấu Trúc Thư Mục Chính
+## Vận hành và giới hạn
 
-```text
-eduface-system/
-├── backend/
-│   ├── core/
-│   │   ├── auth.py               # Xác thực JWT HS256, băm mật khẩu scrypt & phân quyền RBAC
-│   │   ├── azure_face.py         # Pipeline AI InsightFace (buffalo_sc 512-D), CLAHE, Liveness
-│   │   ├── database.py           # Kết nối MongoDB Atlas (Motor) & khởi tạo Indexes
-│   │   ├── google_identity.py    # Xác thực Google OAuth2 / OpenID Connect
-│   │   ├── schemas.py            # Các mô hình dữ liệu Pydantic v2
-│   │   └── validation.py         # Kiểm tra an toàn tệp ảnh tải lên (Pillow)
-│   ├── routers/
-│   │   ├── auth.py               # API đăng nhập, quản lý tài khoản & Cổng sinh viên (/student-portal)
-│   │   ├── google_auth.py        # API đăng nhập Google & tự động khởi tạo tài khoản sinh viên
-│   │   ├── persons.py            # API đăng ký khuôn mặt (Admin & Sinh viên tự đăng ký /self-enroll)
-│   │   ├── sessions.py           # API mở/đóng phiên điểm danh học phần
-│   │   ├── attendance.py         # API nhận diện khuôn mặt, ghi điểm danh & xuất CSV
-│   │   ├── dashboard.py          # API thống kê tổng quan & hoạt động gần đây
-│   │   └── reports.py            # API báo cáo chuyên cần, Heatmap & lọc sinh viên cấm thi
-│   ├── tests/                    # Bộ kiểm thử tự động Backend (Pytest)
-│   ├── Dockerfile                # Cấu hình đóng gói Docker chạy trên Render
-│   └── main.py                   # Điểm khởi chạy ứng dụng FastAPI & CORS
-└── frontend/
-    ├── src/
-    │   ├── api/client.ts         # Tầng giao tiếp REST API kèm JWT Bearer
-    │   ├── auth/google.ts        # Tích hợp Google Identity Services
-    │   ├── components/           # AppShell, RouteGuards, ProductUI
-    │   ├── context/              # AuthContext, LanguageContext (VI/EN), ThemeContext (Light/Dark)
-    │   └── pages/                # LoginPage, DashboardPage, LiveScannerPage, StudentPortalPage, ...
-    ├── vercel.json               # Cấu hình định tuyến SPA trên Vercel
-    └── vite.config.ts            # Cấu hình đóng gói Vite 8
-```
+Docker chạy tài khoản không phải root, loại `.env`/venv khỏi build context, readiness theo `PORT`. Chưa build Docker/Linux trong lần kiểm tra Windows này. CI đã bổ sung kiểm thử MongoDB transaction và package Python, nhưng chưa có kết quả GitHub Actions từ các thay đổi chưa push.
 
----
+Audit ghi actor/action và một số giá trị trước/sau; chưa phải kho log bất biến. Xóa hồ sơ loại embedding trong transaction, giữ lịch sử học vụ và đưa ảnh Blob vào hàng đợi xóa có retry. Backup, versioning/soft-delete của cloud cần chính sách lưu giữ riêng.
 
-<p align="center">
-  <strong>EduFace · Hệ thống quản lý điểm danh nhận diện khuôn mặt AI</strong><br/>
-  Design and coding by <a href="https://github.com/maitamdev"><strong>maitamdev</strong></a>
-</p>
+Giấy phép mã nguồn không đồng nghĩa giấy phép trọng số mô hình. Kiểm tra [điều kiện sử dụng mô hình InsightFace](https://github.com/deepinsight/insightface#license) trước sử dụng ngoài phạm vi được cấp phép. Cần nghiệm thu với camera thật, dữ liệu được đồng ý sử dụng, OAuth tenant và Blob Storage của đơn vị trước triển khai.

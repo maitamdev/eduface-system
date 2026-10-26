@@ -10,11 +10,10 @@ import jwt
 from fastapi import HTTPException
 
 
-DEFAULT_GOOGLE_CLIENT_ID = "839148608863-iv1en34namc76757touqsf36u1950ou2.apps.googleusercontent.com"
 
 
 def google_configuration() -> dict:
-    client_id = os.environ.get("GOOGLE_CLIENT_ID", DEFAULT_GOOGLE_CLIENT_ID).strip()
+    client_id = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
     if len(client_id) < 15 or " " in client_id:
         return {"enabled": False, "client_id": ""}
     return {"enabled": True, "client_id": client_id}

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, ArrowRight } from "lucide-react";
-import { personsApi, sessionsApi, type PersonOut, type SessionOut } from "@/api/client";
+import { academicApi, personsApi, sessionsApi, type PersonOut, type SessionOut } from "@/api/client";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast } from "@/context/ToastContext";
 import { useResource } from "@/hooks/useResource";
@@ -11,10 +11,12 @@ import { PageHeader, Section, RefreshButton, ErrorNotice, Field, EmptyState, Tab
 export const SessionsPage: React.FC = () => {
   const { t, lang } = useLanguage();
   const toast = useToast();
-  const loader = useCallback(() => sessionsApi.list(undefined, 100), []);
+  const loader = useCallback(() => sessionsApi.listAll(), []);
   const { data: sessions, setData, loading, error, reload } = useResource<SessionOut[]>(loader, []);
   const peopleLoader = useCallback(() => personsApi.list(), []);
   const people = useResource<PersonOut[]>(peopleLoader, []);
+  const courses = useResource(useCallback(() => academicApi.listCourses(), []), []);
+  const [courseId, setCourseId] = useState("");
   const [label, setLabel] = useState("");
   const [department, setDepartment] = useState("");
   const [lateMinutes, setLateMinutes] = useState<number>(15);
@@ -33,7 +35,7 @@ export const SessionsPage: React.FC = () => {
     if (!label.trim() || creating) return;
     setCreating(true);
     try {
-      const session = await sessionsApi.create(label, department || undefined, lateMinutes);
+      const session = await sessionsApi.create(label, department || undefined, lateMinutes, courseId || undefined);
       setData((previous) => [session, ...previous]); setLabel(""); setDepartment("");
       toast.success(t("Đã mở phiên điểm danh.", "Session opened."));
     } catch (err) { toast.error(errorMessage(err)); } finally { setCreating(false); }
@@ -49,8 +51,9 @@ export const SessionsPage: React.FC = () => {
   };
   return <div className="product-page">
     <PageHeader title={t("Phiên điểm danh", "Attendance sessions")} description={t("Mở phiên theo từng Lớp / Học phần và cài đặt mốc thời gian tính đi muộn.", "Manage check-ins by class/department and configure late thresholds.")}><RefreshButton onClick={reload} loading={loading} /></PageHeader>
-    <ErrorNotice message={error} retry={reload} />
+    <ErrorNotice message={error} retry={reload} /><ErrorNotice message={courses.error} retry={courses.reload} />
     <Section title={t("Tạo phiên mới theo Lớp / Học phần", "Open new class session")}><form onSubmit={create} className="inline-form">
+      <Field id="session-course" label={t("Học phần / Học kỳ", "Course / Semester")}><select id="session-course" value={courseId} onChange={(e) => { setCourseId(e.target.value); setDepartment(courses.data.find((c) => c.id === e.target.value)?.department || ""); }}><option value="">{t("Phiên chung (không tính điểm môn)", "General session (no course grade)")}</option>{courses.data.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.name} · {c.semester} · {c.department}</option>)}</select></Field>
       <Field id="session-label" label={t("Tên học phần / Buổi học *", "Session name *")}><input id="session-label" value={label} onChange={(event) => setLabel(event.target.value)} maxLength={200} placeholder={t("Ví dụ: Lập trình Web · Buổi 5", "e.g. Web development · Week 5")} required /></Field>
       <Field id="session-department" label={t("Khoa / Lớp áp dụng", "Target Class / Department")}>
         <input id="session-department" list="known-classes-list" value={department} onChange={(event) => setDepartment(event.target.value)} maxLength={100} placeholder={t("Chọn hoặc nhập mã lớp (VD: CNTT)", "Select or type class (e.g. CNTT)")} />

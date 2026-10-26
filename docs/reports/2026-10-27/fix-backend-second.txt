@@ -1,0 +1,59 @@
+..........................F..FF.......FF..F............................. [ 42%]
+.........................................F.............................. [ 84%]
+..........................                                               [100%]
+================================== FAILURES ===================================
+_______ test_bulk_import_never_merges_a_different_student_by_same_name ________
+tests\test_academic_security.py:286: in test_bulk_import_never_merges_a_different_student_by_same_name
+    assert response.status_code == 409
+E   assert 200 == 409
+E    +  where 200 = <Response [200 OK]>.status_code
+________ test_bulk_import_checks_later_rows_before_any_write[bad_row2] ________
+tests\test_academic_security.py:300: in test_bulk_import_checks_later_rows_before_any_write
+    assert response.status_code in (409, 422)
+E   assert 200 in (409, 422)
+E    +  where 200 = <Response [200 OK]>.status_code
+_________ test_bulk_import_updates_by_id_and_preserves_existing_face __________
+tests\test_academic_security.py:311: in test_bulk_import_updates_by_id_and_preserves_existing_face
+    assert result.json() == {"created": 0, "updated": 1, "accounts_created": 0, "total_processed": 1}
+E   AssertionError: assert {'created': 0...ssed': 1, ...} == {'created': 0...processed': 1}
+E
+E     Omitting 4 identical items, use -vv to show
+E     Left contains 1 more item:
+E     {'credentials': []}
+E     Use -v to get more diff
+_______________ test_first_mark_creates_a_new_attendance_record _______________
+tests\test_attendance_idempotency.py:139: in test_first_mark_creates_a_new_attendance_record
+    assert resp.status_code == 200
+E   assert 422 == 200
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_______________ test_second_mark_in_same_session_is_idempotent ________________
+tests\test_attendance_idempotency.py:154: in test_second_mark_in_same_session_is_idempotent
+    assert first.json()["new_records"] == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'new_records'
+__________ test_non_duplicate_insert_error_is_not_silently_swallowed __________
+tests\test_attendance_idempotency.py:194: in test_non_duplicate_insert_error_is_not_silently_swallowed
+    assert resp.status_code >= 500
+E   assert 422 >= 500
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_____________ test_mark_attendance_stores_session_id_as_objectid ______________
+tests\test_session_id_objectid.py:118: in test_mark_attendance_stores_session_id_as_objectid
+    assert resp.status_code == 200, resp.text
+E   AssertionError: {"detail":"Điểm danh cần hai khung hình camera để kiểm tra chuyển động."}
+E   assert 422 == 200
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\project\AI-Attendance-System\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_academic_security.py::test_bulk_import_never_merges_a_different_student_by_same_name
+FAILED tests/test_academic_security.py::test_bulk_import_checks_later_rows_before_any_write[bad_row2]
+FAILED tests/test_academic_security.py::test_bulk_import_updates_by_id_and_preserves_existing_face
+FAILED tests/test_attendance_idempotency.py::test_first_mark_creates_a_new_attendance_record
+FAILED tests/test_attendance_idempotency.py::test_second_mark_in_same_session_is_idempotent
+FAILED tests/test_attendance_idempotency.py::test_non_duplicate_insert_error_is_not_silently_swallowed
+FAILED tests/test_session_id_objectid.py::test_mark_attendance_stores_session_id_as_objectid
+7 failed, 163 passed, 1 warning in 46.42s

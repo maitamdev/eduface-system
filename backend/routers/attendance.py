@@ -22,7 +22,7 @@ from fastapi import (
 from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from core.database import get_db, get_database, person_already_marked, get_person_by_azure_id
+from core.database import get_db, get_write_db, get_database, person_already_marked, get_person_by_azure_id
 from core.schemas import AttendanceOut, ManualAttendancePayload, MarkAttendanceResponse, IdentifyResult
 from core import azure_face
 from core.auth import require_operator, require_admin, get_user_id_from_request
@@ -30,6 +30,7 @@ from core.rate_limit import limiter
 from core.validation import read_and_validate_image
 from core.audit import record_audit_event
 from core.metrics import record_attendance_mark
+from core.attendance_policy import session_applies_to_person
 from limits import parse as parse_rate_limit
 from limits.storage import MemoryStorage
 from limits.strategies import FixedWindowRateLimiter
@@ -68,7 +69,7 @@ def _compute_scan_status(session: dict, now: datetime) -> str:
 async def identify_frame(
     request:    Request,
     frame:      UploadFile = File(...),
-    confidence: float      = Query(0.40, ge=0.1, le=1.0),
+    confidence: float      = Query(None, ge=0.1, le=1.0),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     image_bytes = await read_and_validate_image(frame)
@@ -91,8 +92,8 @@ async def mark_attendance(
     session_id:  str,
     frame:       UploadFile           = File(...),
     probe_frame: Optional[UploadFile] = File(None),
-    confidence:  float                = Query(0.40, ge=0.1, le=1.0),
-    db: AsyncIOMotorDatabase          = Depends(get_db),
+    confidence:  float                = Query(None, ge=0.1, le=1.0),
+    db: AsyncIOMotorDatabase          = Depends(get_write_db, scope="function"),
 ):
     try:
         session_oid = ObjectId(session_id)
@@ -103,20 +104,19 @@ async def mark_attendance(
     if not session:
         raise HTTPException(404, "Active session not found.")
 
+    if probe_frame is None:
+        raise HTTPException(422, "Điểm danh cần hai khung hình camera để kiểm tra chuyển động.")
     image_bytes = await read_and_validate_image(frame)
     probe_bytes = await read_and_validate_image(probe_frame) if probe_frame is not None else None
     try:
-        if probe_bytes is not None:
-            try:
-                raw_results = await azure_face.identify_faces(image_bytes, confidence, probe_image_bytes=probe_bytes)
-            except TypeError:
-                raw_results = await azure_face.identify_faces(image_bytes, confidence)
-        else:
-            raw_results = await azure_face.identify_faces(image_bytes, confidence)
+        raw_results = await azure_face.identify_faces(image_bytes, confidence, probe_image_bytes=probe_bytes)
     except Exception:
         logger.exception("Identify error during mark")
         raise HTTPException(503, "Face recognition service temporarily unavailable.")
 
+    gate = await db.sessions.update_one({"_id": session_oid, "is_active": True}, {"$inc": {"attendance_revision": 1}})
+    if gate.matched_count == 0:
+        raise HTTPException(409, "Phiên đã đóng trong lúc nhận diện. Vui lòng tải lại.")
     identified: List[IdentifyResult] = []
     new_records = 0
 
@@ -126,10 +126,14 @@ async def mark_attendance(
             logger.warning("Azure person %s not in DB — skipping.", r["azure_person_id"])
             continue
 
-        is_live = bool(r.get("is_live", True))
+        if not session_applies_to_person(session, person):
+            record_attendance_mark("rejected")
+            continue
+        is_live = bool(r.get("is_live", False))
         already = await person_already_marked(db, person["_id"], session_oid)
 
         if not is_live:
+            record_attendance_mark("rejected")
             logger.warning(
                 "Spoof attempt blocked for person=%s (%s): %s",
                 person["_id"], r["name"], r.get("spoof_reason"),
@@ -204,13 +208,15 @@ async def list_attendance(
     person_id:     Optional[str]  = Query(None),
     date_filter:   Optional[date] = Query(None, alias="date"),
     status_filter: Optional[str]  = Query(None, alias="status"),
-    limit:         int            = Query(200, le=1000),
+    limit:         int            = Query(200, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    department: Optional[str] = Query(None),
     db: AsyncIOMotorDatabase      = Depends(get_db),
 ):
     match: dict = {}
     if session_id:
         try:
-            match["session_id"] = ObjectId(session_id)
+            match["session_id"] = {"$in": [ObjectId(session_id), session_id]}
         except (InvalidId, TypeError):
             raise HTTPException(400, f"Invalid session_id format: '{session_id}'.")
     if person_id:
@@ -225,15 +231,18 @@ async def list_attendance(
 
     pipeline = [
         {"$match": match},
-        {"$sort": {"marked_at": -1}},
-        {"$limit": limit},
+        {"$sort": {"marked_at": -1, "_id": -1}},
         # persons._id is a string UUID — direct match works
         {"$lookup": {"from": "persons", "localField": "person_id", "foreignField": "_id", "as": "person"}},
-        # sessions._id is an ObjectId and attendance.session_id is stored as ObjectId
-        {"$lookup": {"from": "sessions", "localField": "session_id", "foreignField": "_id", "as": "session"}},
+        {"$set": {"session_oid": {"$convert": {"input": "$session_id", "to": "objectId", "onError": None, "onNull": None}}}},
+        {"$lookup": {"from": "sessions", "localField": "session_oid", "foreignField": "_id", "as": "session"}},
         {"$unwind": "$person"},
         {"$unwind": "$session"},
     ]
+    if department:
+        import re
+        pipeline.append({"$match": {"person.department": {"$regex": f"^{re.escape(department.strip())}$", "$options": "i"}}})
+    pipeline.extend([{"$skip": offset}, {"$limit": limit}])
 
     rows = []
     async for doc in db.attendance.aggregate(pipeline):
@@ -257,7 +266,7 @@ async def list_attendance(
 async def set_manual_attendance(
     request: Request,
     body: ManualAttendancePayload,
-    db: AsyncIOMotorDatabase = Depends(get_db),
+    db: AsyncIOMotorDatabase = Depends(get_write_db, scope="function"),
 ):
     """Cho phép Giảng viên hoặc Admin điểm danh thủ công / đổi trạng thái (present, late, excused, absent)."""
     try:
@@ -273,14 +282,16 @@ async def set_manual_attendance(
     if not person:
         raise HTTPException(404, "Person not found.")
 
+    if not session_applies_to_person(session, person):
+        raise HTTPException(422, "Sinh viên không thuộc danh sách của phiên này.")
     now_utc = datetime.now(UTC)
     user_id = get_user_id_from_request(request) or "manual"
-    existing = await db.attendance.find_one({"person_id": body.person_id, "session_id": session_oid})
+    existing = await db.attendance.find_one({"person_id": body.person_id, "session_id": {"$in": [session_oid, str(session_oid)]}})
 
     if existing:
         await db.attendance.update_one(
             {"_id": existing["_id"]},
-            {"$set": {"status": body.status, "marked_at": now_utc, "marked_by": user_id}},
+            {"$set": {"status": body.status, "updated_at": now_utc, "updated_by": user_id}},
         )
         att_id = str(existing["_id"])
         conf = existing.get("confidence")
@@ -296,6 +307,9 @@ async def set_manual_attendance(
         att_id = str(res.inserted_id)
         conf = None
 
+    request.state.audit_metadata = {"before_status": existing.get("status") if existing else None,
+                                    "after_status": body.status, "person_id": body.person_id,
+                                    "session_id": body.session_id}
     return AttendanceOut(
         id=att_id,
         person_id=body.person_id,
@@ -304,7 +318,7 @@ async def set_manual_attendance(
         department=person.get("department"),
         session_id=str(session_oid),
         session_label=session["label"],
-        marked_at=now_utc,
+        marked_at=existing["marked_at"] if existing else now_utc,
         confidence=conf,
         status=body.status,
         marked_by=user_id,
@@ -318,42 +332,40 @@ async def export_csv(
     department:  Optional[str]  = Query(None),
     db: AsyncIOMotorDatabase     = Depends(get_db),
 ):
-    records = await list_attendance(
-        session_id=session_id, person_id=None,
-        date_filter=date_filter, status_filter=None,
-        limit=10000, db=db,
-    )
-    if department and department.strip():
-        dept_lower = department.strip().lower()
-        records = [r for r in records if (r.department or "").strip().lower() == dept_lower]
-
-    output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=[
-        "id", "student_id", "person_name", "department", "session_label",
-        "marked_at", "confidence", "status"
-    ])
-    writer.writeheader()
+    # Iterate stable Mongo cursor with filters applied before streaming; no 10k truncation.
+    match = {}
+    if session_id:
+        if not ObjectId.is_valid(session_id):
+            raise HTTPException(422, "Invalid session ID")
+        match["session_id"] = {"$in": [ObjectId(session_id), session_id]}
     vn_tz = timezone(timedelta(hours=7))
-    for r in records:
-        marked_dt = r.marked_at if r.marked_at.tzinfo else r.marked_at.replace(tzinfo=UTC)
-        marked_vn = marked_dt.astimezone(vn_tz).strftime("%Y-%m-%d %H:%M:%S")
-        writer.writerow({key: _safe_csv_cell(value) for key, value in {
-            "id":            r.id,
-            "student_id":    r.student_id or "",
-            "person_name":   r.person_name,
-            "department":    r.department or "",
-            "session_label": r.session_label,
-            "marked_at":     marked_vn,
-            "confidence":    r.confidence if r.confidence is not None else "",
-            "status":        r.status,
-        }.items()})
-    output.seek(0)
-    filename = f"attendance_{datetime.now(vn_tz).date().isoformat()}.csv"
-    return StreamingResponse(
-        iter(["\ufeff" + output.getvalue()]),
-        media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename={filename}"},
-    )
+    if date_filter:
+        start = datetime.combine(date_filter, datetime.min.time(), tzinfo=vn_tz).astimezone(UTC)
+        match["marked_at"] = {"$gte": start, "$lt": start + timedelta(days=1)}
+    pipeline = [{"$match": match}, {"$sort": {"marked_at": -1, "_id": -1}},
+                {"$lookup": {"from": "persons", "localField": "person_id", "foreignField": "_id", "as": "person"}},
+                {"$set": {"session_oid": {"$convert": {"input": "$session_id", "to": "objectId", "onError": None, "onNull": None}}}},
+                {"$lookup": {"from": "sessions", "localField": "session_oid", "foreignField": "_id", "as": "session"}},
+                {"$unwind": "$person"}, {"$unwind": "$session"}]
+    if department:
+        import re
+        pipeline.append({"$match": {"person.department": {"$regex": f"^{re.escape(department.strip())}$", "$options": "i"}}})
+    async def generate():
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["id", "student_id", "person_name", "department", "session_label", "marked_at", "confidence", "status"])
+        yield "\ufeff" + output.getvalue()
+        async for row in db.attendance.aggregate(pipeline):
+            output.seek(0); output.truncate(0)
+            marked = row["marked_at"]
+            marked = marked if marked.tzinfo else marked.replace(tzinfo=UTC)
+            values = [str(row["_id"]), row["person"].get("student_id", ""), row["person"]["name"],
+                      row["person"].get("department", ""), row["session"]["label"],
+                      marked.astimezone(vn_tz).isoformat(), row.get("confidence", ""), row.get("status", "present")]
+            writer.writerow([_safe_csv_cell(v) for v in values])
+            yield output.getvalue()
+    return StreamingResponse(generate(), media_type="text/csv", headers={
+        "Content-Disposition": f"attachment; filename=attendance_{datetime.now(vn_tz).date()}.csv"})
 
 
 # ── Real-Time Streaming WebSocket ─────────────────────────────────────────────
@@ -368,16 +380,14 @@ async def attendance_websocket(
     Accepts raw binary JPEG/WebP frames or base64 data URLs.
     Returns recognition bounding boxes and match status without HTTP overhead.
     """
-    allowed_origins = {
-        "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8080",
-        "https://ai-attendance-system-mauve.vercel.app",
-        *(origin.strip() for origin in os.environ.get("ALLOWED_ORIGINS", "").split(",") if origin.strip()),
-    }
+    from core.origins import allowed_origins as resolve_origins
+    allowed_origins = set(resolve_origins())
     origin = websocket.headers.get("origin")
     if origin and origin not in allowed_origins:
         await websocket.close(code=1008)
         return
     await websocket.accept()
+    db = get_database()
     # Browser WebSockets cannot set Authorization headers. Authenticate the
     # first message instead; credentials must never appear in URL/access logs.
     try:
@@ -391,6 +401,7 @@ async def attendance_websocket(
             request=websocket,
             x_api_key=auth.get("api_key", ""),
             authorization=auth.get("authorization"),
+            db=db,
         )
         confidence = float(auth.get("confidence", 0.4))
         if not 0.1 <= confidence <= 1.0:
@@ -398,7 +409,6 @@ async def attendance_websocket(
     except (HTTPException, ValueError, TypeError, asyncio.TimeoutError, WebSocketDisconnect):
         await websocket.close(code=1008)
         return
-    db = get_database()
     try:
         session_oid = ObjectId(session_id)
         session = await db.sessions.find_one({"_id": session_oid, "is_active": True})
@@ -416,6 +426,18 @@ async def attendance_websocket(
         while True:
             data = await websocket.receive()
             if data["type"] == "websocket.disconnect":
+                break
+            # Recheck expiry, password reset, deactivation, and role changes
+            # before every recognition frame, including on long-lived sockets.
+            try:
+                await require_operator(
+                    request=websocket,
+                    x_api_key=auth.get("api_key", ""),
+                    authorization=auth.get("authorization"),
+                    db=db,
+                )
+            except HTTPException:
+                await websocket.close(code=1008)
                 break
             if not _ws_limiter.hit(_ws_rate, websocket.client.host if websocket.client else "unknown"):
                 await websocket.send_json({"error": "Recognition rate limit exceeded", "status": 429})

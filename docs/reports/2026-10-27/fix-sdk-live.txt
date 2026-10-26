@@ -1,0 +1,1 @@
+Live SDK smoke passed: auth, profiles, sessions, real-model blank frames, attendance, CSV, dashboard and reports.

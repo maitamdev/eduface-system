@@ -1,4 +1,4 @@
-import type { ActivityItem, AttendanceRecord, AuthToken, DailyAttendanceStat, DashboardMetrics, HeatmapItem, IdentifyResult, MarkAttendanceResponse, Person, PersonAttendanceRate, Session, SmartAttendClientOptions, SystemDiagnostics, User } from "./types.js";
+import type { ActivityItem, AttendanceRecord, AuthToken, DailyAttendanceStat, DashboardMetrics, HeatmapResponse, IdentifyResult, MarkAttendanceResponse, Person, PersonAttendanceRate, Session, SmartAttendClientOptions, SystemDiagnostics, User } from "./types.js";
 export * from "./types.js";
 export declare class ApiError extends Error {
     status: number;
@@ -36,20 +36,21 @@ export declare class SmartAttendClient {
             username: string;
             password: string;
             email?: string | null;
-            role?: "operator" | "admin";
+            role?: "operator" | "admin" | "student";
         }) => Promise<User>;
         me: () => Promise<User>;
         logout: () => Promise<void>;
     };
     readonly persons: {
         list: (params?: {
-            search?: string;
             department?: string;
-            active_only?: boolean;
         }) => Promise<Person[]>;
         get: (id: string) => Promise<Person>;
         enroll: (data: {
             name: string;
+            consent: boolean;
+            student_id?: string;
+            person_id?: string;
             email?: string;
             department?: string;
             photos: (Blob | File | any)[];
@@ -58,11 +59,15 @@ export declare class SmartAttendClient {
     };
     readonly sessions: {
         list: (params?: {
-            active_only?: boolean;
+            active?: boolean;
+            limit?: number;
+            offset?: number;
         }) => Promise<Session[]>;
         create: (data: {
             label: string;
             department?: string;
+            course_id?: string;
+            late_after_minutes?: number;
         }) => Promise<Session>;
         get: (id: string) => Promise<Session>;
         end: (id: string) => Promise<Session>;
@@ -72,6 +77,7 @@ export declare class SmartAttendClient {
         mark: (data: {
             session_id: string;
             photo: Blob | File | any;
+            probe_frame: Blob | File;
         }) => Promise<MarkAttendanceResponse>;
         list: (params?: {
             session_id?: string;
@@ -89,7 +95,7 @@ export declare class SmartAttendClient {
         getRates: (params?: {
             department?: string;
         }) => Promise<PersonAttendanceRate[]>;
-        getHeatmap: (days?: number) => Promise<HeatmapItem[]>;
+        getHeatmap: (days?: number) => Promise<HeatmapResponse>;
     };
     readonly diagnostics: {
         getSystemDiagnostics: () => Promise<SystemDiagnostics>;

@@ -1,0 +1,260 @@
+
+> ai-attendance-system-monorepo@1.0.0 test
+> npm run test --workspaces --if-present
+
+
+> @maitamdev/attendance-contracts@1.0.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: attendance-contracts: Exports module and matches contract schema structures
+ok 1 - attendance-contracts: Exports module and matches contract schema structures
+  ---
+  duration_ms: 12.2879
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 399.0525
+
+> @maitamdev/attendance-domain-core@1.0.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: attendance-domain-core: First mark is approved
+ok 1 - attendance-domain-core: First mark is approved
+  ---
+  duration_ms: 9.9531
+  type: 'test'
+  ...
+# Subtest: attendance-domain-core: Duplicate mark in same session is ignored
+ok 2 - attendance-domain-core: Duplicate mark in same session is ignored
+  ---
+  duration_ms: 0.6703
+  type: 'test'
+  ...
+# Subtest: attendance-domain-core: Same person in different session is permitted
+ok 3 - attendance-domain-core: Same person in different session is permitted
+  ---
+  duration_ms: 0.9206
+  type: 'test'
+  ...
+# Subtest: attendance-domain-core: Closed session is rejected
+ok 4 - attendance-domain-core: Closed session is rejected
+  ---
+  duration_ms: 2.5641
+  type: 'test'
+  ...
+# Subtest: attendance-domain-core: Missing or invalid person identifier is rejected
+ok 5 - attendance-domain-core: Missing or invalid person identifier is rejected
+  ---
+  duration_ms: 0.4558
+  type: 'test'
+  ...
+# Subtest: attendance-domain-core: classifyDuplicate categorizes immediate retries vs spaced duplicates
+ok 6 - attendance-domain-core: classifyDuplicate categorizes immediate retries vs spaced duplicates
+  ---
+  duration_ms: 6.5997
+  type: 'test'
+  ...
+# Subtest: attendance-domain-core: filterNewAttendees filters out already marked candidates
+ok 7 - attendance-domain-core: filterNewAttendees filters out already marked candidates
+  ---
+  duration_ms: 7.726
+  type: 'test'
+  ...
+# Subtest: attendance-domain-core: buildAttendanceDraft creates standard draft record
+ok 8 - attendance-domain-core: buildAttendanceDraft creates standard draft record
+  ---
+  duration_ms: 1.0876
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 437.5542
+
+> @maitamdev/face-matching-core@1.0.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: face-matching-core: Identical vectors yield similarity 1.0
+ok 1 - face-matching-core: Identical vectors yield similarity 1.0
+  ---
+  duration_ms: 8.0805
+  type: 'test'
+  ...
+# Subtest: face-matching-core: Orthogonal vectors yield similarity 0.0
+ok 2 - face-matching-core: Orthogonal vectors yield similarity 0.0
+  ---
+  duration_ms: 0.9358
+  type: 'test'
+  ...
+# Subtest: face-matching-core: Normalized and un-normalized vectors produce identical cosine similarity
+ok 3 - face-matching-core: Normalized and un-normalized vectors produce identical cosine similarity
+  ---
+  duration_ms: 1.0646
+  type: 'test'
+  ...
+# Subtest: face-matching-core: Zero vectors return 0.0 without throwing divide-by-zero
+ok 4 - face-matching-core: Zero vectors return 0.0 without throwing divide-by-zero
+  ---
+  duration_ms: 0.5111
+  type: 'test'
+  ...
+# Subtest: face-matching-core: Dimension mismatch throws clear error
+ok 5 - face-matching-core: Dimension mismatch throws clear error
+  ---
+  duration_ms: 1.3299
+  type: 'test'
+  ...
+# Subtest: face-matching-core: NaN and Infinity are caught and rejected
+ok 6 - face-matching-core: NaN and Infinity are caught and rejected
+  ---
+  duration_ms: 0.4788
+  type: 'test'
+  ...
+# Subtest: face-matching-core: findBestMatch honors threshold edges
+ok 7 - face-matching-core: findBestMatch honors threshold edges
+  ---
+  duration_ms: 1.1086
+  type: 'test'
+  ...
+# Subtest: face-matching-core: rankMatches correctly orders multiple candidates
+ok 8 - face-matching-core: rankMatches correctly orders multiple candidates
+  ---
+  duration_ms: 0.4692
+  type: 'test'
+  ...
+# Subtest: face-matching-core: Euclidean distance calculation
+ok 9 - face-matching-core: Euclidean distance calculation
+  ---
+  duration_ms: 4.6721
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 374.6598
+
+> @maitamdev/face-quality-gates@1.0.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: face-quality-gates: Valid face passes quality gate
+ok 1 - face-quality-gates: Valid face passes quality gate
+  ---
+  duration_ms: 3.3071
+  type: 'test'
+  ...
+# Subtest: face-quality-gates: Low confidence score rejected
+ok 2 - face-quality-gates: Low confidence score rejected
+  ---
+  duration_ms: 0.7756
+  type: 'test'
+  ...
+# Subtest: face-quality-gates: Small face rejected (<60px)
+ok 3 - face-quality-gates: Small face rejected (<60px)
+  ---
+  duration_ms: 0.4638
+  type: 'test'
+  ...
+# Subtest: face-quality-gates: Edge margin violation rejected
+ok 4 - face-quality-gates: Edge margin violation rejected
+  ---
+  duration_ms: 0.4626
+  type: 'test'
+  ...
+# Subtest: face-quality-gates: Extreme pose rejected (eye distance ratio < 0.20)
+ok 5 - face-quality-gates: Extreme pose rejected (eye distance ratio < 0.20)
+  ---
+  duration_ms: 0.7905
+  type: 'test'
+  ...
+# Subtest: face-quality-gates: evaluateFaces handles no face and multiple faces
+ok 6 - face-quality-gates: evaluateFaces handles no face and multiple faces
+  ---
+  duration_ms: 0.5052
+  type: 'test'
+  ...
+# Subtest: face-quality-gates: parseBoundingBox supports both tuple and rect formats
+ok 7 - face-quality-gates: parseBoundingBox supports both tuple and rect formats
+  ---
+  duration_ms: 0.4803
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 361.3349
+
+> @maitamdev/smartattend-client@1.0.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: smartattend-client: URL construction and query parameter formatting
+ok 1 - smartattend-client: URL construction and query parameter formatting
+  ---
+  duration_ms: 90.5233
+  type: 'test'
+  ...
+# Subtest: smartattend-client: Bearer token and API-key header propagation
+ok 2 - smartattend-client: Bearer token and API-key header propagation
+  ---
+  duration_ms: 2.9468
+  type: 'test'
+  ...
+# Subtest: smartattend-client: Error mapping into ApiError with status and message
+ok 3 - smartattend-client: Error mapping into ApiError with status and message
+  ---
+  duration_ms: 3.2954
+  type: 'test'
+  ...
+# Subtest: smartattend-client: 204 No Content response handling
+ok 4 - smartattend-client: 204 No Content response handling
+  ---
+  duration_ms: 0.8154
+  type: 'test'
+  ...
+# Subtest: smartattend-client: Form data multipart request does not set json header
+ok 5 - smartattend-client: Form data multipart request does not set json header
+  ---
+  duration_ms: 4.7899
+  type: 'test'
+  ...
+# Subtest: smartattend-client: createSmartAttendClient factory function
+ok 6 - smartattend-client: createSmartAttendClient factory function
+  ---
+  duration_ms: 0.4772
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 541.0058

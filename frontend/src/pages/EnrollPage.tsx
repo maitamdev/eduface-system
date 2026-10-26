@@ -18,6 +18,7 @@ export const EnrollPage: React.FC = () => {
   const [studentId, setStudentId] = useState(() => params.get("studentId") || "");
   const [email, setEmail] = useState(() => params.get("email") || "");
   const [department, setDepartment] = useState(() => params.get("department") || "");
+  const [consent, setConsent] = useState(false);
   const [studentUsername, setStudentUsername] = useState("");
   const [studentPassword, setStudentPassword] = useState("");
   const [source, setSource] = useState<"camera" | "upload">(() => params.get("name") ? "camera" : "upload");
@@ -64,6 +65,8 @@ export const EnrollPage: React.FC = () => {
     setSubmitting(true); setError(null);
     try {
       const person = await personsApi.enroll({
+        consent,
+        person_id: params.get("personId") || undefined,
         name: name.trim(),
         student_id: studentId.trim().toUpperCase() || studentUsername.trim().toUpperCase() || undefined,
         email: email.trim() || undefined,
@@ -84,16 +87,17 @@ export const EnrollPage: React.FC = () => {
   ];
   if (enrolled) return <div className="product-page"><PageHeader title={t("Đã đăng ký khuôn mặt", "Enrollment complete")} /><div className="enrollment-success"><CheckCircle2 size={23} /><div><h2>{enrolled.name}</h2><p>{t("Hồ sơ đã sẵn sàng để điểm danh.", "The profile is ready for check-ins.")}</p></div></div><div className="page-actions"><Link className="secondary-button" to={appPath("/people")}>{t("Về danh bạ", "View directory")}</Link><button className="primary-button" onClick={() => { setEnrolled(null); setName(""); setStudentId(""); setEmail(""); setDepartment(""); setStudentUsername(""); setStudentPassword(""); }}>{t("Đăng ký người tiếp theo", "Enroll another person")}</button></div></div>;
   return <div className="product-page">
-    <PageHeader title={t("Đăng ký & Cập nhật khuôn mặt", "Face enrollment")} description={t("Nhập thông tin (hoặc trùng tên để ghi đè ảnh mới) và chụp từ 1 đến 5 góc mặt chuẩn AI.", "Enter profile details and add 1–5 clear face photos.")}><Link className="secondary-button" to={appPath("/people")}>{t("Về danh bạ", "Back to directory")}</Link></PageHeader>
+    <PageHeader title={t("Đăng ký & Cập nhật khuôn mặt", "Face enrollment")} description={t("Nhập thông tin (dùng mã sinh viên hoặc hồ sơ đã chọn để cập nhật ảnh) và chụp từ 1 đến 5 góc mặt chuẩn AI.", "Enter profile details and add 1–5 clear face photos.")}><Link className="secondary-button" to={appPath("/people")}>{t("Về danh bạ", "Back to directory")}</Link></PageHeader>
     <ErrorNotice message={error || camera.error} />
     <form onSubmit={submit} className="enrollment-grid">
       <Section title={t("Thông tin hồ sơ", "Profile information")}><div className="stack-form">
+        <label className="checkbox-label"><input type="checkbox" checked={consent} required onChange={(e) => setConsent(e.target.checked)} />{t("Tôi xác nhận có sự đồng ý xử lý mẫu khuôn mặt cho mục đích điểm danh. Có thể yêu cầu quản trị viên xóa mẫu.", "I confirm consent to process face templates for attendance. Template deletion can be requested from an administrator.")}</label>
         <Field id="enroll-name" label={t("Họ và tên *", "Full name *")}><input id="enroll-name" autoComplete="name" value={name} maxLength={200} onChange={(event) => setName(event.target.value)} required /></Field>
         <Field id="enroll-mssv" label={t("Mã số sinh viên (MSSV)", "Student ID (MSSV)")}><input id="enroll-mssv" value={studentId} maxLength={50} onChange={(event) => setStudentId(event.target.value)} placeholder={t("VD: 2305CT2070", "e.g. 2305CT2070")} /></Field>
         <Field id="enroll-email" label="Email"><input id="enroll-email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} /></Field>
         <Field id="enroll-department" label={t("Học phần / Lớp", "Course / Class")}><input id="enroll-department" value={department} maxLength={100} onChange={(event) => setDepartment(event.target.value)} placeholder={t("VD: KTCN · CNTT-K21", "e.g. CS-2026 · Intro to AI")} /></Field>
         <Field id="enroll-student-username" label={t("Tạo tài khoản đăng nhập SV (tùy chọn)", "Create student login username (optional)")}><input id="enroll-student-username" autoComplete="off" value={studentUsername} minLength={3} maxLength={50} onChange={(event) => setStudentUsername(event.target.value)} placeholder={t("VD: 2305CT2070", "e.g. 2305CT2070")} /></Field>
-        {studentUsername.trim().length > 0 && <Field id="enroll-student-password" label={t("Mật khẩu SV (tối thiểu 6 ký tự)", "Student password (min 6 chars)")}><input id="enroll-student-password" type="password" autoComplete="new-password" value={studentPassword} minLength={6} onChange={(event) => setStudentPassword(event.target.value)} placeholder={t("Mặc định: 123456 nếu để trống", "Defaults to 123456 if blank")} /></Field>}
+        {studentUsername.trim().length > 0 && <Field id="enroll-student-password" label={t("Mật khẩu SV (tối thiểu 12 ký tự)", "Student password (min 12 chars)")}><input id="enroll-student-password" type="password" autoComplete="new-password" value={studentPassword} minLength={12} required onChange={(event) => setStudentPassword(event.target.value)} placeholder={t("Nhập mật khẩu riêng cho sinh viên", "Enter a unique password")} /></Field>}
         <p className="field-hint">{t("Chọn ảnh đủ sáng, lộ rõ cả 2 mắt - mũi - miệng, không che mặt hoặc quay ngang 90°. Nếu nhập trùng họ tên đã có, hệ thống sẽ tự động cập nhật bộ ảnh mới.", "Use well-lit photos where both eyes, nose, and mouth are visible. Re-submitting an existing name updates its face photos.")}</p>
         <button className="primary-button" disabled={busy || !photos.length || (analysis != null && analysis.invalid > 0)} type="submit">{submitting ? t("Đang đăng ký…", "Enrolling…") : t("Lưu hồ sơ", "Save profile")}</button>
       </div></Section>

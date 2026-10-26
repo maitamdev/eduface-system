@@ -1,0 +1,73 @@
+[
+  {
+    "screen": "Máy quét AI trực tiếp LIVE",
+    "headings": [
+      "171 heading Máy quét điểm danh, Value: 1",
+      "190 heading Hình ảnh đầu vào, Value: 2",
+      "216 heading Kết quả nhận diện & Xác thực người thật, Value: 2",
+      "221 heading Bản ghi của phiên đang chọn, Value: 2"
+    ],
+    "errorBoundary": false
+  },
+  {
+    "screen": "Phiên điểm danh",
+    "headings": [
+      "~\t\t\t\t171 heading Phiên điểm danh, Value: 1",
+      "+\t\t\t\t178 heading Tạo phiên mới theo Lớp / Học phần, Value: 2",
+      "+\t\t\t\t196 heading Phiên đang mở (2), Value: 2",
+      "+\t\t\t\t199 heading Lập trình ứng dụng Web, Value: 3",
+      "+\t\t\t\t206 heading Thiết kế giao diện người dùng, Value: 3",
+      "+\t\t\t\t213 heading Phiên đã kết thúc, Value: 2"
+    ],
+    "errorBoundary": false
+  },
+  {
+    "screen": "Sổ bản ghi điểm danh",
+    "headings": [
+      "171 heading Sổ điểm danh, Value: 1"
+    ],
+    "errorBoundary": false
+  },
+  {
+    "screen": "Hồ sơ Sinh viên & Lớp",
+    "headings": [
+      "171 heading Hồ sơ Sinh viên & Quản lý Lớp, Value: 1"
+    ],
+    "errorBoundary": false
+  },
+  {
+    "screen": "Cổng thông tin sinh viên",
+    "headings": [
+      "171 heading Cổng thông tin sinh viên, Value: 1",
+      "178 heading Xem góc nhìn sinh viên (Dành cho Quản trị viên), Value: 2",
+      "189 heading Hồ sơ học vụ & sinh trắc học, Value: 2",
+      "227 heading Bảng điểm Học vụ & Xét điều kiện dự thi cá nhân, Value: 2",
+      "251 heading Bảng tin & Thông báo Lớp học, Value: 2",
+      "259 heading Học phần & Thời khóa biểu, Value: 2",
+      "286 heading Xin nghỉ phép trực tuyến & Theo dõi duyệt đơn, Value: 2",
+      "340 heading Chi tiết điểm danh theo từng buổi học, Value: 2"
+    ],
+    "errorBoundary": false
+  },
+  {
+    "screen": "Đăng ký khuôn mặt",
+    "headings": [
+      "~\t\t\t\t171 heading Đăng ký & Cập nhật khuôn mặt, Value: 1",
+      "+\t\t\t\t176 heading Thông tin hồ sơ, Value: 2",
+      "+\t\t\t\t190 heading Ảnh khuôn mặt, Value: 2"
+    ],
+    "errorBoundary": false
+  },
+  {
+    "screen": "Tài khoản & Hệ thống",
+    "headings": [
+      "171 heading Tài khoản & hệ thống, Value: 1",
+      "178 heading Tạo tài khoản, Value: 2",
+      "194 heading Tài khoản hệ thống & Phân quyền, Value: 2",
+      "232 heading Chẩn đoán cấu hình, Value: 2",
+      "248 heading Dữ liệu nhận diện khuôn mặt, Value: 2",
+      "252 heading Đăng nhập Google, Value: 2"
+    ],
+    "errorBoundary": false
+  }
+]

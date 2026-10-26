@@ -1,21 +1,81 @@
-"""
-routers/reports.py - MongoDB version
-"""
+"""Attendance reports using the same eligible sessions for every metric."""
 
-from datetime import date, datetime, timedelta, timezone
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 import re
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from core.attendance_policy import (
+    ATTENDED_STATUSES, VN_TZ, as_utc, attendance_status,
+    is_session_assessed, session_applies_to_person, session_local_day,
+)
+from core.auth import require_operator
 from core.database import get_db
 from core.schemas import DailyAttendanceStat, PersonAttendanceStat
-from core.auth import require_operator
 
 router = APIRouter()
-VN_TZ = timezone(timedelta(hours=7))
-ATTENDED_STATUSES = ["present", "late", "excused"]
+
+class ReportPeriod:
+    def __init__(self, dates, persons, sessions, attendance):
+        self.dates = dates
+        self.persons = persons
+        self.sessions = sessions
+        self.attendance = attendance
+
+    def assessed(self, person):
+        """Yield applicable sessions only after closure or a successful check-in."""
+        for session in self.sessions:
+            record = self.attendance.get((str(person["_id"]), str(session["_id"])))
+            if session_applies_to_person(session, person) and is_session_assessed(session, record):
+                yield session, attendance_status(record)
+
+
+async def _load_period(db, days: int, department: Optional[str]) -> ReportPeriod:
+    today = datetime.now(VN_TZ).date()
+    dates = [(today - timedelta(days=days - index - 1)).isoformat() for index in range(days)]
+    since = datetime.combine(today - timedelta(days=days - 1), datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
+    until = datetime.combine(today + timedelta(days=1), datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
+    person_query = {"is_active": True}
+    session_query = {"started_at": {"$gte": since, "$lt": until}}
+    if department and department.strip():
+        dept = {"$regex": rf"^\s*{re.escape(department.strip())}\s*$", "$options": "i"}
+        person_query["department"] = dept
+        session_query["$or"] = [
+            {"department": dept}, {"department": None},
+            {"department": {"$regex": r"^\s*$"}},
+        ]
+    sessions = [doc async for doc in db.sessions.find(session_query, {
+        "_id": 1, "department": 1, "started_at": 1, "ended_at": 1, "is_active": 1, "roster_ids": 1,
+    })]
+    historical_ids = list({pid for session in sessions for pid in session.get("roster_ids", [])})
+    if historical_ids:
+        person_query = {"$or": [person_query, {"_id": {"$in": historical_ids}}]}
+    persons = [doc async for doc in db.persons.find(person_query, {
+        "_id": 1, "name": 1, "department": 1, "enrolled_at": 1,
+    }).sort("name", 1)]
+    attendance = {}
+    if persons and sessions:
+        # Some older documents use string session ids instead of ObjectId.
+        session_ids = list({value for session in sessions for value in (session["_id"], str(session["_id"]))})
+        person_ids = list({value for person in persons for value in (person["_id"], str(person["_id"]))})
+        query = {"session_id": {"$in": session_ids}, "person_id": {"$in": person_ids}}
+        async for record in db.attendance.find(query, {
+            "_id": 1, "person_id": 1, "session_id": 1, "status": 1, "marked_at": 1,
+        }):
+            key = (str(record["person_id"]), str(record["session_id"]))
+            previous = attendance.get(key)
+            # Resolve mixed-id legacy duplicates by timestamp, then id, so the
+            # numerator and status are independent of cursor order.
+            if previous is None or _record_order(record) > _record_order(previous):
+                attendance[key] = record
+    return ReportPeriod(dates, persons, sessions, attendance)
+
+
+def _record_order(record):
+    return (as_utc(record.get("marked_at") or datetime.min), str(record.get("_id", "")))
 
 
 @router.get("/daily", response_model=List[DailyAttendanceStat], dependencies=[Depends(require_operator)])
@@ -24,60 +84,24 @@ async def daily_stats(
     department: Optional[str] = Query(None),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
-    today_vn = datetime.now(VN_TZ).date()
-    since = datetime.combine(today_vn - timedelta(days=days), datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
-
-    person_query: dict = {"is_active": True}
-    sess_match: dict = {"started_at": {"$gte": since}}
-    allowed_person_ids = None
-    if department and department.strip():
-        dept_regex = {"$regex": f"^{re.escape(department.strip())}$", "$options": "i"}
-        person_query["department"] = dept_regex
-        sess_match["$or"] = [{"department": dept_regex}, {"department": None}, {"department": ""}]
-        allowed_person_ids = [doc["_id"] async for doc in db.persons.find(person_query, {"_id": 1})]
-
-    att_match: dict = {"marked_at": {"$gte": since}, "status": {"$in": ATTENDED_STATUSES}}
-    if allowed_person_ids is not None:
-        att_match["person_id"] = {"$in": allowed_person_ids}
-
-    # Present counts per day (Vietnam local day +07:00)
-    pipeline = [
-        {"$match": att_match},
-        {"$group": {
-            "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$marked_at", "timezone": "+07:00"}},
-            "present": {"$addToSet": "$person_id"},
-        }},
-    ]
-    present_map = {}
-    async for doc in db.attendance.aggregate(pipeline):
-        present_map[doc["_id"]] = len(doc["present"])
-
-    # Sessions per day (Vietnam local day +07:00)
-    sess_pipeline = [
-        {"$match": sess_match},
-        {"$group": {
-            "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$started_at", "timezone": "+07:00"}},
-            "count": {"$sum": 1},
-        }},
-    ]
-    session_map = {}
-    async for doc in db.sessions.aggregate(sess_pipeline):
-        session_map[doc["_id"]] = doc["count"]
-
-    total_enrolled = await db.persons.count_documents(person_query) or 1
-
-    stats = []
-    for i in range(days):
-        d = (today_vn - timedelta(days=days - i - 1)).isoformat()
-        present = present_map.get(d, 0)
-        rate = round((present / total_enrolled) * 100, 1)
-        stats.append(DailyAttendanceStat(
-            date=d,
-            total_sessions=session_map.get(d, 0),
-            total_present=present,
-            attendance_rate=rate,
-        ))
-    return stats
+    period = await _load_period(db, days, department)
+    present = defaultdict(int)
+    opportunities = defaultdict(int)
+    assessed_sessions = defaultdict(set)
+    # Closed sessions remain visible even if no current profile applies.
+    for session in period.sessions:
+        if is_session_assessed(session):
+            assessed_sessions[session_local_day(session).isoformat()].add(str(session["_id"]))
+    for person in period.persons:
+        for session, status in period.assessed(person):
+            day = session_local_day(session).isoformat()
+            assessed_sessions[day].add(str(session["_id"]))
+            opportunities[day] += 1
+            present[day] += status in ATTENDED_STATUSES
+    return [DailyAttendanceStat(
+        date=day, total_sessions=len(assessed_sessions[day]), total_present=present[day],
+        attendance_rate=round(100 * present[day] / opportunities[day], 1) if opportunities[day] else 0.0,
+    ) for day in period.dates]
 
 
 @router.get("/persons", response_model=List[PersonAttendanceStat], dependencies=[Depends(require_operator)])
@@ -86,41 +110,19 @@ async def person_stats(
     department: Optional[str] = Query(None),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
-    today_vn = datetime.now(VN_TZ).date()
-    since = datetime.combine(today_vn - timedelta(days=days), datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
-
-    person_query: dict = {"is_active": True}
-    sess_query: dict = {"started_at": {"$gte": since}}
-    if department and department.strip():
-        dept_regex = {"$regex": f"^{re.escape(department.strip())}$", "$options": "i"}
-        person_query["department"] = dept_regex
-        sess_query["$or"] = [{"department": dept_regex}, {"department": None}, {"department": ""}]
-
-    total_sessions = await db.sessions.count_documents(sess_query) or 1
-
-    pipeline = [
-        {"$match": {"marked_at": {"$gte": since}, "status": {"$in": ATTENDED_STATUSES}}},
-        {"$group": {"_id": "$person_id", "present_count": {"$sum": 1}}},
-    ]
-    present_map = {}
-    async for doc in db.attendance.aggregate(pipeline):
-        present_map[doc["_id"]] = doc["present_count"]
-
+    period = await _load_period(db, days, department)
     stats = []
-    async for p in db.persons.find(person_query).sort("name", 1):
-        present = present_map.get(p["_id"], 0)
-        rate = round((present / total_sessions) * 100, 1)
+    for person in period.persons:
+        statuses = [status for _, status in period.assessed(person)]
+        total = len(statuses)
+        present = sum(status in ATTENDED_STATUSES for status in statuses)
+        rate = round(100 * present / total, 1) if total else 0.0
         stats.append(PersonAttendanceStat(
-            person_id=str(p["_id"]),
-            name=p["name"],
-            department=p.get("department"),
-            total_sessions=total_sessions,
-            present_count=present,
-            attendance_rate=rate,
-            is_defaulter=rate < 75.0,
+            person_id=str(person["_id"]), name=person["name"], department=person.get("department"),
+            total_sessions=total, present_count=present, attendance_rate=rate,
+            is_defaulter=total > 0 and rate < 75.0,
         ))
-
-    return sorted(stats, key=lambda x: x.attendance_rate)
+    return sorted(stats, key=lambda stat: stat.attendance_rate)
 
 
 @router.get("/heatmap", dependencies=[Depends(require_operator)])
@@ -129,41 +131,17 @@ async def heatmap(
     department: Optional[str] = Query(None),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
-    today_vn = datetime.now(VN_TZ).date()
-    since = datetime.combine(today_vn - timedelta(days=days), datetime.min.time(), tzinfo=VN_TZ).astimezone(timezone.utc)
-    date_range = [
-        (today_vn - timedelta(days=days - i - 1)).isoformat()
-        for i in range(days)
-    ]
-
-    person_query: dict = {"is_active": True}
-    if department and department.strip():
-        person_query["department"] = {"$regex": f"^{re.escape(department.strip())}$", "$options": "i"}
-
-    pipeline = [
-        {"$match": {"marked_at": {"$gte": since}}},
-        {"$project": {
-            "person_id": 1,
-            "status":    1,
-            "day": {"$dateToString": {"format": "%Y-%m-%d", "date": "$marked_at", "timezone": "+07:00"}},
-        }},
-    ]
-    att_map: dict = {}
-    async for doc in db.attendance.aggregate(pipeline):
-        att_map.setdefault(doc["person_id"], {})[doc["day"]] = doc["status"]
-
+    period = await _load_period(db, days, department)
     persons = []
-    async for p in db.persons.find(person_query).sort("name", 1):
-        pid = str(p["_id"])
+    for person in period.persons:
+        per_day = defaultdict(list)
+        for session, status in period.assessed(person):
+            per_day[session_local_day(session).isoformat()].append(status in ATTENDED_STATUSES)
         persons.append({
-            "person_id":  pid,
-            "name":       p["name"],
-            "department": p.get("department"),
-            "data": [
-                1 if att_map.get(pid, {}).get(d) in ATTENDED_STATUSES else
-                0 if d in att_map.get(pid, {}) else None
-                for d in date_range
-            ],
+            "person_id": str(person["_id"]), "name": person["name"],
+            "department": person.get("department"),
+            # Missing any assessed session makes a day absent. No applicable
+            # assessed session is neutral, including an unmarked open session.
+            "data": [int(all(per_day[day])) if per_day[day] else None for day in period.dates],
         })
-
-    return {"dates": date_range, "persons": persons}
+    return {"dates": period.dates, "persons": persons}

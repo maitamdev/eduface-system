@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import { AccountSecurity } from "@/components/AccountSecurity";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, ScanFace, CalendarClock, ClipboardList, Users, UserPlus,
@@ -10,6 +11,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
 import { healthApi } from "@/api/client";
 import { appPath } from "@/lib/format";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; previewRole?: "admin" | "operator" | "student" }> = ({ children, preview = false, previewRole = "admin" }) => {
   const { user, role: authRole, logout } = useAuth();
@@ -18,6 +20,7 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  const [securityOpen, setSecurityOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -70,6 +73,7 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
     { to: "/reports", icon: BarChart3, label: t("Báo cáo & Thống kê", "Analytics & Reports") },
   ];
   const studentLinks = [
+    { to: "/toeic", icon: BookOpen, label: "TOEIC cùng DHV" },
     { to: "/student", icon: GraduationCap, label: t("Cổng thông tin sinh viên", "Student Portal") },
   ];
   const adminLinks = [
@@ -117,11 +121,13 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
       )}
     </div>
     <div className="sidebar-bottom">
+      {!preview && <button className="text-button" onClick={() => setSecurityOpen(true)}>{t("Đổi mật khẩu", "Change password")}</button>}
       <div className="sidebar-profile"><div><strong>{preview ? t("Bản xem thử", "Design preview") : user?.username || "User"}</strong><small>{roleLabel}</small></div><button className="icon-button" onClick={handleLogout} aria-label={t("Đăng xuất", "Sign out")}><LogOut size={17} /></button></div>
     </div>
   </div>;
 
   return <div className="workspace">
+    {securityOpen && <AccountSecurity onClose={() => setSecurityOpen(false)} />}
     <a href="#main-content" className="skip-link">{t("Đến nội dung chính", "Skip to content")}</a>
     <aside className="workspace-sidebar">{sidebar()}</aside>
     {mobileOpen && <div className="mobile-drawer-backdrop" onClick={() => setMobileOpen(false)}><div ref={drawerRef} role="dialog" aria-modal="true" aria-label={t("Menu điều hướng", "Navigation menu")} className="mobile-drawer" onClick={(event) => event.stopPropagation()}>{sidebar(true)}</div></div>}
@@ -137,7 +143,7 @@ export const AppShell: React.FC<{ children: React.ReactNode; preview?: boolean; 
           <button className="icon-button" onClick={toggleTheme} aria-label={t("Đổi giao diện Sáng / Tối", "Toggle Light / Dark mode")}>{theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</button>
         </div>
       </header>
-      <main id="main-content" tabIndex={-1} className="workspace-main">{children}</main>
+      <main id="main-content" tabIndex={-1} className="workspace-main"><PageErrorBoundary><Suspense fallback={<div role="status" className="panel-empty">{t("Đang tải trang…", "Loading page…")}</div>}>{children}</Suspense></PageErrorBoundary></main>
       <footer className="workspace-footer">
         <span>EduFace · {t("Hệ thống quản lý điểm danh nhận diện khuôn mặt AI", "AI Facial Recognition Attendance System")}</span>
         <span>Design and coding by <a href="https://github.com/maitamdev" target="_blank" rel="noreferrer">maitamdev</a></span>

@@ -1,0 +1,9 @@
+test_cosine_geometry (test_matching.MatchingTests.test_cosine_geometry) ... ok
+test_invalid_vectors_are_rejected (test_matching.MatchingTests.test_invalid_vectors_are_rejected) ... ok
+test_normalization_is_scale_independent (test_matching.MatchingTests.test_normalization_is_scale_independent) ... ok
+test_zero_vectors_do_not_match (test_matching.MatchingTests.test_zero_vectors_do_not_match) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+OK

@@ -1,3 +1,4 @@
+import { csvDocument } from "@/lib/csv";
 import React, { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Trash2, Pencil, Camera, Download, BookOpen } from "lucide-react";
@@ -129,26 +130,12 @@ export const PeoplePage: React.FC = () => {
 
   const exportRosterCsv = () => {
     const header = ["Họ và tên", "MSSV", "Lớp / Khoa", "Chuyên ngành", "Khóa", "Giới tính", "Ngày sinh", "Số điện thoại", "Email", "Cố vấn học tập", "Trạng thái học vụ", "Tỷ lệ chuyên cần (90 ngày)"];
-    const csvRows = [header.join(",")];
-    filtered.forEach((p) => {
+    const csvRows = [header, ...filtered.map((p) => {
       const stat = stats.error ? undefined : stats.data.find((item) => item.person_id === p.id);
-      const row = [
-        `"${(p.name || "").replace(/"/g, '""')}"`,
-        `"${(p.student_id || "").replace(/"/g, '""')}"`,
-        `"${(p.department || "").replace(/"/g, '""')}"`,
-        `"${(p.major || "").replace(/"/g, '""')}"`,
-        `"${(p.cohort || "").replace(/"/g, '""')}"`,
-        `"${(p.gender || "").replace(/"/g, '""')}"`,
-        `"${(p.date_of_birth || "").replace(/"/g, '""')}"`,
-        `"${(p.phone || "").replace(/"/g, '""')}"`,
-        `"${(p.email || "").replace(/"/g, '""')}"`,
-        `"${(p.advisor || "").replace(/"/g, '""')}"`,
-        `"${academicStatusLabel(p.academic_status)}"`,
-        `"${stat ? `${stat.attendance_rate}%` : ""}"`,
-      ];
-      csvRows.push(row.join(","));
-    });
-    const blob = new Blob(["\uFEFF" + csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+      return [p.name, p.student_id, p.department, p.major, p.cohort, p.gender, p.date_of_birth,
+        p.phone, p.email, p.advisor, academicStatusLabel(p.academic_status), stat ? `${stat.attendance_rate}%` : ""];
+    })];
+    const blob = new Blob([csvDocument(csvRows)], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -182,7 +169,7 @@ export const PeoplePage: React.FC = () => {
     <Section><div className="directory-filters"><SearchField label={t("Tìm tên, MSSV, SĐT, email, chuyên ngành…", "Search name, student ID, phone, email, major…")} value={search} onChange={(value) => { setSearch(value); setPage(1); }} /><Field id="people-department" label={t("Khoa / Lớp", "Class / Department")}><select id="people-department" value={department} onChange={(event) => { setDepartment(event.target.value); setPage(1); }}><option value="">{t("Tất cả khoa / lớp", "All classes")}</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></Field><Field id="people-status" label={t("Trạng thái học vụ", "Academic status")}><select id="people-status" value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }}><option value="">{t("Tất cả trạng thái", "All statuses")}</option><option value="active">{t("Đang theo học", "Active")}</option><option value="warning">{t("Cảnh báo học vụ", "Academic Warning")}</option><option value="leave">{t("Bảo lưu", "On Leave")}</option><option value="graduated">{t("Đã tốt nghiệp", "Graduated")}</option></select></Field></div>
     <Table label={t("Danh bạ sinh viên", "Student directory")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>MSSV</th><th>{t("Khoa / Lớp", "Class")}</th><th>{t("Chuyên ngành / Khóa", "Major / Cohort")}</th><th>{t("Liên hệ (SĐT / Email)", "Contact")}</th><th>{t("Trạng thái học vụ", "Academic Status")}</th><th>{t("Chuyên cần · 90 ngày", "Attendance · 90d")}</th><th className="align-right">{t("Thao tác", "Actions")}</th></tr></thead><tbody>{rows.map((person) => {
       const stat = stats.error ? undefined : stats.data.find((item) => item.person_id === person.id);
-      const reenrollQuery = new URLSearchParams({
+      const reenrollQuery = new URLSearchParams({ personId: person.id,
         name: person.name,
         ...(person.student_id ? { studentId: person.student_id } : {}),
         ...(person.department ? { department: person.department } : {}),

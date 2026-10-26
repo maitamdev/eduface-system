@@ -1,0 +1,23 @@
+
+> ai-attendance-system-monorepo@1.0.0 build
+> npm run build --workspaces --if-present
+
+
+> @maitamdev/attendance-contracts@1.0.0 build
+> tsc
+
+
+> @maitamdev/attendance-domain-core@1.0.0 build
+> tsc
+
+
+> @maitamdev/face-matching-core@1.0.0 build
+> tsc
+
+
+> @maitamdev/face-quality-gates@1.0.0 build
+> tsc
+
+
+> @maitamdev/smartattend-client@1.0.0 build
+> tsc

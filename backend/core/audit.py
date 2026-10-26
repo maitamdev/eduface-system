@@ -1,6 +1,6 @@
 """
 core/audit.py
-Immutable audit trail logger for compliance and security events.
+Append-only application audit events. Database roles/retention must protect the collection.
 """
 import logging
 from datetime import datetime, UTC
@@ -19,7 +19,7 @@ async def record_audit_event(
     metadata: Optional[dict[str, Any]] = None,
 ) -> None:
     """
-    Persists an immutable audit log entry to MongoDB.
+    Persists an audit log entry to MongoDB.
     Non-blocking / failsafe: will not fail the primary user request if logging encounters a fault.
     """
     try:

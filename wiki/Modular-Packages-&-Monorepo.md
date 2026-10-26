@@ -1,3 +1,5 @@
+> Tài liệu trước đợt sửa 27/10/2026; một số mô tả kiến trúc/AI/quyền có thể đã cũ. Đối chiếu [README hiện hành](../README.md) và [hướng dẫn nâng cấp](../docs/UPGRADE_2026_10.md). Không coi các số accuracy/latency cũ là kết quả nghiệm thu.
+
 # 📦 Modular Packages & Monorepo Architecture
 
 SmartAttend is engineered as an enterprise-grade monorepo combining a full-stack AI attendance platform with a suite of decoupled, standalone libraries published under the `@maitamdev` scope.

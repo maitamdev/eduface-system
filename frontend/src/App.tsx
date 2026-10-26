@@ -7,18 +7,20 @@ import { ToastProvider } from "@/context/ToastContext";
 import { AppShell } from "@/components/AppShell";
 import { RequireAuth, RequireAdmin } from "@/components/RouteGuards";
 import { healthApi } from "@/api/client";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
-import { LoginPage } from "@/pages/LoginPage";
-import { DashboardPage } from "@/pages/DashboardPage";
-import { LiveScannerPage } from "@/pages/LiveScannerPage";
-import { SessionsPage } from "@/pages/SessionsPage";
-import { RecordsPage } from "@/pages/RecordsPage";
-import { PeoplePage } from "@/pages/PeoplePage";
-import { EnrollPage } from "@/pages/EnrollPage";
-import { ReportsPage } from "@/pages/ReportsPage";
-import { SystemAdminPage } from "@/pages/SystemAdminPage";
-import { StudentPortalPage } from "@/pages/StudentPortalPage";
-import { AcademicManagementPage } from "@/pages/AcademicManagementPage";
+const LoginPage = lazy(() => import("@/pages/LoginPage").then((m) => ({ default: m.LoginPage })));
+const DashboardPage = lazy(() => import("@/pages/DashboardPage").then((m) => ({ default: m.DashboardPage })));
+const LiveScannerPage = lazy(() => import("@/pages/LiveScannerPage").then((m) => ({ default: m.LiveScannerPage })));
+const SessionsPage = lazy(() => import("@/pages/SessionsPage").then((m) => ({ default: m.SessionsPage })));
+const RecordsPage = lazy(() => import("@/pages/RecordsPage").then((m) => ({ default: m.RecordsPage })));
+const PeoplePage = lazy(() => import("@/pages/PeoplePage").then((m) => ({ default: m.PeoplePage })));
+const EnrollPage = lazy(() => import("@/pages/EnrollPage").then((m) => ({ default: m.EnrollPage })));
+const ReportsPage = lazy(() => import("@/pages/ReportsPage").then((m) => ({ default: m.ReportsPage })));
+const SystemAdminPage = lazy(() => import("@/pages/SystemAdminPage").then((m) => ({ default: m.SystemAdminPage })));
+const StudentPortalPage = lazy(() => import("@/pages/StudentPortalPage").then((m) => ({ default: m.StudentPortalPage })));
+const AcademicManagementPage = lazy(() => import("@/pages/AcademicManagementPage").then((m) => ({ default: m.AcademicManagementPage })));
+const ToeicPage = lazy(() => import("@/features/toeic/ToeicPage").then((m) => ({ default: m.ToeicPage })));
 
 const DesignPreviewPage = import.meta.env.DEV
   ? lazy(() => import("@/pages/DesignPreviewPage").then((module) => ({ default: module.DesignPreviewPage })))
@@ -28,7 +30,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     // Giữ kết nối Render luôn thức khi đang mở tab trình duyệt (ping mỗi 4 phút)
     const timer = window.setInterval(() => {
-      healthApi.check().catch(() => {});
+      if (document.visibilityState === "visible") healthApi.check().catch(() => {});
     }, 4 * 60 * 1000);
     return () => window.clearInterval(timer);
   }, []);
@@ -39,11 +41,12 @@ export const App: React.FC = () => {
         <ToastProvider>
           <AuthProvider>
             <BrowserRouter>
-              <Routes>
+              <PageErrorBoundary><Suspense fallback={<div role="status" className="panel-empty">EduFace…</div>}><Routes>
                 <Route path="/login" element={<LoginPage />} />
                 {DesignPreviewPage && <Route path="/design-preview/*" element={<Suspense fallback={<div role="status" className="panel-empty">EduFace…</div>}><DesignPreviewPage /></Suspense>} />}
 
                 {/* Operator & Admin routes */}
+                <Route path="/toeic" element={<RequireAuth><AppShell><ToeicPage /></AppShell></RequireAuth>} />
                 <Route
                   path="/"
                   element={
@@ -155,7 +158,7 @@ export const App: React.FC = () => {
 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
+              </Routes></Suspense></PageErrorBoundary>
             </BrowserRouter>
           </AuthProvider>
         </ToastProvider>

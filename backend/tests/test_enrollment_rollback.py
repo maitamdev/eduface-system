@@ -33,6 +33,10 @@ class FakePersonsCollection:
         self._docs = []
         self.raise_on_insert = raise_on_insert
 
+    async def update_one(self, query, update):
+        for doc in self._docs:
+            if doc.get("_id") == query.get("_id"): doc.update(update.get("$set", {}))
+
     async def find_one(self, query):
         return None  # no existing name/person collisions
 
@@ -93,7 +97,7 @@ def app_factory(monkeypatch):
 def _enroll(client):
     return client.post(
         "/api/persons/enroll",
-        data={"name": "New Person"},
+        data={"consent": "true", "name": "New Person"},
         files={"photos": ("photo.jpg", b"irrelevant-bytes", "image/jpeg")},
     )
 

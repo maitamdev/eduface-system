@@ -1,0 +1,35 @@
+
+> eduface-frontend@2.0.0 test
+> vitest run --run
+
+[vite:react-swc] We recommend switching to `@vitejs/plugin-react` for improved performance as no swc plugins are used. More information at https://vite.dev/rolldown
+
+ RUN  v5.0.5 D:/project/AI-Attendance-System/frontend
+
+Error: Test rendering failure
+    at BrokenPage (D:/project/AI-Attendance-System/frontend/src/components/PageErrorBoundary.test.tsx:12:48)
+    at renderWithHooks (D:\project\AI-Attendance-System\frontend\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (D:\project\AI-Attendance-System\frontend\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (D:\project\AI-Attendance-System\frontend\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (D:\project\AI-Attendance-System\frontend\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+    at HTMLUnknownElementImpl.dispatchEvent (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:114:17)
+Error: Test rendering failure
+    at BrokenPage (D:/project/AI-Attendance-System/frontend/src/components/PageErrorBoundary.test.tsx:12:48)
+    at renderWithHooks (D:\project\AI-Attendance-System\frontend\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (D:\project\AI-Attendance-System\frontend\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (D:\project\AI-Attendance-System\frontend\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (D:\project\AI-Attendance-System\frontend\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+    at HTMLUnknownElementImpl.dispatchEvent (D:\project\AI-Attendance-System\frontend\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:114:17)
+
+ Test Files  4 passed (4)
+      Tests  26 passed (26)
+   Start at  01:03:22
+   Duration  15.30s (environment 58%, tests 21%, import 20%, transform 1%, worker 1%)

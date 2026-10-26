@@ -20,6 +20,8 @@ import uuid
 import asyncio
 import inspect
 import logging
+import threading
+from core.metrics import record_inference_duration, set_enrolled_subjects
 
 import cv2
 import numpy as np
@@ -49,13 +51,21 @@ def _log_timing(operation: str, started_at: float, **fields) -> None:
     duration_ms = (time.perf_counter() - started_at) * 1000
     extra = " ".join(f"{k}={v}" for k, v in fields.items())
     metrics_logger.info("op=%s duration_ms=%.1f %s", operation, duration_ms, extra)
+    if operation == "identify":
+        record_inference_duration(duration_ms / 1000)
 
 
 # ── Global face analysis model singleton ──────────────────────────────────────
 
 _app = None
+_model_lock = threading.RLock()
 
 def _get_insight_app():
+    with _model_lock:
+        return _initialize_insight_app()
+
+
+def _initialize_insight_app():
     """Lazily load the InsightFace model once per process."""
     global _app
     if _app is None:
@@ -66,11 +76,12 @@ def _get_insight_app():
             ort.set_default_logger_severity(3)
 
             from insightface.app import FaceAnalysis
-            _app = FaceAnalysis(
+            model = FaceAnalysis(
                 name="buffalo_sc",
                 providers=["CPUExecutionProvider"],
             )
-            _app.prepare(ctx_id=-1, det_size=(640, 640), det_thresh=0.3)
+            model.prepare(ctx_id=-1, det_size=(640, 640), det_thresh=0.3)
+            _app = model
             logger.info("InsightFace model loaded (det_thresh=0.3, det_size=640).")
         except Exception as e:
             logger.error("InsightFace load failed: %s", e)
@@ -81,25 +92,11 @@ def _get_insight_app():
 # ── Motor-backed Persistence helpers (Single MongoDB Client) ──────────────────
 
 async def _load_all() -> dict:
-    """
-    Returns {person_id: {"name": str, "embeddings": [np.ndarray, ...]}}
-
-    KNOWN LIMITATION (Remediation Plan item #13 — deferred, Effort: L):
-    This pulls every enrolled person's embeddings into memory on every single
-    identify/duplicate-check call — O(n) documents fetched + O(n) cosine
-    similarity comparisons per call, with no caching. Fine at the current
-    scale (tens to low hundreds of enrolled people); will not scale to
-    thousands without added latency and MongoDB load.
-
-    SCALING TRIGGER THRESHOLDS (Step 12):
-    Revisit and implement caching / vector search when:
-      1. Enrolled person count exceeds 500 active persons.
-      2. Or p95 identify latency exceeds 2.0 seconds based on timing logs.
-    Escalation Path:
-      Tier 1: Cache the embedding matrix in-process as a NumPy array,
-              invalidated on enroll/delete.
-      Tier 2: Migrate to a vector index (MongoDB Atlas Vector Search or FAISS).
-    """
+    """A short-lived cache; writes invalidate it, TTL bounds cross-worker staleness."""
+    now = time.monotonic()
+    if _matrix_cache.get("valid") and now - _matrix_cache.get("loaded_at", 0) < 5:
+        return _matrix_cache["store"]
+    generation = _matrix_cache.get("generation", 0)
     db = get_database()
     store = {}
     async for doc in db.face_encodings.find():
@@ -108,7 +105,17 @@ async def _load_all() -> dict:
             "name":       doc["name"],
             "embeddings": [np.array(e, dtype=np.float32) for e in doc["embeddings"]],
         }
+    if generation == _matrix_cache.get("generation", 0):
+        matrix, pids, names = _build_normalized_matrix(store)
+        _matrix_cache.update(valid=True, loaded_at=now, store=store, matrix=matrix, pids=pids, names=names)
+        set_enrolled_subjects(len(store))
     return store
+
+
+def _matrix_for_store(store):
+    if _matrix_cache.get("valid") and _matrix_cache.get("store") is store:
+        return _matrix_cache["matrix"], _matrix_cache["pids"], _matrix_cache["names"]
+    return _build_normalized_matrix(store)
 
 
 # ── Normalized Embedding Matrix Cache (Tier 1 Scaling) ─────────────────────────
@@ -123,6 +130,8 @@ _matrix_cache: dict = {
 
 def invalidate_cache() -> None:
     """Invalidates the in-memory normalized embedding matrix cache."""
+    _matrix_cache["generation"] = _matrix_cache.get("generation", 0) + 1
+    _matrix_cache["store"] = None
     _matrix_cache["valid"] = False
     _matrix_cache["matrix"] = None
     _matrix_cache["pids"] = []
@@ -132,7 +141,7 @@ def invalidate_cache() -> None:
 def _build_normalized_matrix(store: dict) -> tuple[np.ndarray | None, list[str], list[str]]:
     """
     Builds a pre-normalized 2D Float32 matrix from the store dictionary.
-    Enables single-step BLAS dot product matching (50x faster than scalar loops).
+    Enables single-step BLAS dot product matching (vectorized matching).
     Also synthesizes an L2-normalized Master Centroid Prototype per person (when
     >= 2 embeddings exist) to cancel out pose/lighting variance across angles.
     """
@@ -211,19 +220,8 @@ def _bytes_to_bgr(image_bytes: bytes) -> np.ndarray:
 
 
 def _calibrate_confidence(raw_sim: float) -> float:
-    """
-    Maps raw 512-D ArcFace cosine similarity (compressed by Additive Angular Margin
-    m=0.5 rad) to a calibrated biometric confidence score in [0.0, 1.0]:
-      - Impostor boundary (<= 0.35): unboosted
-      - Genuine matches (0.55 - 0.85): calibrated to 82% - 96%
-      - Identical vector (1.00): 1.0000
-    """
-    if raw_sim >= 0.9999:
-        return 1.0
-    if raw_sim <= 0.35:
-        return max(0.0, float(raw_sim))
-    t = (float(raw_sim) - 0.35) / 0.65
-    return float(min(1.0, 0.35 + 0.65 * (t ** 0.28)))
+    """Compatibility helper: report raw similarity, never an invented probability."""
+    return float(np.clip(raw_sim, 0.0, 1.0))
 
 
 def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
@@ -387,7 +385,7 @@ def _check_liveness(bgr: np.ndarray, face) -> dict:
     Multi-cue passive anti-spoofing diagnostics:
     1. Laplacian variance evaluates high-frequency sharpness (detects blurry paper prints or extreme screen Moiré).
     2. HSV Specular Glare analysis detects smartphone glass / glossy photo reflection patches.
-    3. YCrCb Chrominance variance & luminance dynamic range verify natural 3D skin shading vs flat 2D displays.
+    3. YCrCb Chrominance variance & luminance dynamic range flag unusual color/contrast; this is not a depth measurement.
     """
     try:
         box = face.bbox.astype(int)
@@ -395,21 +393,20 @@ def _check_liveness(bgr: np.ndarray, face) -> dict:
         x1, y1 = max(0, box[0]), max(0, box[1])
         x2, y2 = min(w, box[2]), min(h, box[3])
         if x2 <= x1 or y2 <= y1:
-            return {"is_live": True, "laplacian_variance": 100.0, "spoof_reason": None}
+            return {"is_live": False, "laplacian_variance": 0.0, "spoof_reason": "Không xác minh được chất lượng/liveness của khuôn mặt"}
 
         face_crop = bgr[y1:y2, x1:x2]
         gray = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
         lap_var = float(cv2.Laplacian(gray, cv2.CV_64F).var())
 
-        # Zero variance happens in synthetic test mocks (e.g. all-zeros image in pytest)
         if lap_var == 0.0:
-            return {"is_live": True, "laplacian_variance": 0.0, "spoof_reason": None}
+            return {"is_live": False, "laplacian_variance": 0.0, "spoof_reason": "Ảnh không có chi tiết khuôn mặt"}
 
         if lap_var < 28.0:
             return {
                 "is_live": False,
                 "laplacian_variance": round(lap_var, 2),
-                "spoof_reason": "Ảnh quá mờ hoặc thiếu chi tiết da 3D (Nghi vấn ảnh in giấy / ảnh chụp lại)",
+                "spoof_reason": "Ảnh quá mờ hoặc thiếu chi tiết; cần chụp lại",
             }
 
         if lap_var > 3400.0:
@@ -430,7 +427,7 @@ def _check_liveness(bgr: np.ndarray, face) -> dict:
                 "spoof_reason": "Phát hiện vùng lóa phản chiếu kính từ màn hình điện thoại / ảnh ép bóng",
             }
 
-        # YCrCb skin chrominance & 3D shading gradient check
+        # YCrCb chrominance and luminance heuristic
         ycrcb = cv2.cvtColor(face_crop, cv2.COLOR_BGR2YCrCb)
         y_std = float(np.std(ycrcb[:, :, 0]))
         cr_std = float(np.std(ycrcb[:, :, 1]))
@@ -438,7 +435,7 @@ def _check_liveness(bgr: np.ndarray, face) -> dict:
             return {
                 "is_live": False,
                 "laplacian_variance": round(lap_var, 2),
-                "spoof_reason": "Phổ màu và độ tương phản khối 3D phẳng bất thường (Nghi vấn ảnh 2D)",
+                "spoof_reason": "Phổ màu và độ tương phản bất thường; cần kiểm tra lại",
             }
 
         occ_ok, occ_reason = _check_occlusion_and_landmarks(face, bgr)
@@ -451,7 +448,7 @@ def _check_liveness(bgr: np.ndarray, face) -> dict:
 
         return {"is_live": True, "laplacian_variance": round(lap_var, 2), "spoof_reason": None}
     except Exception:
-        return {"is_live": True, "laplacian_variance": 100.0, "spoof_reason": None}
+        return {"is_live": False, "laplacian_variance": 0.0, "spoof_reason": "Không xác minh được chất lượng/liveness của khuôn mặt"}
 
 
 def _check_multiframe_motion(bgr_main: np.ndarray, face_main, probe_bgr: np.ndarray | None) -> tuple[bool, str | None]:
@@ -460,7 +457,7 @@ def _check_multiframe_motion(bgr_main: np.ndarray, face_main, probe_bgr: np.ndar
     or rigid flat photos held in front of the camera.
     """
     if probe_bgr is None:
-        return True, None
+        return False, "Không xác minh được chuyển động giữa hai khung hình"
     try:
         if probe_bgr.shape[:2] != bgr_main.shape[:2]:
             probe_bgr = cv2.resize(probe_bgr, (bgr_main.shape[1], bgr_main.shape[0]))
@@ -469,19 +466,19 @@ def _check_multiframe_motion(bgr_main: np.ndarray, face_main, probe_bgr: np.ndar
         x1, y1 = max(0, box[0]), max(0, box[1])
         x2, y2 = min(w, box[2]), min(h, box[3])
         if x2 - x1 < 20 or y2 - y1 < 20:
-            return True, None
+            return False, "Không xác minh được chuyển động giữa hai khung hình"
 
         crop_main = cv2.cvtColor(bgr_main[y1:y2, x1:x2], cv2.COLOR_BGR2GRAY)
         crop_probe = cv2.cvtColor(probe_bgr[y1:y2, x1:x2], cv2.COLOR_BGR2GRAY)
         if float(np.std(crop_main)) == 0.0:
-            return True, None
+            return False, "Không xác minh được chuyển động giữa hai khung hình"
 
         face_diff = float(np.mean(cv2.absdiff(crop_main, crop_probe)))
         if face_diff < 0.35:
             return False, "Khung hình tĩnh hoàn toàn giữa 2 lần quét (Nghi vấn dùng ảnh tĩnh giả mạo)"
         return True, None
     except Exception:
-        return True, None
+        return False, "Không xác minh được chuyển động giữa hai khung hình"
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -516,6 +513,9 @@ async def enroll_person(name: str, image_bytes_list: list, existing_person_id: s
                     )
                     continue
 
+                if len(faces) != 1:
+                    quality_errors.append(f"Ảnh {idx+1}: Chỉ chụp một người trong khung hình.")
+                    continue
                 faces_detected += 1
                 face = max(faces, key=lambda f: (f.bbox[2]-f.bbox[0]) * (f.bbox[3]-f.bbox[1]))
                 ok, reason = _check_face_quality(face, w, h, bgr)
@@ -614,16 +614,18 @@ async def identify_faces(
 
         logger.info("Detected %d face(s) in frame.", len(faces))
 
-        norm_matrix, all_pids, all_names = _build_normalized_matrix(store)
+        norm_matrix, all_pids, all_names = _matrix_for_store(store)
         if norm_matrix is None or len(all_pids) == 0:
             logger.info("No enrolled embeddings found in store.")
             _log_timing("identify", _t0, faces_detected=len(faces), matches=0, result="empty_store")
             return []
 
-        threshold = confidence_threshold if confidence_threshold is not None else cfg["threshold"]
+        threshold = max(cfg["threshold"], confidence_threshold if confidence_threshold is not None else cfg["threshold"])
         results   = []
 
         for face in faces:
+            if float(face.det_score) < 0.60:
+                continue
             unknown_emb = np.array(face.embedding, dtype=np.float32)
             u_norm = np.linalg.norm(unknown_emb)
             if u_norm > 0:
@@ -632,7 +634,7 @@ async def identify_faces(
             box       = face.bbox.astype(int)
             det_score = float(face.det_score)
 
-            # High-performance BLAS matrix-vector dot product (50x faster than Python loop)
+            # High-performance BLAS matrix-vector dot product
             similarities = np.dot(norm_matrix, unknown_emb)
             best_idx     = int(np.argmax(similarities))
             best_sim     = float(similarities[best_idx])
@@ -643,7 +645,7 @@ async def identify_faces(
                 det_score, all_names[best_idx], best_sim, calibrated_conf, threshold,
             )
 
-            if best_sim < min(threshold, 0.38) or calibrated_conf < threshold:
+            if not np.isfinite(best_sim) or best_sim < threshold:
                 continue
 
             liveness = _check_liveness(bgr, face)
@@ -685,7 +687,7 @@ async def identify_faces(
 
 async def upload_photo_to_blob(person_id: str, image_bytes: bytes, filename: str) -> str:
     cfg = _cfg()
-    if not cfg["blob_conn_str"]:
+    if not cfg["blob_conn_str"] or os.environ.get("STORE_ENROLLMENT_PHOTOS", "false").lower() != "true":
         return ""
     try:
         from azure.storage.blob import BlobServiceClient, ContentSettings
@@ -702,7 +704,7 @@ async def upload_photo_to_blob(person_id: str, image_bytes: bytes, filename: str
             c.get_container_properties()
         except Exception:
             blob_svc.create_container(container)
-        blob_name = f"persons/{person_id}/{filename}"
+        blob_name = f"persons/{person_id}/enrollment.jpg"
         blob      = c.get_blob_client(blob_name)
         blob.upload_blob(
             image_bytes, overwrite=True,
@@ -733,7 +735,7 @@ async def check_duplicate_face(
     def _check():
         fa    = _get_insight_app()
 
-        norm_matrix, all_pids, all_names = _build_normalized_matrix(store)
+        norm_matrix, all_pids, all_names = _matrix_for_store(store)
         if norm_matrix is None or len(all_pids) == 0:
             _log_timing("duplicate_check", _t0, photos=len(image_bytes_list), result="empty_store")
             return None
@@ -779,7 +781,7 @@ async def check_duplicate_face(
                         best_overall = candidate
 
             except Exception as e:
-                logger.warning("Duplicate check error on photo %d: %s", photo_idx+1, e)
+                raise RuntimeError("Duplicate face verification failed") from e
 
         if best_overall:
             logger.warning(
@@ -829,6 +831,10 @@ async def analyze_enrollment_images(image_bytes_list: list) -> dict:
                     results.append(entry)
                     continue
 
+                if len(faces) != 1:
+                    entry["reason"] = "Chỉ chụp một người trong khung hình."
+                    results.append(entry)
+                    continue
                 face   = max(faces, key=lambda f: (f.bbox[2]-f.bbox[0]) * (f.bbox[3]-f.bbox[1]))
                 box    = face.bbox.astype(int)
                 face_w = box[2] - box[0]

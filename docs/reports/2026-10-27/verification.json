@@ -1,0 +1,334 @@
+{
+  "self_enroll": {
+    "error_type": "AttributeError",
+    "message": "'AuthenticatedUser' object has no attribute 'person_id'"
+  },
+  "reenrollment_history": {
+    "before": true,
+    "after": false,
+    "enrolled_at_overwritten": true
+  },
+  "dashboard_two_sessions": {
+    "total_enrolled": 10,
+    "sessions_today": 2,
+    "present_today": 20,
+    "attendance_rate": 200.0
+  },
+  "confidence_mapping": [
+    {
+      "raw": 0.38,
+      "displayed": 0.6247
+    },
+    {
+      "raw": 0.4,
+      "displayed": 0.667
+    },
+    {
+      "raw": 0.45,
+      "displayed": 0.7349
+    },
+    {
+      "raw": 0.55,
+      "displayed": 0.8173
+    },
+    {
+      "raw": 0.8,
+      "displayed": 0.9364
+    }
+  ],
+  "liveness_uniform_image": {
+    "is_live": true,
+    "laplacian_variance": 0.0,
+    "spoof_reason": null
+  },
+  "liveness_exception": {
+    "is_live": true,
+    "laplacian_variance": 100.0,
+    "spoof_reason": null
+  },
+  "liveness_without_probe": [
+    true,
+    null
+  ],
+  "sdk_contract": {
+    "identify_photo_field_status": 422,
+    "mark_missing_session_path_status": 404
+  },
+  "cors_unrelated_vercel_origin": {
+    "status": 200,
+    "allow_origin": "https://unrelated-audit-example.vercel.app",
+    "allow_credentials": "true"
+  },
+  "health_without_lifespan": {
+    "status": 200,
+    "body": {
+      "status": "healthy"
+    }
+  },
+  "openapi": {
+    "path_count": 45,
+    "operation_count": 52,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "summary": "Login"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/register",
+        "summary": "Register User"
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/me",
+        "summary": "Get Current Profile"
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/users",
+        "summary": "List Users"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/auth/users/{user_id}",
+        "summary": "Update User"
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/student-portal",
+        "summary": "Get Student Portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/google/config",
+        "summary": "Get Google Config"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/google",
+        "summary": "Exchange Google Identity"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/auth/users/{user_id}/google",
+        "summary": "Link Google Account"
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/microsoft/config",
+        "summary": "Get Configuration"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/microsoft/challenge",
+        "summary": "Create Challenge"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/microsoft",
+        "summary": "Exchange Identity"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/auth/users/{user_id}/microsoft",
+        "summary": "Link Identity"
+      },
+      {
+        "method": "GET",
+        "path": "/api/dashboard/metrics",
+        "summary": "Get Metrics"
+      },
+      {
+        "method": "GET",
+        "path": "/api/dashboard/activity",
+        "summary": "Get Activity"
+      },
+      {
+        "method": "GET",
+        "path": "/api/persons/debug-encodings",
+        "summary": "Debug Encodings"
+      },
+      {
+        "method": "GET",
+        "path": "/api/persons/debug-config",
+        "summary": "Debug Config"
+      },
+      {
+        "method": "GET",
+        "path": "/api/persons",
+        "summary": "List Persons"
+      },
+      {
+        "method": "POST",
+        "path": "/api/persons/enroll/analyze",
+        "summary": "Analyze Photos"
+      },
+      {
+        "method": "POST",
+        "path": "/api/persons/enroll",
+        "summary": "Enroll Person"
+      },
+      {
+        "method": "POST",
+        "path": "/api/persons/self-enroll",
+        "summary": "Self Enroll Student"
+      },
+      {
+        "method": "GET",
+        "path": "/api/persons/{person_id}",
+        "summary": "Get Person"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/persons/{person_id}",
+        "summary": "Update Person"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/persons/{person_id}",
+        "summary": "Delete Person"
+      },
+      {
+        "method": "GET",
+        "path": "/api/sessions",
+        "summary": "List Sessions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/sessions",
+        "summary": "Create Session"
+      },
+      {
+        "method": "GET",
+        "path": "/api/sessions/{session_id}",
+        "summary": "Get Session"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/sessions/{session_id}/end",
+        "summary": "End Session"
+      },
+      {
+        "method": "POST",
+        "path": "/api/attendance/identify",
+        "summary": "Identify Frame"
+      },
+      {
+        "method": "POST",
+        "path": "/api/attendance/mark/{session_id}",
+        "summary": "Mark Attendance"
+      },
+      {
+        "method": "GET",
+        "path": "/api/attendance",
+        "summary": "List Attendance"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/attendance/manual",
+        "summary": "Set Manual Attendance"
+      },
+      {
+        "method": "GET",
+        "path": "/api/attendance/export/csv",
+        "summary": "Export Csv"
+      },
+      {
+        "method": "GET",
+        "path": "/api/reports/daily",
+        "summary": "Daily Stats"
+      },
+      {
+        "method": "GET",
+        "path": "/api/reports/persons",
+        "summary": "Person Stats"
+      },
+      {
+        "method": "GET",
+        "path": "/api/reports/heatmap",
+        "summary": "Heatmap"
+      },
+      {
+        "method": "GET",
+        "path": "/api/academic/courses",
+        "summary": "List Courses"
+      },
+      {
+        "method": "POST",
+        "path": "/api/academic/courses",
+        "summary": "Create Course"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/academic/courses/{course_id}",
+        "summary": "Delete Course"
+      },
+      {
+        "method": "GET",
+        "path": "/api/academic/grades",
+        "summary": "List Grades"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/academic/grades",
+        "summary": "Upsert Grade"
+      },
+      {
+        "method": "GET",
+        "path": "/api/academic/my-grade",
+        "summary": "Get My Grade"
+      },
+      {
+        "method": "GET",
+        "path": "/api/academic/leaves",
+        "summary": "List Leave Requests"
+      },
+      {
+        "method": "POST",
+        "path": "/api/academic/leaves",
+        "summary": "Create Leave Request"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/academic/leaves/{leave_id}",
+        "summary": "Review Leave Request"
+      },
+      {
+        "method": "GET",
+        "path": "/api/academic/announcements",
+        "summary": "List Announcements"
+      },
+      {
+        "method": "POST",
+        "path": "/api/academic/announcements",
+        "summary": "Create Announcement"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/academic/announcements/{ann_id}",
+        "summary": "Delete Announcement"
+      },
+      {
+        "method": "POST",
+        "path": "/api/academic/import-students",
+        "summary": "Bulk Import Students"
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "summary": "Root"
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "summary": "Health"
+      },
+      {
+        "method": "GET",
+        "path": "/metrics",
+        "summary": "Metrics"
+      }
+    ]
+  }
+}

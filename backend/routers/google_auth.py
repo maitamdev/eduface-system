@@ -57,28 +57,12 @@ async def exchange_google_identity(
     display_name = (claims.get("name") or email.split("@")[0]).strip()
     escaped_email = re.escape(email)
 
-    # 1. Tìm tài khoản EduFace đã liên kết với email Google này
-    user = await db.users.find_one(
-        {
-            "$or": [
-                {"google_email": {"$regex": f"^{escaped_email}$", "$options": "i"}},
-                {"username": {"$regex": f"^{escaped_email}$", "$options": "i"}},
-            ],
-            "is_active": True,
-        }
-    )
-
-    # 2. Kiểm tra xem email này có khớp với hồ sơ sinh viên đã đăng ký khuôn mặt không
-    matched_person = await db.persons.find_one(
-        {
-            "email": {"$regex": f"^{escaped_email}$", "$options": "i"},
-            "is_active": True,
-        }
-    )
-    matched_person_id = str(matched_person["_id"]) if matched_person else None
-
-    if not user and matched_person_id:
-        user = await db.users.find_one({"person_id": matched_person_id, "is_active": True})
+    # Only a deliberately linked, verified identity grants access to an existing account.
+    user = await db.users.find_one({"google_email": {"$regex": f"^{escaped_email}$", "$options": "i"}})
+    if user and not user.get("is_active", False):
+        raise HTTPException(403, "Tài khoản đã bị khóa.")
+    if not user and await db.users.find_one({"username": {"$regex": f"^{escaped_email}$", "$options": "i"}}):
+        raise HTTPException(409, "Tài khoản đã tồn tại. Quản trị viên cần liên kết Google trước khi đăng nhập.")
 
     # 3. Nếu là tài khoản Google mới hoàn toàn -> Tự động tạo tài khoản Sinh viên (role='student')
     # để sinh viên vào Cổng sinh viên (/student) tự khai báo Họ tên, MSSV, Lớp và chụp ảnh khuôn mặt lần đầu!
@@ -86,14 +70,17 @@ async def exchange_google_identity(
         new_user_doc = {
             "username": email,
             "display_name": display_name,
-            "password_hash": hash_password(secrets.token_urlsafe(24)),
+            "password_hash": await run_in_threadpool(hash_password, secrets.token_urlsafe(24)),
             "role": "student",
             "google_email": email,
-            "person_id": matched_person_id,
+            "person_id": None,
             "is_active": True,
             "created_at": datetime.now(timezone.utc),
         }
-        res = await db.users.insert_one(new_user_doc)
+        try:
+            res = await db.users.insert_one(new_user_doc)
+        except DuplicateKeyError:
+            raise HTTPException(409, "Tài khoản vừa được tạo hoặc liên kết. Vui lòng đăng nhập lại.") from None
         new_user_doc["_id"] = res.inserted_id
         user = new_user_doc
     elif display_name and not user.get("display_name"):
@@ -102,7 +89,7 @@ async def exchange_google_identity(
             {"$set": {"display_name": display_name}},
         )
 
-    token, expires = create_access_token(str(user["_id"]), user["username"], user["role"])
+    token, expires = create_access_token(str(user["_id"]), user["username"], user["role"], user.get("auth_version", 0))
     return TokenResponse(
         access_token=token,
         expires_in=expires,

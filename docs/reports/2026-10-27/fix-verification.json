@@ -1,0 +1,21 @@
+{
+  "backend_tests": 195,
+  "mongodb_integration_included": 9,
+  "frontend_tests": 26,
+  "javascript_package_tests": 31,
+  "python_package_tests": 4,
+  "sdk_live_smoke": "passed",
+  "frontend_build": "passed",
+  "npm_known_vulnerabilities": 0,
+  "python_known_vulnerabilities": 0,
+  "unresolved": [
+    "operator class scoping",
+    "real-person AI/PAD evaluation",
+    "live OAuth/Blob verification",
+    "existing-data migration/reconciliation",
+    "Docker/Linux validation"
+  ],
+  "published": false,
+  "deployed": false,
+  "pushed": false
+}

@@ -9,6 +9,7 @@ Endpoints:
 """
 
 import re
+import asyncio
 from datetime import datetime, timezone
 from typing import Optional
 from bson import ObjectId
@@ -24,9 +25,12 @@ from core.auth import (
     require_operator,
     verify_password,
 )
+from core.rate_limit import limiter
 from core.database import get_db
+from core.attendance_policy import session_applies_to_person, is_session_assessed
 from core.schemas import (
     PersonOut,
+    PasswordChange,
     StudentPortalSummary,
     StudentSessionItem,
     TokenResponse,
@@ -40,7 +44,9 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("5/minute")
 async def login(
+    request: Request,
     credentials: UserLogin,
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
@@ -48,7 +54,7 @@ async def login(
     username = credentials.username.strip()
     user_doc = await db.users.find_one({"username": username, "is_active": True})
 
-    if not user_doc or not verify_password(credentials.password, user_doc.get("password_hash", "")):
+    if not user_doc or not await asyncio.to_thread(verify_password, credentials.password, user_doc.get("password_hash", "")):
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Invalid username or password.",
@@ -58,6 +64,7 @@ async def login(
         user_id=str(user_doc["_id"]),
         username=user_doc["username"],
         role=user_doc["role"],
+        auth_version=user_doc.get("auth_version", 0),
     )
 
     return TokenResponse(
@@ -86,12 +93,14 @@ async def register_user(
     now = datetime.now(timezone.utc)
     user_doc = {
         "username": username,
-        "password_hash": hash_password(body.password),
+        "password_hash": await asyncio.to_thread(hash_password, body.password),
         "role": body.role,
         "is_active": True,
         "created_at": now,
         "person_id": body.person_id,
     }
+    if body.person_id and not await db.persons.find_one({"_id": body.person_id, "is_active": True}):
+        raise HTTPException(422, "Hồ sơ liên kết không tồn tại hoặc đã ngừng hoạt động.")
     result = await db.users.insert_one(user_doc)
 
     return UserOut(
@@ -116,7 +125,7 @@ async def get_current_profile(
 
     if user.auth_type == "jwt" and ObjectId.is_valid(user.id):
         doc = await db.users.find_one({"_id": ObjectId(user.id)})
-        if doc:
+        if doc and doc.get("is_active") is True and doc.get("auth_version", 0) == user.auth_version:
             return UserOut(
                 id=str(doc["_id"]),
                 username=doc["username"],
@@ -128,6 +137,9 @@ async def get_current_profile(
                 google_email=doc.get("google_email"),
                 microsoft_oid=doc.get("microsoft_oid"),
             )
+
+    if user.auth_type == "jwt":
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Account is unavailable. Please log in again.")
 
     return UserOut(
         id=user.id,
@@ -190,12 +202,19 @@ async def update_user(
     if body.is_active is not None:
         updates["is_active"] = body.is_active
     if body.password is not None and body.password.strip():
-        updates["password_hash"] = hash_password(body.password.strip())
+        updates["password_hash"] = await asyncio.to_thread(hash_password, body.password.strip())
     if body.person_id is not None:
         updates["person_id"] = body.person_id.strip() or None
+        if updates["person_id"] and not await db.persons.find_one({"_id": updates["person_id"], "is_active": True}):
+            raise HTTPException(422, "Hồ sơ liên kết không tồn tại hoặc đã ngừng hoạt động.")
 
     if updates:
-        await db.users.update_one({"_id": oid}, {"$set": updates})
+        update_operation = {"$set": updates}
+        if "password_hash" in updates or updates.get("is_active") is False:
+            # Resetting a password or disabling an account invalidates existing
+            # sessions, including after the account is enabled again.
+            update_operation["$inc"] = {"auth_version": 1}
+        await db.users.update_one({"_id": oid}, update_operation)
         doc.update(updates)
 
     return UserOut(
@@ -258,22 +277,12 @@ async def get_student_portal(
         enrolled_by=person_doc.get("enrolled_by"),
     )
 
-    dept = (person_doc.get("department") or "").strip()
-    if dept:
-        escaped_dept = re.escape(dept)
-        session_query = {
-            "$or": [
-                {"department": {"$regex": f"^{escaped_dept}$", "$options": "i"}},
-                {"department": None},
-                {"department": ""},
-            ]
-        }
-    else:
-        session_query = {}
+    session_query = {}
 
     session_docs = []
-    async for sdoc in db.sessions.find(session_query).sort("started_at", -1).limit(100):
-        session_docs.append(sdoc)
+    async for sdoc in db.sessions.find(session_query).sort("started_at", -1):
+        if session_applies_to_person(sdoc, person_doc):
+            session_docs.append(sdoc)
 
     attendance_by_session = {}
     async for adoc in db.attendance.find({"person_id": pid}):
@@ -285,7 +294,7 @@ async def get_student_portal(
         sid = str(sdoc["_id"])
         att = attendance_by_session.get(sid)
         is_active = bool(sdoc.get("is_active", False))
-        if att:
+        if att and is_session_assessed(sdoc, att):
             raw_status = att.get("status", "present")
             if raw_status in ("present", "late", "excused"):
                 item_status = raw_status if raw_status in ("present", "late", "excused") else "present"
@@ -336,3 +345,24 @@ async def get_student_portal(
         is_defaulter=assessed_sessions > 0 and rate < 75.0,
         sessions=items,
     )
+
+
+@router.post("/password", response_model=TokenResponse, dependencies=[Depends(require_authenticated)])
+@limiter.limit("5/minute")
+async def change_password(request: Request, body: PasswordChange,
+                          db: AsyncIOMotorDatabase = Depends(get_db)):
+    user = request.state.user
+    if user.auth_type != "jwt" or not ObjectId.is_valid(user.id):
+        raise HTTPException(403, "Cần đăng nhập bằng tài khoản cá nhân.")
+    doc = await db.users.find_one({"_id": ObjectId(user.id), "is_active": True})
+    if not doc or not await asyncio.to_thread(verify_password, body.current_password, doc.get("password_hash", "")):
+        raise HTTPException(400, "Mật khẩu hiện tại không đúng.")
+    if body.current_password == body.new_password:
+        raise HTTPException(422, "Mật khẩu mới phải khác mật khẩu hiện tại.")
+    encoded = await asyncio.to_thread(hash_password, body.new_password)
+    changed = await db.users.update_one({"_id": doc["_id"], "password_hash": doc["password_hash"]},
+        {"$set": {"password_hash": encoded}, "$inc": {"auth_version": 1}})
+    if not changed.matched_count:
+        raise HTTPException(409, "Mật khẩu vừa được thay đổi. Vui lòng đăng nhập lại.")
+    token, expires = create_access_token(str(doc["_id"]), doc["username"], doc["role"], doc.get("auth_version", 0) + 1)
+    return TokenResponse(access_token=token, expires_in=expires, role=doc["role"], username=doc["username"])

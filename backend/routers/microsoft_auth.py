@@ -66,7 +66,7 @@ async def exchange_identity(request: Request, body: MicrosoftExchange, db: Async
     })
     if not user or user.get("role") not in {"admin", "operator", "student"}:
         raise HTTPException(403, "This Microsoft account is not linked to an active EduFace account. Contact your administrator.")
-    token, expires = create_access_token(str(user["_id"]), user["username"], user["role"])
+    token, expires = create_access_token(str(user["_id"]), user["username"], user["role"], user.get("auth_version", 0))
     return TokenResponse(access_token=token, expires_in=expires, role=user["role"], username=user["username"])
 
 

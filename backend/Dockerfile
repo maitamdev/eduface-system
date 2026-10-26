@@ -28,7 +28,14 @@ app.prepare(ctx_id=-1, det_size=(640, 640))
 print("InsightFace buffalo_sc model cached in image.")
 EOF
 
-COPY . .
+COPY core ./core
+COPY routers ./routers
+COPY scripts ./scripts
+COPY data ./data
+COPY main.py .
+RUN useradd --create-home --uid 10001 appuser && cp -r /root/.insightface /home/appuser/.insightface && chown -R appuser:appuser /app /home/appuser
+USER appuser
+HEALTHCHECK --interval=30s --timeout=5s --start-period=120s CMD python -c "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.getenv('PORT','8000') + '/health', timeout=4)"
 
 EXPOSE 8000
 

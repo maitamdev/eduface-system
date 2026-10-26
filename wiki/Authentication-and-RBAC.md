@@ -1,3 +1,5 @@
+> Tài liệu trước đợt sửa 27/10/2026; một số mô tả kiến trúc/AI/quyền có thể đã cũ. Đối chiếu [README hiện hành](../README.md) và [hướng dẫn nâng cấp](../docs/UPGRADE_2026_10.md). Không coi các số accuracy/latency cũ là kết quả nghiệm thu.
+
 # 🔐 Authentication, Authorization & RBAC
 
 SmartAttend implements a zero-trust, stateless authentication model utilizing signed **JSON Web Tokens (JWT)** and per-user identity tracking.

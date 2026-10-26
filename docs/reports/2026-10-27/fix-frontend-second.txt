@@ -1,0 +1,65 @@
+
+> eduface-frontend@2.0.0 build
+> tsc -b && vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 2330 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/microsoft-redirect.html                                       0.57 kB │ gzip:  0.36 kB
+dist/index.html                                                    1.01 kB │ gzip:  0.53 kB
+dist/assets/be-vietnam-pro-vietnamese-400-normal-BuGn0gnm.woff     6.56 kB
+dist/assets/be-vietnam-pro-vietnamese-600-normal-DkpCIyan.woff     6.88 kB
+dist/assets/be-vietnam-pro-vietnamese-500-normal-CfdwVo8-.woff     6.88 kB
+dist/assets/be-vietnam-pro-vietnamese-700-normal-By_5yT39.woff     6.89 kB
+dist/assets/be-vietnam-pro-latin-ext-400-normal-DYBYyMQr.woff      8.90 kB
+dist/assets/be-vietnam-pro-latin-ext-700-normal-4Hjo2OtD.woff      9.18 kB
+dist/assets/be-vietnam-pro-latin-ext-500-normal-CK0UkkKf.woff      9.20 kB
+dist/assets/be-vietnam-pro-latin-ext-600-normal-BeUwKxhG.woff      9.22 kB
+dist/assets/be-vietnam-pro-vietnamese-400-normal-CRcqvyg1.woff2   11.53 kB
+dist/assets/be-vietnam-pro-vietnamese-500-normal-DREgrEoJ.woff2   12.17 kB
+dist/assets/be-vietnam-pro-vietnamese-600-normal-nyU-ZL2p.woff2   12.17 kB
+dist/assets/be-vietnam-pro-vietnamese-700-normal-Csr0PCuG.woff2   12.46 kB
+dist/assets/be-vietnam-pro-latin-ext-400-normal-CiZNW1ec.woff2    13.05 kB
+dist/assets/be-vietnam-pro-latin-ext-500-normal-h0Fp6aX0.woff2    13.54 kB
+dist/assets/be-vietnam-pro-latin-ext-600-normal-BNd8euf0.woff2    13.60 kB
+dist/assets/be-vietnam-pro-latin-ext-700-normal-C8_gqRu2.woff2    13.85 kB
+dist/assets/be-vietnam-pro-latin-400-normal-bXgqVju9.woff         16.43 kB
+dist/assets/be-vietnam-pro-latin-700-normal-C2EtzaOi.woff         16.90 kB
+dist/assets/be-vietnam-pro-latin-500-normal-BJkVuMHw.woff         16.99 kB
+dist/assets/be-vietnam-pro-latin-600-normal-5IO4e7bK.woff         17.01 kB
+dist/assets/be-vietnam-pro-latin-400-normal-PpnXBOrz.woff2        21.16 kB
+dist/assets/be-vietnam-pro-latin-500-normal-B6LVzGNe.woff2        21.89 kB
+dist/assets/be-vietnam-pro-latin-600-normal-BZDkUTrt.woff2        22.03 kB
+dist/assets/be-vietnam-pro-latin-700-normal-DlW1Zbsh.woff2        22.15 kB
+dist/assets/main-7vixvZff.css                                     44.36 kB │ gzip:  9.64 kB
+dist/assets/plus-B77ZmWag.js                                       0.14 kB │ gzip:  0.14 kB
+dist/assets/arrow-right-DAiZL-mB.js                                0.16 kB │ gzip:  0.15 kB
+dist/assets/circle-check-C3MVI066.js                               0.17 kB │ gzip:  0.16 kB
+dist/assets/megaphone-Cbprh4ox.js                                  0.18 kB │ gzip:  0.17 kB
+dist/assets/camera-MzeWwXdi.js                                     0.24 kB │ gzip:  0.20 kB
+dist/assets/download-BvP_V1IL.js                                   0.25 kB │ gzip:  0.21 kB
+dist/assets/trash-2-D-F-nJHd.js                                    0.35 kB │ gzip:  0.24 kB
+dist/assets/useResource-Ek6ByqAM.js                                0.55 kB │ gzip:  0.35 kB
+dist/assets/modulepreload-polyfill-P2Xu9kJm.js                     0.67 kB │ gzip:  0.38 kB
+dist/assets/rolldown-runtime-XKyaHtl9.js                           0.72 kB │ gzip:  0.42 kB
+dist/assets/csv-CQ7MwZp0.js                                        1.06 kB │ gzip:  0.68 kB
+dist/assets/useCamera-BBIK2jET.js                                  2.34 kB │ gzip:  1.17 kB
+dist/assets/microsoft-BSlgpVG6.js                                  7.55 kB │ gzip:  3.30 kB
+dist/assets/SessionsPage-BRjJg8wb.js                               7.60 kB │ gzip:  2.89 kB
+dist/assets/ReportsPage-Dw2svbta.js                                8.61 kB │ gzip:  3.37 kB
+dist/assets/RecordsPage-2DfBs6DI.js                                9.25 kB │ gzip:  3.14 kB
+dist/assets/EnrollPage-DRd7zW0J.js                                10.30 kB │ gzip:  3.99 kB
+dist/assets/LoginPage-BMupxJWR.js                                 10.73 kB │ gzip:  4.57 kB
+dist/assets/DashboardPage-BZk6yd6B.js                             11.09 kB │ gzip:  4.11 kB
+dist/assets/SystemAdminPage-B0b1b-qK.js                           13.44 kB │ gzip:  4.07 kB
+dist/assets/LiveScannerPage-qcbaUeJI.js                           15.99 kB │ gzip:  6.00 kB
+dist/assets/PeoplePage-NcxdoD_1.js                                17.12 kB │ gzip:  5.33 kB
+dist/assets/circle-alert-BZx0034J.js                              17.41 kB │ gzip:  5.92 kB
+dist/assets/StudentPortalPage-BBZwfnXd.js                         27.25 kB │ gzip:  9.20 kB
+dist/assets/AcademicManagementPage-BJDDPCzt.js                    28.69 kB │ gzip:  8.79 kB
+dist/assets/main-bBs_Q4iI.js                                     202.60 kB │ gzip: 66.81 kB
+dist/assets/BarChart-Cgt7OC-_.js                                 368.31 kB │ gzip: 98.21 kB
+
+✓ built in 2.17s

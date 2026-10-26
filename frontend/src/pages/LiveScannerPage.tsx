@@ -22,7 +22,7 @@ export const LiveScannerPage: React.FC = () => {
   const camera = useCamera();
   const [source, setSource] = useState<"camera" | "upload">("camera");
   const [mode, setMode] = useState<"mark" | "identify">("mark");
-  const [confidence, setConfidence] = useState(.4);
+  const [confidence, setSimilarity] = useState(.4);
   const [uploaded, setUploaded] = useState<File | null>(null);
   const [uploadUrl, setUploadUrl] = useState("");
   const [results, setResults] = useState<IdentifyResult[]>([]);
@@ -39,7 +39,6 @@ export const LiveScannerPage: React.FC = () => {
   const socketFrameBusy = useRef(false);
   const [frameSize, setFrameSize] = useState({ width: 1280, height: 720 });
 
-  const [livenessCheck, setLivenessCheck] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [livenessPrompt, setLivenessPrompt] = useState<string | null>(null);
 
@@ -122,8 +121,8 @@ export const LiveScannerPage: React.FC = () => {
     busy.current = true; setScanning(true); setError(null); setMessage(null);
     try {
       let probeFrame: Blob | undefined;
-      if (source === "camera" && mode === "mark" && livenessCheck) {
-        setLivenessPrompt(t("Giữ tự nhiên / Nghiêng nhẹ đầu để xác thực người thật (Chống ảnh giả)…", "Hold naturally / slightly move head for 3D liveness check…"));
+      if (source === "camera" && mode === "mark") {
+        setLivenessPrompt(t("Nghiêng nhẹ đầu để kiểm tra chuyển động…", "Slightly move your head for a motion check…"));
         probeFrame = await captureVideoFrame(camera.videoRef.current);
         await new Promise((resolve) => setTimeout(resolve, 280));
       }
@@ -163,7 +162,7 @@ export const LiveScannerPage: React.FC = () => {
       }
     } catch (err) { if (request === generation.current) { setError(errorMessage(err)); setAuto(false); } }
     finally { busy.current = false; setScanning(false); setLivenessPrompt(null); }
-  }, [mode, selected?.id, source, uploaded, confidence, livenessCheck, playCheckinTone, camera.videoRef, records.reload, t]);
+  }, [mode, selected?.id, source, uploaded, confidence, playCheckinTone, camera.videoRef, records.reload, t]);
   const scanRef = useRef(scan); scanRef.current = scan;
   useEffect(() => {
     if (!auto || !camera.streaming || source !== "camera") return;
@@ -220,10 +219,10 @@ export const LiveScannerPage: React.FC = () => {
       {source === "camera" ? <div className="camera-controls"><button className="secondary-button" disabled={camera.starting || isDesignPreview()} onClick={() => camera.streaming ? stopCamera() : void camera.start()}>{camera.starting ? t("Đang mở…", "Starting…") : camera.streaming ? t("Tắt camera", "Stop camera") : t("Bật camera", "Start camera")}</button><button className="icon-button" disabled={camera.starting || scanning || socketState !== "off"} onClick={() => { setAuto(false); void camera.flip(); }} aria-label={t("Đổi camera", "Switch camera")}><SwitchCamera size={17} /></button></div> : <Field id="scanner-upload" label={t("Chọn ảnh · Tối đa 10 MB", "Choose image · Up to 10 MB")}><input id="scanner-upload" type="file" accept="image/*" disabled={scanning} onChange={(event) => { changeUpload(event.target.files?.[0]); event.target.value = ""; }} /></Field>}
       {isDesignPreview() && <p className="field-hint">{t("Bản xem thử không mở camera hoặc gửi ảnh lên máy chủ.", "Preview does not open the camera or send photos to the server.")}</p>}
       <div className="scan-options">
-        <Field id="scanner-confidence" label={t(`Ngưỡng nhận diện: ${Math.round(confidence * 100)}%`, `Recognition threshold: ${Math.round(confidence * 100)}%`)}><input id="scanner-confidence" type="range" min="0.1" max="1" step="0.05" value={confidence} disabled={scanning || auto || socketState !== "off"} onChange={(event) => setConfidence(Number(event.target.value))} /></Field>
+        <Field id="scanner-confidence" label={t(`Ngưỡng tương đồng cosine: ${confidence.toFixed(2)}`, `Cosine similarity threshold: ${confidence.toFixed(2)}`)}><input id="scanner-confidence" type="range" min="0.4" max="1" step="0.05" value={confidence} disabled={scanning || auto || socketState !== "off"} onChange={(event) => setSimilarity(Number(event.target.value))} /></Field>
         {source === "camera" && mode === "mark" && (
           <label className="checkbox-label">
-            <input type="checkbox" checked={livenessCheck} disabled={scanning} onChange={(event) => setLivenessCheck(event.target.checked)} />
+            <input type="checkbox" checked readOnly disabled aria-label={t("Luôn kiểm tra hai khung hình", "Dual-frame check always enabled")} />
             {t("Chống giả mạo 2 khung hình (Liveness)", "Dual-frame anti-spoofing")}
           </label>
         )}
@@ -232,7 +231,7 @@ export const LiveScannerPage: React.FC = () => {
       </div>
       <div className="page-actions"><button className="primary-button" disabled={scanning || auto || socketState !== "off" || (source === "camera" ? !camera.streaming : !uploaded) || (mode === "mark" && !selected) || isDesignPreview()} onClick={() => void scan()}><ScanFace size={15} />{scanning ? t("Đang xác thực…", "Verifying…") : mode === "mark" ? t("Quét và điểm danh", "Scan and check in") : t("Nhận diện", "Identify")}</button>{source === "camera" && mode === "identify" && <button className="secondary-button" disabled={!camera.streaming || !selected || scanning || isDesignPreview()} onClick={() => socketState === "off" ? startSocket() : stopSocket()}>{socketState === "off" ? t("Nhận diện trực tiếp", "Live recognition") : socketState === "connecting" ? t("Hủy kết nối", "Cancel connection") : t("Dừng trực tiếp", "Stop live recognition")}</button>}</div>
       {message && <p className="scan-message" role="status">{message}</p>}
-    </Section><Section title={t("Kết quả nhận diện & Xác thực người thật", "Recognition & Liveness results")} description={mode === "identify" ? t("Chế độ này không ghi điểm danh.", "This mode does not record attendance.") : t("Tự động chặn ghi điểm danh nếu phát hiện ảnh tĩnh hoặc màn hình điện thoại.", "Automatically blocks check-in if a static photo or phone screen is detected.")}>{results.length ? <div className="recognition-list">{results.map((result) => <div key={result.azure_person_id}><strong>{result.name}</strong><span>{Math.round(result.confidence * 100)}%</span><small className={result.is_live === false ? "warning-text" : "attendance-status"}>{result.is_live === false ? t(`⚠️ Chặn ảnh giả (${result.spoof_reason || "Spoof"})`, `⚠️ Spoof blocked`) : mode === "mark" ? result.already_marked ? t("Đã có bản ghi", "Already recorded") : t("✓ Người thật · Đã ghi điểm danh", "✓ Live · Recorded") : t("✓ Người thật · Đã nhận diện", "✓ Live · Identified")}</small></div>)}</div> : <EmptyState>{t("Kết quả xuất hiện sau khi quét.", "Results appear after scanning.")}</EmptyState>}</Section></div>
+    </Section><Section title={t("Kết quả nhận diện và kiểm tra ảnh", "Recognition and image checks")} description={mode === "identify" ? t("Chế độ này không ghi điểm danh.", "This mode does not record attendance.") : t("Kiểm tra ảnh và chuyển động hỗ trợ phát hiện bất thường; chưa thay thế kiểm định chống giả mạo chuyên dụng. Điểm hiển thị là tương đồng cosine.", "Image and motion checks flag anomalies; they are not certified presentation attack detection. Scores show cosine similarity.")}>{results.length ? <div className="recognition-list">{results.map((result) => <div key={result.azure_person_id}><strong>{result.name}</strong><span>{result.confidence.toFixed(3)}</span><small className={result.is_live === false ? "warning-text" : "attendance-status"}>{result.is_live === false ? t(`⚠️ Chặn ảnh giả (${result.spoof_reason || "Spoof"})`, `⚠️ Spoof blocked`) : mode === "mark" ? result.already_marked ? t("Đã có bản ghi", "Already recorded") : t("Đã qua kiểm tra · Đã ghi điểm danh", "Checks passed · Recorded") : t("Đã nhận diện", "Identified")}</small></div>)}</div> : <EmptyState>{t("Kết quả xuất hiện sau khi quét.", "Results appear after scanning.")}</EmptyState>}</Section></div>
     <Section
       title={t("Bản ghi của phiên đang chọn", "Selected session records")}
       description={
@@ -253,7 +252,7 @@ export const LiveScannerPage: React.FC = () => {
       }
       action={<Link to={appPath(`/records${selected ? `?sessionId=${selected.id}` : ""}`)} className="text-link">{t("Mở sổ điểm danh", "View records")}</Link>}
     >
-      <Table label={t("Điểm danh trong phiên", "Session check-ins")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>MSSV</th><th>{t("Khoa / Lớp", "Department")}</th><th>{t("Trạng thái", "Status")}</th><th>{t("Thời gian", "Time")}</th><th className="align-right">{t("Độ tin cậy", "Confidence")}</th></tr></thead><tbody>{records.data.map((record) => <tr key={record.id}><td className="cell-strong">{record.person_name}</td><td className="numeric-cell">{record.student_id || "–"}</td><td>{record.department || "–"}</td><td className={record.status === "absent" ? "warning-text" : "attendance-status"}>{record.status === "present" ? t("Có mặt", "Present") : record.status === "late" ? t("Đi muộn", "Late") : record.status === "excused" ? t("Có phép", "Excused") : t("Vắng", "Absent")}</td><td>{dateTime(record.marked_at, lang)}</td><td className="align-right">{record.confidence != null ? `${Math.round(record.confidence * 100)}%` : "–"}</td></tr>)}</tbody></Table>{!records.data.length && <EmptyState loading={records.loading}>{records.error ? t("Bản ghi chưa tải được.", "Records unavailable.") : t("Chưa có lượt điểm danh trong phiên.", "No check-ins in this session.")}</EmptyState>}
+      <Table label={t("Điểm danh trong phiên", "Session check-ins")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>MSSV</th><th>{t("Khoa / Lớp", "Department")}</th><th>{t("Trạng thái", "Status")}</th><th>{t("Thời gian", "Time")}</th><th className="align-right">{t("Tương đồng", "Similarity")}</th></tr></thead><tbody>{records.data.map((record) => <tr key={record.id}><td className="cell-strong">{record.person_name}</td><td className="numeric-cell">{record.student_id || "–"}</td><td>{record.department || "–"}</td><td className={record.status === "absent" ? "warning-text" : "attendance-status"}>{record.status === "present" ? t("Có mặt", "Present") : record.status === "late" ? t("Đi muộn", "Late") : record.status === "excused" ? t("Có phép", "Excused") : t("Vắng", "Absent")}</td><td>{dateTime(record.marked_at, lang)}</td><td className="align-right">{record.confidence != null ? record.confidence.toFixed(3) : "–"}</td></tr>)}</tbody></Table>{!records.data.length && <EmptyState loading={records.loading}>{records.error ? t("Bản ghi chưa tải được.", "Records unavailable.") : t("Chưa có lượt điểm danh trong phiên.", "No check-ins in this session.")}</EmptyState>}
     </Section>
   </div>;
 };

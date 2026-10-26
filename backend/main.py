@@ -34,7 +34,7 @@ import os
 import logging
 import asyncio
 from fastapi import FastAPI, Response
-from fastapi.middleware.cors import CORSMiddleware
+from core.http_app import CorsFastAPI
 from contextlib import asynccontextmanager
 
 from slowapi import _rate_limit_exceeded_handler
@@ -42,8 +42,10 @@ from slowapi.errors import RateLimitExceeded
 
 from core.database import init_db
 from core.rate_limit import limiter
-from core.logging_context import RequestIDMiddleware, install_request_id_filter
-from routers import persons, sessions, attendance, reports, dashboard, auth, microsoft_auth, google_auth, academic
+from pymongo.errors import DuplicateKeyError, OperationFailure
+from fastapi.responses import JSONResponse
+from core.logging_context import install_request_id_filter
+from routers import persons, sessions, attendance, reports, dashboard, auth, microsoft_auth, google_auth, academic, toeic
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -62,19 +64,23 @@ def _preload_insightface():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    app.state.startup_attempted = True
+    app.state.database_initialized = False
     retry_task = None
     try:
-        await asyncio.wait_for(init_db(), timeout=6.0)
+        await asyncio.wait_for(init_db(), timeout=30.0)
+        app.state.database_initialized = True
     except Exception as exc:
         logger.warning(
-            "Initial MongoDB connection failed (%s). Will retry in background every 10s — check MongoDB Atlas Network Access (whitelist 0.0.0.0/0).",
+            "Initial MongoDB connection failed (%s). Will retry in background every 10s — check MongoDB connectivity, least-privilege network access, and index migration diagnostics.",
             exc,
         )
         async def _retry_init_db():
             while True:
                 await asyncio.sleep(10)
                 try:
-                    await asyncio.wait_for(init_db(), timeout=8.0)
+                    await asyncio.wait_for(init_db(), timeout=30.0)
+                    app.state.database_initialized = True
                     logger.info("✅ Background MongoDB connection succeeded!")
                     return
                 except Exception:
@@ -90,6 +96,8 @@ async def lifespan(app: FastAPI):
 
     logger.info("=== Startup complete. Ready to serve requests. ===")
 
+    from core.biometric_cleanup import cleanup_loop
+    cleanup_task = asyncio.create_task(cleanup_loop())
     keepalive_task = None
     render_url = os.getenv("RENDER_EXTERNAL_URL", "https://eduface-system.onrender.com").rstrip("/")
     if os.getenv("RENDER") or os.getenv("RENDER_EXTERNAL_URL"):
@@ -110,13 +118,22 @@ async def lifespan(app: FastAPI):
     try:
         yield
     finally:
+        cleanup_task.cancel()
+        await asyncio.gather(cleanup_task, return_exceptions=True)
         if retry_task and not retry_task.done():
             retry_task.cancel()
         if keepalive_task and not keepalive_task.done():
             keepalive_task.cancel()
 
 
-app = FastAPI(
+def _resolve_cors_origins() -> list:
+    from core.origins import allowed_origins
+    return allowed_origins()
+
+
+allow_origins = _resolve_cors_origins()
+app = CorsFastAPI(
+    cors_origins=allow_origins,
     title="Smart Attendance System API",
     description="InsightFace + MongoDB powered attendance backend",
     version="4.2.0",
@@ -125,76 +142,31 @@ app = FastAPI(
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_middleware(RequestIDMiddleware)
 
 
 @app.middleware("http")
 async def add_security_headers(request, call_next):
-    response = await call_next(request)
+    if (request.url.path.startswith("/api/") and getattr(app.state, "startup_attempted", False)
+            and not getattr(app.state, "database_initialized", False)):
+        response = JSONResponse({"detail": "Cơ sở dữ liệu chưa sẵn sàng. Vui lòng thử lại sau."}, status_code=503)
+    else:
+        response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    if request.method in {"POST", "PUT", "PATCH", "DELETE"} and response.status_code < 400:
+        user = getattr(request.state, "user", None)
+        if user is not None:
+            from core.audit import record_audit_event
+            await record_audit_event(action=f"{request.method} {request.url.path}", actor_id=user.id,
+                actor_role=user.role, ip_address=request.client.host if request.client else "unknown",
+                target_id=request.url.path, metadata=getattr(request.state, "audit_metadata", {}))
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+
     return response
 
-
-def _resolve_cors_origins() -> list:
-    """
-    Build the CORS allow-list (Remediation Plan item #16 — CORS tightening).
-
-    `allow_credentials=True` is required below (the frontend sends the
-    X-API-Key header on protected calls), and per the CORS spec + Starlette's
-    own implementation, `allow_origins=["*"]` combined with
-    `allow_credentials=True` is a real vulnerability: it tells browsers to
-    accept cross-origin credentialed requests from ANY site, effectively
-    disabling the same-origin protections auth is supposed to provide.
-
-    Previously this was "reasonable defaults, double-check no wildcard ever
-    ends up here" — a manual-review-only safeguard. This function makes it a
-    startup-time hard failure instead: a wildcard in ALLOWED_ORIGINS now
-    crashes app startup with a clear error rather than silently deploying an
-    open CORS policy.
-    """
-    default_origins = [
-        "http://localhost:5173",
-        "http://localhost:8080",
-        "http://127.0.0.1:5173",
-        "https://ai-attendance-system-mauve.vercel.app",
-        "https://eduface-system.vercel.app",
-        "https://face-dhv-edu.vercel.app",
-        "https://dhv-edu.tech",
-        "https://www.dhv-edu.tech",
-        "https://maitamdev.io.vn",
-        "https://www.maitamdev.io.vn",
-    ]
-    env_origins = os.getenv("ALLOWED_ORIGINS", "")
-    extra = [o.strip() for o in env_origins.split(",") if o.strip()]
-
-    origins = list(dict.fromkeys(default_origins + extra))  # de-dupe, keep order
-
-    if "*" in origins:
-        raise RuntimeError(
-            "ALLOWED_ORIGINS resolved to include '*' (wildcard). This is refused "
-            "at startup because allow_credentials=True is set below — a wildcard "
-            "origin combined with credentialed requests would accept "
-            "cross-origin, authenticated calls from any website. List explicit "
-            "origins in ALLOWED_ORIGINS instead (comma-separated)."
-        )
-
-    logger.info("CORS allow_origins resolved to: %s", origins)
-    return origins
-
-
-allow_origins = _resolve_cors_origins()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allow_origins,
-    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*(vercel\.app|dhv-edu\.tech|maitamdev\.io\.vn)$",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 app.include_router(auth.router,        prefix="/api/auth",       tags=["Authentication"])
 app.include_router(google_auth.router, prefix="/api/auth",       tags=["Google sign-in"])
@@ -205,6 +177,7 @@ app.include_router(sessions.router,   prefix="/api/sessions",   tags=["Sessions"
 app.include_router(attendance.router, prefix="/api/attendance", tags=["Attendance"])
 app.include_router(reports.router,    prefix="/api/reports",    tags=["Reports"])
 app.include_router(academic.router,   prefix="/api/academic",   tags=["Academic Management"])
+app.include_router(toeic.router, prefix="/api/toeic", tags=["TOEIC cùng DHV"])
 
 
 @app.get("/", tags=["Health"])
@@ -214,7 +187,24 @@ async def root():
 
 @app.get("/health", tags=["Health"])
 async def health():
-    return {"status": "healthy"}
+    from fastapi.responses import JSONResponse
+    from core.database import get_database
+    from core import azure_face
+    database_ready = False
+    try:
+        await asyncio.wait_for(get_database().command("ping"), timeout=2)
+        database_ready = True
+    except Exception:
+        pass
+    model_ready = azure_face._app is not None
+    ready = database_ready and model_ready and getattr(app.state, "database_initialized", False)
+    return JSONResponse({"status": "healthy" if ready else "not_ready",
+                         "database": database_ready, "model": model_ready}, status_code=200 if ready else 503)
+
+
+@app.get("/live", tags=["Health"])
+async def liveness():
+    return {"status": "alive"}
 
 
 @app.get("/metrics", tags=["Observability"])
@@ -222,3 +212,27 @@ async def metrics():
     from core.metrics import get_prometheus_metrics
     payload, media_type = get_prometheus_metrics()
     return Response(content=payload, media_type=media_type)
+
+
+@app.exception_handler(DuplicateKeyError)
+async def duplicate_key_handler(request, exc):
+    return JSONResponse({"detail": "Dữ liệu trùng mã hoặc liên kết đã tồn tại. Tải lại và kiểm tra hồ sơ."}, status_code=409)
+
+
+@app.exception_handler(OperationFailure)
+async def database_operation_handler(request, exc):
+    logger.error("Database operation failed (code=%s)", exc.code)
+    return JSONResponse({"detail": "Không thể hoàn tất thao tác dữ liệu. Vui lòng tải lại và thử lại."}, status_code=503)
+
+
+@app.exception_handler(Exception)
+async def unexpected_error_handler(request, exc):
+    request_id = getattr(request.state, "request_id", "unknown")
+    logger.error("Unhandled request error: %s %s request_id=%s", request.method,
+                 request.url.path, request_id, exc_info=(type(exc), exc, exc.__traceback__))
+    return JSONResponse(
+        {"detail": "Máy chủ gặp lỗi khi xử lý yêu cầu. Vui lòng cung cấp mã yêu cầu cho quản trị viên.",
+         "request_id": request_id},
+        status_code=500,
+        headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY"},
+    )

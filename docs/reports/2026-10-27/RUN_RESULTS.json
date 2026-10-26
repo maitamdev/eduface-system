@@ -1,0 +1,141 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Bangkok",
+  "git_base": "162a61b3ac41a062c7c25187934e102c62a1448d",
+  "scope": "current working tree; mock/local tests; production not evaluated",
+  "backend_pytest": {
+    "passed": 170,
+    "warnings": 1,
+    "seconds": 83.85
+  },
+  "frontend_vitest": {
+    "passed": 24,
+    "files": 4,
+    "seconds": 63.36
+  },
+  "packages_after_build": {
+    "passed": 31,
+    "typecheck": "passed",
+    "build": "passed"
+  },
+  "frontend_build": {
+    "status": "passed",
+    "vite_build_seconds": 26.35,
+    "main_js_kb": 197.16,
+    "main_js_gzip_kb": 65.32
+  },
+  "pip_audit": {
+    "packages": 86,
+    "known_vulnerabilities": 0,
+    "skipped": 0
+  },
+  "npm_audit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 54,
+      "dev": 170,
+      "optional": 62,
+      "peer": 12,
+      "peerOptional": 0,
+      "total": 223
+    }
+  },
+  "model_smoke": {
+    "model": "buffalo_sc",
+    "provider": "CPUExecutionProvider",
+    "load_seconds": 15.802,
+    "blank_inference_seconds": 1.592,
+    "faces": 0,
+    "accuracy_tested": false
+  },
+  "browser_smoke": {
+    "sample_data": true,
+    "screens": 10,
+    "console_errors_observed": 0,
+    "real_camera_tested": false
+  },
+  "cli_create_user_help": {
+    "result": "failed",
+    "error": "ModuleNotFoundError: No module named core"
+  },
+  "source_sha256": {
+    "backend/core/attendance_policy.py": "dcf6f6cc8eda2d3b67b57fcc5f21fcdf39ade3aa36ad3771f8dce37ede523835",
+    "backend/core/audit.py": "d936b6732f562203f0fbfdbfd717e67b929228c1ee2719e0eae7797a6b96de82",
+    "backend/core/auth.py": "bba2876e5b6380f681c8b35c2685549b279c53f6762d5ba77db950d358617d8e",
+    "backend/core/azure_face.py": "3cd560b1c1ff240b573207bc52488bf8089e01b35c8cf478fe51d51db0c9c2f5",
+    "backend/core/database.py": "425c614e9cc399888915710de97195a7a3c87e037be9d3ec44b06313235c76b2",
+    "backend/core/google_identity.py": "bb9b1e69aa454aa1936ca8c3bfdf2d5df2cfa1d59caaa61df9db43f767554f2d",
+    "backend/core/logging_context.py": "13ab00eb3eb64645f094ac9c532a389e8ae6127c7646384f86b73cc9b3e69f3a",
+    "backend/core/metrics.py": "07d64494d132bf9274706c5569245a4cdddcddac120a5d94dee82c5ec556818d",
+    "backend/core/microsoft_identity.py": "aadad64142a4aaed172a83df09f0cc8e78370fda195b2334168c24cca773b739",
+    "backend/core/rate_limit.py": "4fea39997f293d788a773c7c49b96a760c7cdb7f966f0dd339fc3f40683e4ccb",
+    "backend/core/schemas.py": "d64eba71bb7a916983eef1df6014c3ae85a6032f7d8b1ac050cdad451980fbd0",
+    "backend/core/validation.py": "6c0d365a0ffd05ac2c0837878001e8eb628d453e452b2d0c9b834d917403a42f",
+    "backend/core/vision_engine.py": "3e878e08656170da5b62a7441bcbd93277708b9d7dcf6f6be5be42430f222ec7",
+    "backend/core/__init__.py": "5d21070956458d55a1d0c8893c0da184747f5cd2fa96147a58c86d7389d4860c",
+    "backend/routers/academic.py": "75a5499acccc77ff4e76e9bd8d7eaaf57c4ab17b01c56d9c961b0a556c0987bb",
+    "backend/routers/attendance.py": "724f2262952a4c7173fb31ac5ace01a787fe884ca4c69cbcaf915253285f1c78",
+    "backend/routers/auth.py": "3cfa0246712d6dba2864706800c393c4cc6045c79376fa8f5fa50fcead6cf8a4",
+    "backend/routers/dashboard.py": "0a66a3a9b19adc5f8e4f95c1182ce4c3ad5e013bbc1b281efe0f61efcd4803fd",
+    "backend/routers/google_auth.py": "dd019236a3b3cee4a927aa4d59b9727fbdbe6f59456132474603937313c111bb",
+    "backend/routers/microsoft_auth.py": "01c6c36652ceb229a911da4c4174fde7b921591547e09bb99a5e44143560dfc2",
+    "backend/routers/persons.py": "7a1ae061f4f05641e964d07aff161a7b315fcf4191b025d43e43f11cc996f6f1",
+    "backend/routers/reports.py": "32b1dd31e4f9d79331a6e9a8d69aa19f582c951406baff066891e64806720978",
+    "backend/routers/sessions.py": "062effcb5adccc9618e00394b64c5391e9954dd208c30c39aa4b4588db4649ab",
+    "backend/routers/__init__.py": "9e69d80ee4b343a2a90df3a220a1dd981eabcfcc92c926b3cda1048609cb7d33",
+    "frontend/src/App.tsx": "f634f0ad61d49393fff0b15a55bfaf82932e6e0909661c7f47e06f496d15835d",
+    "frontend/src/main.tsx": "138cff0758b9e3652a7868d86eff6ee141d151725c0f3b01105fa9e35a526bbf",
+    "frontend/src/vite-env.d.ts": "6a1d394916d718c822220efbf6a624595fcb7601d957e4e2d5ce6c7abf476c34",
+    "frontend/src/api/client.ts": "d11b168f6c8713b6739a9f0304dd4dcd705c25cd08ef428082ef1b6f24ad4950",
+    "frontend/src/auth/google.ts": "1952a305537a4f604c3300aa69d5ae72f040276c90fa0167df7e8025326996af",
+    "frontend/src/auth/microsoft.test.ts": "b74042b4e0a47955e18938e2d897c2c19e69698625d509cd784060657130dc4f",
+    "frontend/src/auth/microsoft.ts": "a886bb75a9b494081ad6902075977a5decadea36b0b4b541e47e3680dce5ef8d",
+    "frontend/src/components/AppShell.tsx": "975d73653bdff6dc0738c0cbb1cf2d510aa97c8d1ee53d4023e0dec33040c7c5",
+    "frontend/src/components/PageErrorBoundary.test.tsx": "5d04e4204829bf2c8a7a60fd3a938947a8a0de451bcfcf4bbbba08bfc6ea27f5",
+    "frontend/src/components/PageErrorBoundary.tsx": "dbd097a2376e467aee59db8a326f6e413e79a1d65506d57b208ce65456a8fa0c",
+    "frontend/src/components/ProductUI.tsx": "5c2fe58c103d3e537fa8b259a33df0f2f446cc0e50f0e753a164b3609a599a36",
+    "frontend/src/components/RouteGuards.tsx": "8eae0c8e90d86a59e49a41d0eb24af88b828bf5d20e07f8c163a743733c0fca3",
+    "frontend/src/context/AuthContext.tsx": "b325846d290aeedd22d7e3d02bd06e530414872187ac92856f2fba1fb3f86681",
+    "frontend/src/context/LanguageContext.tsx": "351978fdb7558d58816644fd6c4b577cb7c178f59ac43be8e69aeaf289466eb5",
+    "frontend/src/context/ThemeContext.tsx": "b856a1839fb86ba9019de4ab1a18af6c426e6108c8575b4e198f4cb3b4706821",
+    "frontend/src/context/ToastContext.tsx": "5dbbd53678455bfbd2b83e7ed726baee179bb731e9a8742a264daa83ef0e6650",
+    "frontend/src/hooks/useCamera.ts": "52c5d3acd00404680ff11b6d9157965fdcaaf10be8c5095c105a9a10a629a087",
+    "frontend/src/hooks/useResource.ts": "7115122d1923b35fcc68d4747973a7d9b5012047a61fde0c0a86872b3f6d8780",
+    "frontend/src/lib/csv.test.ts": "452a5d6366c121e9548e94c9df4d33a90596d3213693694338659f9242de7dd8",
+    "frontend/src/lib/csv.ts": "cde3575ac69c58fb44546b179dfef3ba2c4b4a45ec985888b5bad7128a882569",
+    "frontend/src/lib/format.ts": "81e0bf23b08d13fd88914eb3b2e0aec74f56934a6cd36720379f2b6758cb6b07",
+    "frontend/src/pages/AcademicManagementPage.tsx": "b545a9c24effff91964a96470c27dea428b402d5a404bc578c27adeee0fd5bd1",
+    "frontend/src/pages/DashboardPage.tsx": "f0b4e66d094ff1301d0274103474997a12f6bb0ada69b812d33f88cef8c6e463",
+    "frontend/src/pages/DesignPreviewPage.tsx": "56507b64b8956255bc0385dc67e46df63c871919cbdfe7a11790490903ea0291",
+    "frontend/src/pages/EnrollPage.tsx": "a11ee7a18af8451876b56936408cbaf5116b4266d2112acff665db9b46f5b3b6",
+    "frontend/src/pages/LiveScannerPage.tsx": "2097e779851cff047c910866ae4251acb32efa09c47ac4d26505ee2ba19fb057",
+    "frontend/src/pages/LoginPage.test.tsx": "ec29dbb4b35c7ce3633a1780e280562971e6ff4fc206f01ac1d86705d3345f3f",
+    "frontend/src/pages/LoginPage.tsx": "02632d30e2eb538b22765da16efb5ca3607d7755da20d6e07858c2e26aa34448",
+    "frontend/src/pages/PeoplePage.tsx": "b3e9839cca2bf98c299bf5d8ef97b18914ac7d0f94522ccf57e8bfeba208662d",
+    "frontend/src/pages/RecordsPage.tsx": "efb3da2531da639a734416597a8b1d9cb35ae6c32597097baeb51f0ebad1b12e",
+    "frontend/src/pages/ReportsPage.tsx": "68dff73b54d05503602824c32c5a5de1f8ba5551877afc033f12d0ccd6a57655",
+    "frontend/src/pages/SessionsPage.tsx": "e0e560614f0dc13ed99c647f24ea45613a95664062b5752ee618bbe667d9434f",
+    "frontend/src/pages/StudentPortalPage.tsx": "4e9600dcc69919168c63b03361c36a87407a56c2b6e8ab68247c45cfc6c822c4",
+    "frontend/src/pages/SystemAdminPage.tsx": "43906d6874b26c84d2405bc0c8594a0a47c6d85d8f66478e77df77de5ee5b214",
+    "frontend/src/preview/mockApi.ts": "374199b5e40d15a3c7641bbae79881e53a36add47fbdae290d56681a0b967170",
+    "packages/attendance-contracts/src/index.ts": "ff23ae715105bdec3fc82c5f92ac707bc70a217d80b317d4f5fe5e9bc9ad4fbc",
+    "packages/attendance-domain-core/src/index.ts": "ebbc255192f32d2cc62c9135b94bcaa4bf7660e0a7774299697fde99f565492c",
+    "packages/attendance-domain-core/src/types.ts": "dd85eebde12c1ee8691f988069ce25ccc8c7b45858bf0b4ac8abd3c8262daa59",
+    "packages/face-matching-core/src/index.ts": "549af2afe6222aabdfa3c80b5ff45868bcc050ca1a6d1433d3fc1a67e8e43aeb",
+    "packages/face-matching-core/src/types.ts": "0796cd7699cf4da1cd9ff983aee268c9724cd3fe3cfc675452e100da19019c66",
+    "packages/face-quality-gates/src/index.ts": "6b8e5714c907f2697a9aab4834a4118692b37a295061f3bbdb1ad9f1f7c589cd",
+    "packages/face-quality-gates/src/types.ts": "b0b139c69e93fa081482b4644296fa771509c5f9f7c8d5755abd0f4a9c5e9a07",
+    "packages/python/face-matching-core/smartattend_face_matching/matching.py": "444509d2c80380d1897ebd75909026fe3a96fd55b8206f945a601dba831bfb4b",
+    "packages/python/face-matching-core/smartattend_face_matching/types.py": "056127f979afd0870a016f2c30376fa7a1327618f82410ad38b6e338757252a5",
+    "packages/python/face-matching-core/smartattend_face_matching/__init__.py": "3171184a77a2f91911e9dacb1eaabecfdce880503976c2d91e6cc5435360be6b",
+    "packages/smartattend-client/src/index.ts": "f6e4f578e0c6b81b0accc7a1aaf7d41b918c51760cdc87ab37094daaf8b1424d",
+    "packages/smartattend-client/src/types.ts": "eca18ffdfdc430b2625b2bc39d5c57b1ccae32ae61bc19ec112b87c2480e423d"
+  }
+}

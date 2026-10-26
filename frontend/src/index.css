@@ -424,3 +424,8 @@ button:disabled { cursor: wait; opacity: .6; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+.page-recovery { padding: 64px 24px; max-width: 620px; margin: 0 auto; }
+.page-recovery > svg { color: var(--ui-muted); margin-bottom: 20px; }
+.page-recovery h1 { font-size: 24px; font-weight: 600; margin-bottom: 12px; }
+.page-recovery p { color: var(--ui-muted); line-height: 1.8; margin-bottom: 24px; }
+.page-recovery .page-actions { justify-content: flex-start; }

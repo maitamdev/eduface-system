@@ -23,6 +23,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useToast } from "@/context/ToastContext";
 import { useResource } from "@/hooks/useResource";
 import { dateTime, errorMessage, matchesSearch } from "@/lib/format";
+import { csvDocument, parseCsv, downloadCsv } from "@/lib/csv";
 import {
   EmptyState,
   ErrorNotice,
@@ -41,14 +42,16 @@ export const AcademicManagementPage: React.FC = () => {
   const toast = useToast();
   const [activeTab, setActiveTab] = useState<TabKey>("grades");
   const [departmentFilter, setDepartmentFilter] = useState("");
+  const [courseId, setCourseId] = useState("");
+  const [issuedCredentials, setIssuedCredentials] = useState<{ username: string; password: string; student_id: string }[]>([]);
   const [search, setSearch] = useState("");
 
   const peopleLoader = useCallback(() => personsApi.list(), []);
   const people = useResource(peopleLoader, []);
 
   const gradesLoader = useCallback(
-    () => academicApi.listGrades(departmentFilter || undefined),
-    [departmentFilter]
+    () => academicApi.listGrades(departmentFilter || undefined, courseId || undefined),
+    [departmentFilter, courseId]
   );
   const grades = useResource<StudentGradeRow[]>(gradesLoader, []);
 
@@ -99,7 +102,6 @@ export const AcademicManagementPage: React.FC = () => {
     "2305CT2070, Mai Trần Thiên Tâm, KTCN, tam@dhv.edu.vn, 0901234567, Nam, K23, Công nghệ Thông tin\n2305CT2071, Nguyễn Văn An, KTCN, an@dhv.edu.vn, 0902345678, Nam, K23, Công nghệ Thông tin"
   );
   const [createAccounts, setCreateAccounts] = useState(true);
-  const [defaultPw, setDefaultPw] = useState("123456");
   const [importing, setImporting] = useState(false);
 
   const departments = [
@@ -159,10 +161,12 @@ export const AcademicManagementPage: React.FC = () => {
       return;
     }
 
+    if (!courseId) { toast.error(t("Chọn học phần trước khi nhập điểm.", "Select a course before entering grades.")); return; }
     setSavingGradeId(row.person_id);
     try {
       const updated = await academicApi.upsertGrade({
         person_id: row.person_id,
+        course_id: courseId,
         midterm_score: midterm,
         final_score: final,
         bonus_score: bonus,
@@ -195,13 +199,13 @@ export const AcademicManagementPage: React.FC = () => {
       "Điểm chữ",
       "Điều kiện dự thi",
     ];
-    const rows = [header.join(",")];
+    const rows: (string | number)[][] = [header];
     filteredGrades.forEach((g) => {
       rows.push(
         [
-          `"${(g.name || "").replace(/"/g, '""')}"`,
-          `"${(g.student_id || "").replace(/"/g, '""')}"`,
-          `"${(g.department || "").replace(/"/g, '""')}"`,
+          g.name || "",
+          g.student_id || "",
+          g.department || "",
           g.present_count,
           g.total_sessions,
           `${g.attendance_rate}%`,
@@ -212,11 +216,11 @@ export const AcademicManagementPage: React.FC = () => {
           g.total_10 ?? "",
           g.gpa_4 ?? "",
           g.letter_grade ?? "",
-          `"${g.exam_eligible ? "Đủ điều kiện" : "Cấm thi (< 75%)"}"`,
-        ].join(",")
+          g.total_sessions === 0 ? "Chưa đánh giá" : g.exam_eligible ? "Đủ điều kiện" : "Cấm thi (< 75%)",
+        ]
       );
     });
-    const blob = new Blob(["\uFEFF" + rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([csvDocument(rows)], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -318,28 +322,19 @@ export const AcademicManagementPage: React.FC = () => {
   const handleBulkImport = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!csvText.trim() || importing) return;
-    const lines = csvText
-      .split(/\r?\n/)
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0);
-
-    const parsed = lines
-      .map((line) => {
-        const parts = line.split(",").map((p) => p.trim());
-        if (parts.length < 3) return null;
-        if (parts[0].toLowerCase() === "mssv" || parts[0].toLowerCase() === "student_id") return null;
-        return {
-          student_id: parts[0],
-          name: parts[1],
-          department: parts[2],
-          email: parts[3] || undefined,
-          phone: parts[4] || undefined,
-          gender: parts[5] || undefined,
-          cohort: parts[6] || undefined,
-          major: parts[7] || undefined,
-        };
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null);
+    let parsed;
+    try {
+      const rows = parseCsv(csvText);
+      if (rows[0] && ["mssv", "student_id"].includes(rows[0][0].trim().toLowerCase())) rows.shift();
+      if (rows.length > 500) throw new Error(t("Tối đa 500 sinh viên mỗi lần nhập.", "Maximum 500 students per import."));
+      parsed = rows.map((row, index) => {
+        const parts = row.map((cell) => cell.trim());
+        if (parts.length < 3 || parts.length > 8 || !parts[0] || !parts[1] || !parts[2])
+          throw new Error(t(`Dòng ${index + 1}: cần 3–8 cột và đủ MSSV, họ tên, lớp.`, `Row ${index + 1}: expected 3–8 columns with ID, name and class.`));
+        return { student_id: parts[0], name: parts[1], department: parts[2], email: parts[3] || undefined,
+          phone: parts[4] || undefined, gender: parts[5] || undefined, cohort: parts[6] || undefined, major: parts[7] || undefined };
+      });
+    } catch (err) { toast.error(errorMessage(err)); return; }
 
     if (!parsed.length) {
       toast.error(
@@ -356,7 +351,6 @@ export const AcademicManagementPage: React.FC = () => {
       const res = await academicApi.importStudents({
         students: parsed,
         create_login_accounts: createAccounts,
-        default_password: defaultPw.trim() || "123456",
       });
       toast.success(
         t(
@@ -364,6 +358,7 @@ export const AcademicManagementPage: React.FC = () => {
           `Processed ${res.total_processed} students (${res.created} created, ${res.updated} updated, ${res.accounts_created} logins)!`
         )
       );
+      setIssuedCredentials(res.credentials || []);
       reloadAll();
     } catch (err) {
       toast.error(errorMessage(err));
@@ -395,7 +390,7 @@ export const AcademicManagementPage: React.FC = () => {
         <select
           aria-label={t("Lọc theo Lớp / Khoa", "Filter by class")}
           value={departmentFilter}
-          onChange={(e) => setDepartmentFilter(e.target.value)}
+          onChange={(e) => { setDepartmentFilter(e.target.value); setCourseId(""); setGradeDrafts({}); }}
           style={{ minWidth: 165 }}
         >
           <option value="">{t("Tất cả các lớp", "All classes")}</option>
@@ -487,7 +482,7 @@ export const AcademicManagementPage: React.FC = () => {
             "Course Gradebook & Automated AI Attendance Scoring"
           )}
           description={t(
-            "Công thức tính tự động: Điểm tổng kết (Hệ 10) = 10% Điểm chuyên cần AI + 30% Giữa kỳ + 60% Cuối kỳ + Điểm cộng. Sinh viên dưới 75% chuyên cần sẽ bị đánh dấu Cấm thi.",
+            "Công thức tính tự động: Điểm tổng kết (Hệ 10) = 10% Điểm chuyên cần AI + 30% Giữa kỳ + 60% Cuối kỳ + Điểm cộng. Sinh viên dưới 75% chuyên cần được cảnh báo chưa đạt điều kiện chuyên cần, cần giảng viên xác nhận.",
             "Formula: Total (10) = 10% AI Attendance + 30% Midterm + 60% Final + Bonus. Students under 75% attendance are marked Exam Ineligible."
           )}
           action={
@@ -509,6 +504,8 @@ export const AcademicManagementPage: React.FC = () => {
             </div>
           }
         >
+          <Field id="grade-course" label={t("Học phần và học kỳ", "Course and semester")}><select id="grade-course" value={courseId} disabled={!!savingGradeId} onChange={(e) => { setCourseId(e.target.value); setGradeDrafts({}); }}><option value="">{t("Dữ liệu cũ chưa gắn học phần (chỉ xem)", "Legacy grades without a course (read only)")}</option>{courses.data.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.name} · {c.semester} · {c.department}</option>)}</select></Field>
+          <ErrorNotice message={courses.error} retry={courses.reload} />
           <ErrorNotice message={grades.error} retry={grades.reload} />
           <Table label={t("Bảng điểm sinh viên", "Student gradebook")}>
             <thead>
@@ -607,7 +604,7 @@ export const AcademicManagementPage: React.FC = () => {
                       <button
                         type="button"
                         className="secondary-button"
-                        disabled={savingGradeId === row.person_id}
+                        disabled={!courseId || savingGradeId === row.person_id}
                         onClick={() => void handleSaveGrade(row)}
                         style={{ padding: "4px 10px", fontSize: 11 }}
                       >
@@ -1048,17 +1045,8 @@ export const AcademicManagementPage: React.FC = () => {
                   "Auto-create Student Portal login accounts (Username = Student ID)"
                 )}
               </label>
-              {createAccounts && (
-                <Field id="bulk-default-pw" label={t("Mật khẩu mặc định", "Default password")}>
-                  <input
-                    id="bulk-default-pw"
-                    value={defaultPw}
-                    onChange={(e) => setDefaultPw(e.target.value)}
-                    minLength={6}
-                    style={{ maxWidth: 180 }}
-                  />
-                </Field>
-              )}
+              {createAccounts && <p className="field-hint">{t("Mỗi tài khoản nhận một mật khẩu ngẫu nhiên riêng. Tải danh sách sau khi nhập và gửi riêng cho từng sinh viên.", "Each account receives a unique random password. Download the list after importing and deliver credentials individually.")}</p>}
+              {!!issuedCredentials.length && <button type="button" className="secondary-button" onClick={() => downloadCsv("tai-khoan-sinh-vien.csv", [["MSSV", "Tài khoản", "Mật khẩu tạm"], ...issuedCredentials.map((c) => [c.student_id, c.username, c.password])])}><Download size={14} />{t("Tải tài khoản vừa cấp", "Download issued credentials")}</button>}
             </div>
             <div>
               <button type="submit" className="primary-button" disabled={importing}>

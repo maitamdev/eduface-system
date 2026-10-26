@@ -26,9 +26,9 @@ export const RecordsPage: React.FC<{ previewRole?: "admin" | "operator" }> = () 
   const [manualStatus, setManualStatus] = useState<"present" | "late" | "excused" | "absent">("present");
   const [savingManual, setSavingManual] = useState(false);
 
-  const loader = useCallback(() => attendanceApi.list({ session_id: sessionId || undefined, date: date || undefined, status: statusFilter || undefined, limit: 500 }), [sessionId, date, statusFilter]);
+  const loader = useCallback(() => attendanceApi.listAll({ session_id: sessionId || undefined, date: date || undefined, status: statusFilter || undefined }), [sessionId, date, statusFilter]);
   const { data: records, setData: setRecords, loading, error, reload } = useResource<AttendanceOut[]>(loader, []);
-  const sessionLoader = useCallback(() => sessionsApi.list(undefined, 100), []);
+  const sessionLoader = useCallback(() => sessionsApi.listAll(), []);
   const sessionData = useResource(sessionLoader, []);
   const peopleLoader = useCallback(() => personsApi.list(), []);
   const peopleData = useResource<PersonOut[]>(peopleLoader, []);
@@ -117,7 +117,7 @@ export const RecordsPage: React.FC<{ previewRole?: "admin" | "operator" }> = () 
       </Field>
       <Field id="records-date" label={t("Ngày điểm danh", "Date")}><input id="records-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} /></Field>
     </div><div className="table-toolbar"><SearchField label={t("Tìm tên, MSSV, lớp hoặc phiên…", "Search name, student ID, class or session…")} value={search} onChange={setSearch} /><button className="text-button" onClick={() => { setSearch(""); setDepartment(""); setDate(""); setStatusFilter(""); setParams({}); }}>{t("Xóa bộ lọc", "Reset filters")}</button></div>
-    <Table label={t("Bản ghi điểm danh", "Attendance records")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>MSSV</th><th>{t("Khoa / Lớp", "Class")}</th><th>{t("Phiên điểm danh", "Session")}</th><th>{t("Thời gian", "Time")}</th><th>{t("Trạng thái (Đổi nhanh)", "Status")}</th><th className="align-right">{t("Độ tin cậy", "Confidence")}</th></tr></thead><tbody>{rows.map((record) => <tr key={record.id}><td className="cell-strong">{record.person_name}</td><td className="numeric-cell">{record.student_id || "–"}</td><td>{record.department || "–"}</td><td>{record.session_label}</td><td className="numeric-cell">{dateTime(record.marked_at, lang)}</td><td>
+    <Table label={t("Bản ghi điểm danh", "Attendance records")}><thead><tr><th>{t("Họ và tên", "Name")}</th><th>MSSV</th><th>{t("Khoa / Lớp", "Class")}</th><th>{t("Phiên điểm danh", "Session")}</th><th>{t("Thời gian", "Time")}</th><th>{t("Trạng thái (Đổi nhanh)", "Status")}</th><th className="align-right">{t("Tương đồng cosine", "Cosine similarity")}</th></tr></thead><tbody>{rows.map((record) => <tr key={record.id}><td className="cell-strong">{record.person_name}</td><td className="numeric-cell">{record.student_id || "–"}</td><td>{record.department || "–"}</td><td>{record.session_label}</td><td className="numeric-cell">{dateTime(record.marked_at, lang)}</td><td>
       <select
         aria-label={t(`Trạng thái của ${record.person_name}`, `Status for ${record.person_name}`)}
         value={record.status}
@@ -129,7 +129,7 @@ export const RecordsPage: React.FC<{ previewRole?: "admin" | "operator" }> = () 
         <option value="excused">{t("📋 Có phép", "📋 Excused")}</option>
         <option value="absent">{t("✕ Vắng mặt", "✕ Absent")}</option>
       </select>
-    </td><td className="align-right numeric-cell">{record.confidence != null ? `${Math.round(record.confidence * 100)}%` : t("Thủ công / Hệ thống", "Manual / Auto")}</td></tr>)}</tbody></Table>
+    </td><td className="align-right numeric-cell">{record.confidence != null ? record.confidence.toFixed(3) : t("Thủ công / Hệ thống", "Manual / Auto")}</td></tr>)}</tbody></Table>
     {!rows.length && <EmptyState loading={loading}>{error ? t("Chưa tải được dữ liệu.", "Records unavailable.") : t("Không có bản ghi phù hợp.", "No matching records.")}</EmptyState>}
     <Pager page={currentPage} pages={pages} count={filtered.length} onChange={setPage} />
     <p className="field-hint">{t("Giảng viên và Admin có thể đổi trực tiếp trạng thái (Có mặt / Đi muộn / Có phép / Vắng mặt) hoặc xuất CSV theo Phiên, Ngày và Lớp.", "Instructors and Admins can update attendance status inline or export CSV filtered by session, date, and class.")}</p>

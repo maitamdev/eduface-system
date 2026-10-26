@@ -44,8 +44,8 @@ export const SystemAdminPage: React.FC = () => {
   const saveEditUser = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!editUserTarget || savingUser) return;
-    if (editUserPassword.trim() && editUserPassword.trim().length < 6) {
-      toast.warning(t("Mật khẩu mới phải có tối thiểu 6 ký tự.", "New password must be at least 6 characters."));
+    if (editUserPassword.trim() && editUserPassword.trim().length < 12) {
+      toast.warning(t("Mật khẩu mới phải có tối thiểu 12 ký tự.", "New password must be at least 12 characters."));
       return;
     }
     setSavingUser(true);
@@ -81,7 +81,7 @@ export const SystemAdminPage: React.FC = () => {
   const create = async (event: React.FormEvent) => {
     event.preventDefault();
     if (creating) return;
-    if (username.trim().length < 3 || password.length < 6) { toast.warning(t("Tên đăng nhập tối thiểu 3 ký tự; mật khẩu tối thiểu 6 ký tự.", "Username needs 3 characters; password needs 6.")); return; }
+    if (username.trim().length < 3 || password.length < 12) { toast.warning(t("Tên đăng nhập tối thiểu 3 ký tự; mật khẩu tối thiểu 12 ký tự.", "Username needs 3 characters; password needs 6.")); return; }
     setCreating(true);
     try {
       const result = await authApi.registerUser({ username: username.trim(), password, role, person_id: role === "student" && personId ? personId : undefined });
@@ -94,7 +94,7 @@ export const SystemAdminPage: React.FC = () => {
     <PageHeader title={t("Tài khoản & hệ thống", "Users & system")} description={t("Cấp tài khoản và kiểm tra cấu hình nhận diện.", "Manage accounts and inspect recognition configuration.")}><RefreshButton onClick={reload} loading={users.loading || config.loading || encodings.loading} /></PageHeader>
     <div className="management-grid"><Section title={t("Tạo tài khoản", "Create account")} description={t("Operator vận hành điểm danh; Admin quản trị hệ thống; Student xem lịch sử điểm danh cá nhân.", "Operators handle check-ins; admins manage profiles; students view their personal attendance history.")}><form onSubmit={create} className="stack-form">
       <Field id="user-username" label={t("Tên đăng nhập *", "Username *")}><input id="user-username" autoComplete="off" value={username} minLength={3} maxLength={50} onChange={(event) => setUsername(event.target.value)} required /></Field>
-      <Field id="user-password" label={t("Mật khẩu *", "Password *")} hint={t("Tối thiểu 6 ký tự theo chính sách hiện tại.", "At least 6 characters under the current policy.")}><input id="user-password" type="password" autoComplete="new-password" value={password} minLength={6} onChange={(event) => setPassword(event.target.value)} required /></Field>
+      <Field id="user-password" label={t("Mật khẩu *", "Password *")} hint={t("Tối thiểu 12 ký tự theo chính sách hiện tại.", "At least 12 characters under the current policy.")}><input id="user-password" type="password" autoComplete="new-password" value={password} minLength={12} onChange={(event) => setPassword(event.target.value)} required /></Field>
       <Field id="user-role" label={t("Vai trò", "Role")}><select id="user-role" value={role} onChange={(event) => setRole(event.target.value as "admin" | "operator" | "student")}><option value="operator">{t("Operator · Giảng viên / Vận hành", "Operator · Instructor")}</option><option value="admin">{t("Admin · Quản trị viên", "Administrator")}</option><option value="student">{t("Student · Sinh viên", "Student")}</option></select></Field>
       {role === "student" && <Field id="user-person" label={t("Liên kết hồ sơ khuôn mặt sinh viên", "Link to enrolled student profile")}><select id="user-person" value={personId} onChange={(event) => setPersonId(event.target.value)}><option value="">{t("— Chọn hồ sơ sinh viên —", "— Select student profile —")}</option>{persons.data.map((person) => <option key={person.id} value={person.id}>{person.name} {person.department ? `(${person.department})` : ""}</option>)}</select></Field>}
       <button className="primary-button" type="submit" disabled={creating}>{creating ? t("Đang tạo…", "Creating…") : t("Tạo tài khoản", "Create account")}</button>
@@ -131,7 +131,7 @@ export const SystemAdminPage: React.FC = () => {
             </select>
           </Field>
           <Field id="edit-user-password" label={t("Đặt lại mật khẩu mới (Để trống nếu giữ nguyên)", "Reset password (leave blank to keep current)")}>
-            <input id="edit-user-password" type="password" autoComplete="new-password" value={editUserPassword} onChange={(e) => setEditUserPassword(e.target.value)} placeholder={t("Nhập tối thiểu 6 ký tự để đổi mật khẩu…", "At least 6 characters…")} />
+            <input id="edit-user-password" type="password" autoComplete="new-password" value={editUserPassword} onChange={(e) => setEditUserPassword(e.target.value)} placeholder={t("Nhập tối thiểu 12 ký tự để đổi mật khẩu…", "At least 12 characters…")} />
           </Field>
           <div className="dialog-actions">
             <button type="button" className="secondary-button" disabled={savingUser} onClick={() => setEditUserTarget(null)}>{t("Hủy", "Cancel")}</button>
