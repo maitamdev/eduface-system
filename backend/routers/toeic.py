@@ -301,9 +301,11 @@ async def vocabulary(request: Request, lesson_id: str | None = None, db=Depends(
 @router.get("/lexicon")
 async def open_lexicon(request: Request, deck: Literal["all", "ngsl", "tsl"] = "all",
                        q: str = Query("", max_length=120), state: Literal["all", "due", "new", "learned"] = "all",
+                       pos: Literal["all", "n", "v", "adj", "adv", "func"] = "all",
+                       letter: str = Query("all", pattern=r"^(all|[a-zA-Z])$"),
                        offset: int = Query(0, ge=0, le=10000), limit: int = Query(30, ge=1, le=50), db=Depends(get_db)):
     uid, timestamp = learner(request), now()
-    words = search_words(deck, q)
+    words = search_words(deck, q, pos=pos, letter=letter.lower())
     ids = [w["id"] for w in words]
     stored = {d["vocabulary_id"]: d async for d in db.toeic_cards.find({"user_id": uid, "vocabulary_id": {"$in": ids}})} if ids else {}
     due = {key for key, value in stored.items() if value["due"] <= timestamp}
@@ -315,7 +317,8 @@ async def open_lexicon(request: Request, deck: Literal["all", "ngsl", "tsl"] = "
             "offset": offset, "limit": limit, "due_count": len(due), "new_count": len(words) - len(stored),
             "items": [card_view(w, stored.get(w["id"])) for w in selected[offset:offset + limit]],
             "license": lexicon()["license"], "license_url": lexicon()["license_url"], "sources": lexicon()["sources"],
-            "download_url": "/toeic/lexicon.json", "attribution_url": "/toeic/licenses/NGSL-TSL.md"}
+            "download_url": "/toeic/lexicon.json", "handbook_url": "/toeic/so-tay-tu-vung-song-ngu.md",
+            "attribution_url": "/toeic/licenses/NGSL-TSL.md"}
 
 
 @router.post("/vocabulary/{card_id}/review")

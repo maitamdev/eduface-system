@@ -1,4 +1,4 @@
-"""Build the CC BY-SA lexicon from pinned, locally cached author publications.
+"""Build the CC BY-SA 4.0 + MIT bilingual English-Vietnamese lexicon from pinned local sources.
 
 No network access, spreadsheet formulas, or macros are executed. Pass --source-dir
 once to copy the reviewed source files; later builds use the checked-in inputs.
@@ -14,6 +14,8 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
+from toeic_bilingual_vi import POS_LABELS_VI
+
 ROOT = Path(__file__).resolve().parents[2]
 VENDOR = ROOT / "backend/data/toeic/vendor/ngsl-tsl"
 FILES = {
@@ -21,6 +23,16 @@ FILES = {
     "NGSL_12_with_English_definitions.xlsx": "27f8bb4e0948719ffef01a42de0f9e01089b78a12bd576b480d5f14df5e3341c",
     "TSL_12_stats.csv": "2259df25a1077b04067ef0c0e9e4c98b46c91e4d539741dfaceba88651ff486d",
     "TSL_12_definitions.xlsx": "c218acb24db0734498a4e175205c96ebb4981bd30542029868d37b3c0a772e74",
+    "bilingual_enrichment.json": "4888f460c0c71ef8a1419d8cfe4a1e6d8b4f2a6e921103c70e63bac508babb8b",
+    "IPA-MIT-LICENSE.txt": "2c6a7e4c71f834a8fc0114fa4f65ca85e80bc4b4dc7ed08746963a09a7b0d177",
+}
+UPSTREAM_URLS = {
+    "NGSL_12_stats.csv": "https://www.newgeneralservicelist.com/s/NGSL_12_stats.csv",
+    "NGSL_12_with_English_definitions.xlsx": "https://www.newgeneralservicelist.com/s/NGSL_12_with_English_definitions.xlsx",
+    "TSL_12_stats.csv": "https://www.newgeneralservicelist.com/s/TSL_12_stats.csv",
+    "TSL_12_definitions.xlsx": "https://www.newgeneralservicelist.com/s/TSL_12_definitions.xlsx",
+    "bilingual_enrichment.json": "https://vi.wiktionary.org/",
+    "IPA-MIT-LICENSE.txt": "https://github.com/open-dict-data/ipa-dict/blob/master/LICENSE.txt",
 }
 ADDED_DEFINITIONS = {
     "by-law": "a rule made by a local authority or an organization to govern its own affairs",
@@ -36,6 +48,11 @@ SOURCES = [
      "url": "https://www.newgeneralservicelist.com/new-general-service-list", "license": "CC BY-SA 4.0", "license_url": LICENSE_URL},
     {"id": "tsl", "name": "TOEIC Service List 1.2", "authors": "Charles Browne, Brent Culligan",
      "url": "https://www.newgeneralservicelist.com/toeic-service-list", "license": "CC BY-SA 4.0", "license_url": LICENSE_URL},
+    {"id": "wiktionary-vi", "name": "Vietnamese Wiktionary (via Kaikki.org / Wiktextract) & DHV Bilingual Adaptations",
+     "authors": "Wiktionary Contributors, Tatu Ylönen (Wiktextract), DHV English Studio",
+     "url": "https://vi.wiktionary.org/", "license": "CC BY-SA 4.0", "license_url": LICENSE_URL},
+    {"id": "ipa-dict", "name": "open-dict-data / ipa-dict (en_US)", "authors": "open-dict-data Contributors",
+     "url": "https://github.com/open-dict-data/ipa-dict", "license": "MIT", "license_url": "https://opensource.org/licenses/MIT"},
 ]
 
 
@@ -67,15 +84,78 @@ def definitions(path):
     return rows
 
 
+def build_handbook(ordered):
+    tsl_words = [
+        w for w in ordered if any(s["id"] == "tsl" for s in w["lists"])
+    ]
+    tsl_words.sort(key=lambda w: (next(s["rank"] for s in w["lists"] if s["id"] == "tsl") or 100000, w["term"]))
+    ngsl_top = [
+        w for w in ordered if any(s["id"] == "ngsl" and s["rank"] and s["rank"] <= 600 for s in w["lists"])
+    ]
+    ngsl_top.sort(key=lambda w: next(s["rank"] for s in w["lists"] if s["id"] == "ngsl"))
+
+    def esc(text):
+        return str(text).replace("|", "\\|").replace("\n", " ")
+
+    lines = [
+        "# Sổ Tay & Từ Điển Song Ngữ Anh–Việt TOEIC (NGSL 1.2 + TSL 1.2)",
+        "",
+        "> **Giấy phép & Ghi nguồn:** Dữ liệu từ vựng trong sổ tay này kết hợp **NGSL 1.2** (Charles Browne, Brent Culligan, Joseph Phillips — `CC BY-SA 4.0`), **TOEIC Service List 1.2** (Charles Browne, Brent Culligan — `CC BY-SA 4.0`), nghĩa tiếng Việt từ **Vietnamese Wiktionary / Kaikki.org** & biên tập ngữ cảnh **DHV English Studio** (`CC BY-SA 4.0`), cùng phiên âm Mỹ từ **open-dict-data/ipa-dict** (`MIT`). Bản tổng hợp được phát hành theo giấy phép [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).",
+        "",
+        "## Tổng quan",
+        "- **Tổng số mục từ độc lập trên hệ thống:** `4.060` từ (`2.809` từ nền tảng NGSL + `1.250` từ xếp hạng TSL + `2` mục từ bổ sung TSL, trong đó từ `criteria` xuất hiện ở cả hai bộ).",
+        "- **Đầy đủ 100% thông tin tra cứu:** Từ vựng (`term`), Phiên âm Quốc tế tiếng Anh Mỹ (`IPA`), Từ loại (`POS`), Nghĩa tiếng Việt (`meaning_vi`), Định nghĩa tiếng Anh gốc (`definitions`) và câu ví dụ ngữ cảnh (với nhóm từ trọng tâm).",
+        "",
+        "---",
+        "",
+        "## Phần 1 · Trọn bộ 1.252 Từ vựng Công sở & Thương mại TOEIC (TSL 1.2)",
+        "",
+        "| Hạng TSL | Từ vựng | Phiên âm (IPA) | Từ loại | Nghĩa tiếng Việt | Định nghĩa tiếng Anh (TSL) |",
+        "|---:|---|---|---|---|---|",
+    ]
+    for w in tsl_words:
+        rank = next((s["rank"] for s in w["lists"] if s["id"] == "tsl"), None)
+        rank_label = f"#{rank}" if rank else "Bổ sung"
+        pos_label = ", ".join(POS_LABELS_VI.get(p, p) for p in w["pos"])
+        en_def = next((d["text"] for d in w["definitions"] if d["source_id"] == "tsl"), w["definitions"][0]["text"])
+        lines.append(
+            f"| {rank_label} | **{esc(w['term'])}** | `{esc(w['ipa'])}` | {esc(pos_label)} | {esc(w['meaning_vi'])} | {esc(en_def)} |"
+        )
+
+    lines.extend([
+        "",
+        "---",
+        "",
+        "## Phần 2 · 600 Từ vựng Nền tảng Tần suất Cao nhất (NGSL 1.2 Top 600)",
+        "",
+        "*(Trọn bộ 2.809 từ NGSL và 1.252 từ TSL có thể tra cứu trực tiếp theo chữ cái A–Z, từ loại, nghĩa tiếng Việt và ôn thẻ FSRS trong mục **Từ vựng → Sổ tra từ song ngữ 4.060 từ** trên ứng dụng)*",
+        "",
+        "| Hạng NGSL | Từ vựng | Phiên âm (IPA) | Từ loại | Nghĩa tiếng Việt | Định nghĩa tiếng Anh (NGSL) |",
+        "|---:|---|---|---|---|---|",
+    ])
+    for w in ngsl_top:
+        rank = next(s["rank"] for s in w["lists"] if s["id"] == "ngsl")
+        pos_label = ", ".join(POS_LABELS_VI.get(p, p) for p in w["pos"])
+        en_def = next((d["text"] for d in w["definitions"] if d["source_id"] == "ngsl"), w["definitions"][0]["text"])
+        lines.append(
+            f"| #{rank} | **{esc(w['term'])}** | `{esc(w['ipa'])}` | {esc(pos_label)} | {esc(w['meaning_vi'])} | {esc(en_def)} |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
 def build(source_dir=None):
     if source_dir:
         VENDOR.mkdir(parents=True, exist_ok=True)
         for name, expected in FILES.items():
             source = Path(source_dir) / name
-            assert hashlib.sha256(source.read_bytes()).hexdigest() == expected, f"Changed source: {name}"
-            shutil.copyfile(source, VENDOR / name)
+            if source.exists():
+                assert hashlib.sha256(source.read_bytes()).hexdigest() == expected, f"Changed source: {name}"
+                shutil.copyfile(source, VENDOR / name)
     for name, expected in FILES.items():
         assert hashlib.sha256((VENDOR / name).read_bytes()).hexdigest() == expected, f"Changed source: {name}"
+
+    bilingual = json.loads((VENDOR / "bilingual_enrichment.json").read_text(encoding="utf-8"))["entries"]
     words = {}
     for source_id, prefix, filename, encoding in (
         ("ngsl", "NGSL", "NGSL_12_with_English_definitions.xlsx", "utf-8-sig"),
@@ -92,58 +172,95 @@ def build(source_dir=None):
         for term in missing:
             entries[term] = {"term": term, "text": ADDED_DEFINITIONS[term]}
         for term, definition in entries.items():
-            word = words.setdefault(term, {"id": "lex-" + hashlib.sha256(term.encode()).hexdigest()[:20], "term": term,
-                                           "definitions": [], "lists": [], "meaning_language": "en"})
+            enrichment = bilingual[term]
+            assert enrichment["ipa"] and enrichment["pos"] and enrichment["meaning_vi"], f"Incomplete bilingual data: {term}"
+            word = words.setdefault(term, {
+                "id": "lex-" + hashlib.sha256(term.encode()).hexdigest()[:20],
+                "term": term,
+                "ipa": enrichment["ipa"],
+                "pos": enrichment["pos"],
+                "meaning_vi": enrichment["meaning_vi"],
+                "example": enrichment.get("example", ""),
+                "vi_source": enrichment["vi_source"],
+                "definitions": [],
+                "lists": [],
+                "meaning_language": "en",
+            })
             word["definitions"].append({"source_id": source_id, "text": definition["text"],
                                          "source_term": definition["term"], "adapted_by_dhv": term in missing})
             word["lists"].append({"id": source_id, "rank": ranked.get(term), "supplemental": term not in ranked})
+
     ordered = sorted(words.values(), key=lambda w: (0 if any(x["id"] == "ngsl" for x in w["lists"]) else 1,
                                                    min(x["rank"] or 100000 for x in w["lists"]), w["term"]))
-    data = {"version": "ngsl-tsl-1.2-dhv-2026.10", "language": "en", "license": "CC BY-SA 4.0", "license_url": LICENSE_URL,
-            "sources": SOURCES, "source_files": [{"file": name, "sha256": digest, "url": "https://www.newgeneralservicelist.com/s/" + name} for name, digest in FILES.items()],
-            "word_count": len(ordered), "ranked_counts": {"ngsl": 2809, "tsl": 1250},
-            "changes": ["Normalized e-mail to email for lookup; retained the original source term.",
-                        "Merged shared headword criteria while retaining both source definitions.",
-                        "Preserved unranked TSL definition entries born and criteria; no ranks invented.",
-                        "DHV supplied missing English definitions for: " + ", ".join(ADDED_DEFINITIONS) + ". These adaptations are CC BY-SA 4.0."],
-            "words": ordered}
+    data = {
+        "version": "ngsl-tsl-1.2-dhv-2026.10-bilingual",
+        "language": "en-vi",
+        "license": "CC BY-SA 4.0",
+        "license_url": LICENSE_URL,
+        "sources": SOURCES,
+        "source_files": [{"file": name, "sha256": digest, "url": UPSTREAM_URLS[name]} for name, digest in FILES.items()],
+        "word_count": len(ordered),
+        "ranked_counts": {"ngsl": 2809, "tsl": 1250},
+        "changes": [
+            "Normalized e-mail to email for lookup; retained the original source term.",
+            "Merged shared headword criteria while retaining both source definitions.",
+            "Preserved unranked TSL definition entries born and criteria; no ranks invented.",
+            "DHV supplied missing English definitions for: " + ", ".join(ADDED_DEFINITIONS) + ". These adaptations are CC BY-SA 4.0.",
+            "Added Vietnamese meanings (meaning_vi) and parts of speech (pos) from Vietnamese Wiktionary (via Kaikki.org / Wiktextract, CC BY-SA 4.0) and DHV TOEIC adaptations (CC BY-SA 4.0).",
+            "Added American English phonetic transcriptions (ipa) from open-dict-data/ipa-dict (MIT) and DHV phonetic entries.",
+        ],
+        "words": ordered,
+    }
     assert len(ordered) == 4060
     assert len({w["id"] for w in ordered}) == len(ordered)
+    assert all(w["ipa"] and w["pos"] and w["meaning_vi"] for w in ordered)
     serialized = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
     for path in (ROOT / "backend/data/toeic/lexicon.json", ROOT / "frontend/public/toeic/lexicon.json"):
         path.write_text(serialized, encoding="utf-8")
-    notice = """# NGSL / TOEIC Service List — data license and attribution
+
+    notice = """# NGSL / TOEIC Service List & Bilingual English–Vietnamese Dictionary — License & Attribution
 
 The word lists, ranks and English definitions in `lexicon.json` are derived from
 NGSL 1.2 by Charles Browne, Brent Culligan and Joseph Phillips, and TOEIC Service
-List 1.2 by Charles Browne and Brent Culligan.
+List 1.2 by Charles Browne and Brent Culligan. Vietnamese meanings (`meaning_vi`)
+and part-of-speech tags (`pos`) are derived from Vietnamese Wiktionary (extracted
+via Kaikki.org / Wiktextract) and curated TOEIC adaptations by DHV English Studio.
+American English phonetic transcriptions (`ipa`) are derived from `open-dict-data/ipa-dict`.
 
-- NGSL: https://www.newgeneralservicelist.com/new-general-service-list
-- TSL: https://www.newgeneralservicelist.com/toeic-service-list
+- NGSL 1.2: https://www.newgeneralservicelist.com/new-general-service-list (CC BY-SA 4.0)
+- TSL 1.2: https://www.newgeneralservicelist.com/toeic-service-list (CC BY-SA 4.0)
+- Vietnamese Wiktionary / Kaikki.org: https://vi.wiktionary.org/ & https://kaikki.org/ (CC BY-SA 4.0)
+- open-dict-data / ipa-dict (en_US): https://github.com/open-dict-data/ipa-dict (MIT License)
 - License: Creative Commons Attribution-ShareAlike 4.0 International
 - License terms: https://creativecommons.org/licenses/by-sa/4.0/
 - Legal code: https://creativecommons.org/licenses/by-sa/4.0/legalcode.en
 
-This adapted dataset is also licensed under CC BY-SA 4.0. Preserve attribution,
+This adapted bilingual dataset is licensed under CC BY-SA 4.0 (with `ipa-dict`
+components under the MIT License; see `IPA-MIT-LICENSE.txt`). Preserve attribution,
 link to the license, indicate changes, and share adaptations under the same
 license. No endorsement by the authors or ETS is implied. This notice applies
 to these data; it does not relicense the application or unrelated media.
 
-DHV changes: normalized spelling for lookup, merged the shared headword criteria
-while preserving both definitions, retained two unranked TSL entries without
-inventing ranks, and supplied six missing English definitions (by-law, café,
-e-book, entrée, résumé, smartphone). The definitions are English, not Vietnamese.
-The JSON records source membership, ranks, adaptations and source-file SHA-256
-digests. Its 4,060 unique headwords comprise 4,059 ranked entries plus the
-unranked headword born; criteria is already ranked in NGSL.
+DHV changes:
+1. Normalized spelling (`e-mail` -> `email`) for lookup while preserving original source terms.
+2. Merged the shared headword `criteria` while preserving both NGSL and TSL definitions.
+3. Retained two unranked TSL entries (`born`, `criteria`) without inventing ranks.
+4. Supplied six missing English definitions (`by-law`, `café`, `e-book`, `entrée`, `résumé`, `smartphone`).
+5. Enriched all 4,060 entries with Vietnamese meanings (`meaning_vi`), standardized parts of speech (`pos`), and American English IPA (`ipa`).
 
-Source publications were retrieved on 2026-10-27. The source XLSX/CSV files are
-retained under backend/data/toeic/vendor/ngsl-tsl for reproducible offline builds.
-No question bank or proprietary code from seikaikyo/toeic-practice is included.
+Source publications were retrieved on 2026-10-27. All pinned inputs and SHA-256 digests
+are retained under `backend/data/toeic/vendor/ngsl-tsl` for reproducible offline builds.
+No question bank or proprietary code from `seikaikyo/toeic-practice` is included.
 """
     (VENDOR / "LICENSE.md").write_text(notice, encoding="utf-8")
     (ROOT / "frontend/public/toeic/licenses/NGSL-TSL.md").write_text(notice, encoding="utf-8")
-    print(f"Built {len(ordered)} unique English headwords; 2809 NGSL ranks, 1250 TSL ranks, 2 unranked TSL memberships.")
+    shutil.copyfile(VENDOR / "IPA-MIT-LICENSE.txt", ROOT / "frontend/public/toeic/licenses/IPA-MIT-LICENSE.txt")
+
+    handbook = build_handbook(ordered)
+    (ROOT / "docs/toeic/SO_TAY_TU_VUNG.md").write_text(handbook, encoding="utf-8")
+    (ROOT / "frontend/public/toeic/so-tay-tu-vung-song-ngu.md").write_text(handbook, encoding="utf-8")
+
+    print(f"Built {len(ordered)} bilingual English-Vietnamese headwords; 2809 NGSL ranks, 1250 TSL ranks, 2 unranked TSL memberships.")
     return data
 
 

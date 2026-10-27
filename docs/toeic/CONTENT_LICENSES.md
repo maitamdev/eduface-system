@@ -22,13 +22,13 @@ Code frontend/backend và script biên soạn TOEIC được viết trực tiế
 
 Xem [phạm vi, kiểm tra và cách tái tạo](MO_RONG_ON_TAP.md). MIT của phần được nhập không thay thế giấy phép của toàn bộ EduFace hoặc quyền đối với các tài liệu bên ngoài được dẫn link.
 
-## NGSL 1.2 & TOEIC Service List 1.2 · CC BY-SA 4.0
+## NGSL 1.2, TOEIC Service List 1.2, Vietnamese Wiktionary & ipa-dict · CC BY-SA 4.0 & MIT
 
-- Tác giả: Charles Browne, Brent Culligan, Joseph Phillips (NGSL 1.2) và Charles Browne, Brent Culligan (TSL 1.2).
-- Nguồn gốc: [NGSL](https://www.newgeneralservicelist.com/new-general-service-list) và [TOEIC Service List](https://www.newgeneralservicelist.com/toeic-service-list).
-- Giấy phép: [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
-- Bản thông báo, ghi nhận thay đổi và SHA-256 của 4 file CSV/XLSX gốc được lưu tại [backend/data/toeic/vendor/ngsl-tsl/LICENSE.md](../../backend/data/toeic/vendor/ngsl-tsl/LICENSE.md) và [frontend/public/toeic/licenses/NGSL-TSL.md](../../frontend/public/toeic/licenses/NGSL-TSL.md).
-- Dữ liệu đã tổng hợp tại `backend/data/toeic/lexicon.json` và bản tải công khai `/toeic/lexicon.json` (cũng được chia sẻ theo CC BY-SA 4.0): gồm **4.060 từ riêng biệt** (2.809 từ xếp hạng NGSL, 1.250 từ xếp hạng TSL, mục `born` bổ sung không xếp hạng trong bảng định nghĩa TSL và `criteria` xuất hiện ở cả hai bảng định nghĩa). Sáu mục xếp hạng TSL thiếu định nghĩa trong file XLSX gốc (`by-law`, `café`, `e-book`, `entrée`, `résumé`, `smartphone`) được DHV bổ sung định nghĩa tiếng Anh và gắn cờ `adapted_by_dhv: true`.
+- Tác giả danh sách tần suất & định nghĩa tiếng Anh: Charles Browne, Brent Culligan, Joseph Phillips ([NGSL 1.2](https://www.newgeneralservicelist.com/new-general-service-list)) và Charles Browne, Brent Culligan ([TSL 1.2](https://www.newgeneralservicelist.com/toeic-service-list)) theo [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- Nghĩa tiếng Việt (`meaning_vi`) và từ loại (`pos`): trích xuất từ [Vietnamese Wiktionary](https://vi.wiktionary.org/) qua [Kaikki.org / Wiktextract](https://kaikki.org/) (`CC BY-SA 4.0`) kết hợp biên tập ngữ cảnh TOEIC của DHV (`CC BY-SA 4.0`).
+- Phiên âm Quốc tế tiếng Anh Mỹ (`ipa`): từ [open-dict-data/ipa-dict (`en_US`)](https://github.com/open-dict-data/ipa-dict) theo giấy phép **MIT** ([IPA-MIT-LICENSE.txt](../../frontend/public/toeic/licenses/IPA-MIT-LICENSE.txt)).
+- Bản thông báo, ghi nhận thay đổi và SHA-256 của toàn bộ file nguồn được lưu tại [backend/data/toeic/vendor/ngsl-tsl/LICENSE.md](../../backend/data/toeic/vendor/ngsl-tsl/LICENSE.md) và [frontend/public/toeic/licenses/NGSL-TSL.md](../../frontend/public/toeic/licenses/NGSL-TSL.md).
+- Dữ liệu đã tổng hợp tại `backend/data/toeic/lexicon.json`, bản tải công khai `/toeic/lexicon.json` và [Sổ tay từ vựng song ngữ](SO_TAY_TU_VUNG.md) (`/toeic/so-tay-tu-vung-song-ngu.md`, chia sẻ theo CC BY-SA 4.0): gồm **4.060 từ riêng biệt** (2.809 từ xếp hạng NGSL, 1.250 từ xếp hạng TSL, mục `born` bổ sung không xếp hạng trong bảng định nghĩa TSL và `criteria` xuất hiện ở cả hai bảng định nghĩa), tất cả đều có đầy đủ `ipa`, `pos`, `meaning_vi` và `definitions`. Sáu mục xếp hạng TSL thiếu định nghĩa tiếng Anh trong file XLSX gốc (`by-law`, `café`, `e-book`, `entrée`, `résumé`, `smartphone`) được DHV bổ sung và gắn cờ `adapted_by_dhv: true`.
 
 ## py-fsrs 6.3.2
 

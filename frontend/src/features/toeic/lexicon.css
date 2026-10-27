@@ -1,11 +1,46 @@
-.toeic-lexicon-filters{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,.7fr)}
+.toeic-lexicon-filters{grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1.3fr) minmax(0,.75fr)}
+.toeic-lexicon-mode{margin:0}
 .toeic-lexicon .toeic-flashcard,.toeic-lexicon .toeic-word-list{min-width:0}
-.toeic-lexicon .toeic-flashcard h3{overflow-wrap:anywhere}
-.toeic-lexicon .toeic-card-answer p{font-size:17px;line-height:1.7;text-align:left}
+.toeic-lexicon .toeic-flashcard h3{overflow-wrap:anywhere;margin-bottom:6px}
+.toeic-phonetic-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0 18px}
+.toeic-ipa{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:15px;color:var(--toeic-green);background:rgba(16,185,129,.1);padding:4px 10px;border-radius:999px;font-weight:600}
+.toeic-pos-list{display:inline-flex;flex-wrap:wrap;gap:6px}
+.toeic-pos-badge{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--ui-surface-2,rgba(148,163,184,.16));color:var(--ui-text);border:1px solid var(--ui-border,rgba(148,163,184,.25))}
+.toeic-bilingual-vi{background:rgba(16,185,129,.08);border-left:3px solid var(--toeic-green);padding:12px 14px;border-radius:10px;margin-bottom:14px;text-align:left}
+.toeic-bilingual-vi h4,.toeic-bilingual-example h4{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--toeic-green)}
+.toeic-meaning-vi{margin:0;font-size:19px !important;font-weight:700;color:var(--ui-text)}
+.toeic-bilingual-example{background:rgba(148,163,184,.08);padding:10px 14px;border-radius:10px;margin-bottom:14px;text-align:left}
+.toeic-bilingual-example p{margin:0;font-style:italic}
+.toeic-en-def{margin-bottom:10px}
+.toeic-lexicon .toeic-card-answer p{font-size:16px;line-height:1.65;text-align:left}
 .toeic-lexicon .toeic-card-answer small{display:block;text-align:left;color:var(--ui-muted);font-size:12px}
-.toeic-lexicon .toeic-word-list>div{max-height:440px}
+.toeic-alphabet-bar{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 16px;padding:10px 12px;background:var(--ui-surface,rgba(255,255,255,.03));border:1px solid var(--ui-border,rgba(148,163,184,.2));border-radius:14px;align-items:center}
+.toeic-alphabet-bar button{border:1px solid transparent;background:transparent;color:var(--ui-muted);font-size:12px;font-weight:700;padding:5px 9px;border-radius:8px;cursor:pointer;transition:all .15s ease}
+.toeic-alphabet-bar button:hover:not(:disabled){color:var(--ui-text);background:rgba(148,163,184,.12)}
+.toeic-alphabet-bar button.active{background:var(--toeic-green);color:#fff}
+.toeic-alphabet-bar .toeic-reset-filter{margin-left:auto;display:inline-flex;align-items:center;gap:5px;color:var(--toeic-green);border-color:rgba(16,185,129,.35)}
+.toeic-word-item-main{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;text-align:left}
+.toeic-word-ipa{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:var(--ui-muted)}
+.toeic-word-item-meta{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.toeic-word-pos{font-size:11px;color:var(--ui-muted)}
+.toeic-status-pill{font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(148,163,184,.14)}
+.toeic-status-pill.due{background:rgba(245,158,11,.18);color:#d97706;font-weight:600}
+.toeic-lexicon .toeic-word-list>div{max-height:460px}
+.toeic-dict-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.toeic-dict-entry{display:flex;flex-direction:column;justify-content:space-between;gap:12px;padding:18px;border-radius:16px;background:var(--ui-surface,rgba(255,255,255,.04));border:1px solid var(--ui-border,rgba(148,163,184,.22))}
+.toeic-dict-entry-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.toeic-dict-title-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px;margin:4px 0 6px}
+.toeic-dict-title-row h3{margin:0;font-size:22px}
+.toeic-dict-entry-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.toeic-icon-btn{padding:7px 9px !important}
+.toeic-dict-body{display:flex;flex-direction:column;gap:8px;text-align:left}
+.toeic-dict-vi{font-size:15px;line-height:1.55;padding:9px 12px;border-radius:10px;background:rgba(16,185,129,.08);border-left:3px solid var(--toeic-green)}
+.toeic-dict-en p{margin:0;font-size:14px;line-height:1.55;color:var(--ui-muted)}
+.toeic-dict-example{margin:0;font-size:13px;font-style:italic;color:var(--ui-muted)}
+.toeic-dict-footer{display:flex;justify-content:flex-end;padding-top:6px;border-top:1px dashed var(--ui-border,rgba(148,163,184,.18))}
 .toeic-lexicon-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:18px;font-size:12px}
 .toeic-lexicon-pagination .toeic-button{padding:8px 10px;font-size:12px}
+.toeic-lexicon-downloads{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
 .toeic-lexicon-credit a:not(.toeic-button){color:var(--toeic-green);text-decoration:underline;text-underline-offset:3px}
-@media(max-width:1000px){.toeic-lexicon-filters{grid-template-columns:1fr 1fr}.toeic-lexicon-filters>label:last-child{grid-column:1/-1}}
+@media(max-width:1050px){.toeic-lexicon-filters{grid-template-columns:1fr 1fr}.toeic-dict-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.toeic-lexicon-filters{grid-template-columns:1fr}.toeic-lexicon .toeic-word-list>div{max-height:280px}.toeic-lexicon .toeic-card-answer p{font-size:16px}}

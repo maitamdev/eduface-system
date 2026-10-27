@@ -12,7 +12,12 @@ it("loads the real licensed dataset lazily and mirrors paginated deck lookup",as
  expect(next.items.some(w=>first.items.some(a=>a.id===w.id))).toBe(false);
  expect(fetch).toHaveBeenCalledTimes(1);
  const cafe=await previewLexicon(new URLSearchParams("deck=tsl&q=cafe"));
- expect(cafe.items.some(w=>w.term==="café")).toBe(true);
+ expect(cafe.items.some(w=>w.term==="café" && w.ipa==="/kæˈfeɪ/")).toBe(true);
+ const vi=await previewLexicon(new URLSearchParams("deck=tsl&q=hoa don"));
+ expect(vi.items.some(w=>w.term==="invoice")).toBe(true);
+ const verbs=await previewLexicon(new URLSearchParams("deck=tsl&pos=v&letter=r"));
+ expect(verbs.items.length).toBeGreaterThan(0);
+ expect(verbs.items.every(w=>w.pos?.includes("v") && w.term.startsWith("r"))).toBe(true);
  const due=await previewLexicon(new URLSearchParams("state=due"));
  expect(due.total).toBe(0);expect(due.new_count).toBe(4060);
 });

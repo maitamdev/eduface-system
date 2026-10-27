@@ -5,22 +5,30 @@ import {OpenLexicon} from "./OpenLexicon";
 import type {LexiconCard,LexiconFilters,LexiconPage} from "./api";
 const api=vi.hoisted(()=>({lexicon:vi.fn(),review:vi.fn()}));
 vi.mock("./api",async original=>({...await original<typeof import("./api")>(),toeicApi:api}));
-const word:LexiconCard={id:"lex-test",lesson_id:"open-lexicon",term:"smartphone",meaning:"a mobile phone that runs applications",example:"",version:0,due:null,reviews:0,meaning_language:"en",definitions:[{source_id:"tsl",text:"a mobile phone that runs applications",source_term:"smartphone",adapted_by_dhv:true}],lists:[{id:"tsl",rank:900,supplemental:false}]};
-const page=(items:LexiconCard[]=[word],total=items.length):LexiconPage=>({version:"test",items,total,word_count:4060,offset:0,limit:30,due_count:0,new_count:total,license:"CC BY-SA 4.0",license_url:"https://creativecommons.org/licenses/by-sa/4.0/",sources:[],download_url:"/toeic/lexicon.json",attribution_url:"/toeic/licenses/NGSL-TSL.md"});
+const word:LexiconCard={id:"lex-test",lesson_id:"open-lexicon",term:"smartphone",ipa:"/ˈsmɑɹtˌfoʊn/",pos:["n"],meaning:"điện thoại thông minh",meaning_vi:"điện thoại thông minh",example:"",version:0,due:null,reviews:0,meaning_language:"en",definitions:[{source_id:"tsl",text:"a mobile phone that runs applications",source_term:"smartphone",adapted_by_dhv:true}],lists:[{id:"tsl",rank:900,supplemental:false}]};
+const page=(items:LexiconCard[]=[word],total=items.length):LexiconPage=>({version:"test",items,total,word_count:4060,offset:0,limit:30,due_count:0,new_count:total,license:"CC BY-SA 4.0",license_url:"https://creativecommons.org/licenses/by-sa/4.0/",sources:[],download_url:"/toeic/lexicon.json",handbook_url:"/toeic/so-tay-tu-vung-song-ngu.md",attribution_url:"/toeic/licenses/NGSL-TSL.md"});
 beforeEach(()=>{api.lexicon.mockReset();api.review.mockReset();api.lexicon.mockResolvedValue(page());});
 afterEach(cleanup);
 
-it("labels English definitions, reveals before rating and keeps preview read-only",async()=>{
+it("shows IPA and POS, reveals bilingual meanings before rating, and supports Dictionary Book mode",async()=>{
  render(<OpenLexicon preview onReviewed={vi.fn()}/>);
  await screen.findByRole("heading",{name:"smartphone"});
+ expect(screen.getAllByText("/ˈsmɑɹtˌfoʊn/").length).toBeGreaterThan(0);
  expect(screen.queryByText(word.definitions[0].text)).toBeNull();
+ expect(screen.queryByText("điện thoại thông minh")).toBeNull();
  expect(screen.queryByRole("button",{name:"Nhớ được"})).toBeNull();
- fireEvent.click(screen.getByRole("button",{name:"Hiện định nghĩa tiếng Anh"}));
+ fireEvent.click(screen.getByRole("button",{name:/Hiện định nghĩa tiếng Anh/}));
+ expect(screen.getByRole("heading",{name:"Nghĩa tiếng Việt"})).toBeTruthy();
+ expect(screen.getByText("điện thoại thông minh")).toBeTruthy();
  expect(screen.getByRole("heading",{name:"Định nghĩa tiếng Anh"})).toBeTruthy();
  expect(screen.getByText(word.definitions[0].text).getAttribute("lang")).toBe("en");
  expect(screen.getByText(/định nghĩa do DHV bổ sung/)).toBeTruthy();
  expect(screen.getByRole("button",{name:"Nhớ được"}).hasAttribute("disabled")).toBe(true);
+ expect(screen.getByRole("link",{name:/Tải sổ tay từ vựng song ngữ/}).getAttribute("href")).toBe("/toeic/so-tay-tu-vung-song-ngu.md");
  expect(screen.getByRole("link",{name:/Tải dữ liệu từ vựng/}).getAttribute("href")).toBe("/toeic/lexicon.json");
+ fireEvent.click(screen.getByRole("button",{name:/Sổ tra từ song ngữ/}));
+ expect(screen.getByLabelText("Trang sổ tra từ song ngữ Anh Việt")).toBeTruthy();
+ expect(screen.getByText("điện thoại thông minh")).toBeTruthy();
  expect(api.review).not.toHaveBeenCalled();
 });
 
@@ -29,11 +37,11 @@ it("persists a review and displays the returned due date instead of allowing an 
  api.review.mockResolvedValue({version:1,due});
  api.lexicon.mockResolvedValueOnce(page()).mockResolvedValue(page([{...word,version:1,due,reviews:1}]));
  render(<OpenLexicon preview={false} onReviewed={onReviewed}/>);
- fireEvent.click(await screen.findByRole("button",{name:"Hiện định nghĩa tiếng Anh"}));
+ fireEvent.click(await screen.findByRole("button",{name:/Hiện định nghĩa tiếng Anh/}));
  fireEvent.click(screen.getByRole("button",{name:"Nhớ được"}));
  await waitFor(()=>expect(onReviewed).toHaveBeenCalledTimes(1));
  expect(api.review).toHaveBeenCalledWith(word.id,3,0,expect.any(String));
- fireEvent.click(await screen.findByRole("button",{name:"Hiện định nghĩa tiếng Anh"}));
+ fireEvent.click(await screen.findByRole("button",{name:/Hiện định nghĩa tiếng Anh/}));
  expect(await screen.findByText(/Lần ôn tiếp:/)).toBeTruthy();
  expect(screen.queryByRole("button",{name:"Nhớ được"})).toBeNull();
 });
@@ -41,7 +49,7 @@ it("persists a review and displays the returned due date instead of allowing an 
 it("retries a failed review with the same event ID",async()=>{
  api.review.mockRejectedValueOnce(new Error("Mất mạng thử nghiệm")).mockResolvedValue({version:1,due:new Date(Date.now()+86400000).toISOString()});
  render(<OpenLexicon preview={false} onReviewed={vi.fn()}/>);
- fireEvent.click(await screen.findByRole("button",{name:"Hiện định nghĩa tiếng Anh"}));
+ fireEvent.click(await screen.findByRole("button",{name:/Hiện định nghĩa tiếng Anh/}));
  fireEvent.click(screen.getByRole("button",{name:"Nhớ được"}));
  await screen.findByRole("alert");
  const id=api.review.mock.calls[0][3];
@@ -63,7 +71,7 @@ it("ignores stale responses when the debounced search changes",async()=>{
  expect(screen.getByRole("heading",{name:"café"})).toBeTruthy();
 });
 
-it("paginates on the server and resets the page when the deck or state changes",async()=>{
+it("paginates on the server and filters by deck, POS, letter, and state",async()=>{
  api.lexicon.mockResolvedValue(page([word],61));
  render(<OpenLexicon preview onReviewed={vi.fn()}/>);
  await screen.findByRole("heading",{name:"smartphone"});
@@ -72,6 +80,10 @@ it("paginates on the server and resets the page when the deck or state changes",
  await screen.findByRole("heading",{name:"smartphone"});
  fireEvent.change(screen.getByLabelText("Bộ từ"),{target:{value:"tsl"}});
  await waitFor(()=>expect(api.lexicon).toHaveBeenLastCalledWith(expect.objectContaining({offset:0,deck:"tsl"}),expect.any(AbortSignal)));
+ fireEvent.change(screen.getByLabelText("Từ loại"),{target:{value:"n"}});
+ await waitFor(()=>expect(api.lexicon).toHaveBeenLastCalledWith(expect.objectContaining({offset:0,pos:"n"}),expect.any(AbortSignal)));
+ fireEvent.click(screen.getByRole("button",{name:"S"}));
+ await waitFor(()=>expect(api.lexicon).toHaveBeenLastCalledWith(expect.objectContaining({offset:0,letter:"s"}),expect.any(AbortSignal)));
  api.lexicon.mockResolvedValue(page([],0));
  fireEvent.change(screen.getByLabelText("Trạng thái thẻ"),{target:{value:"due"}});
  await screen.findByText("Chưa có thẻ đến hạn trong bộ lọc.");
@@ -96,7 +108,7 @@ it("returns to the preceding page when reviewing the final new card removes the 
  fireEvent.change(screen.getByLabelText("Trạng thái thẻ"),{target:{value:"new"}});
  await screen.findByRole("heading",{name:"smartphone"});
  fireEvent.click(screen.getByRole("button",{name:"Sau"}));
- fireEvent.click(await screen.findByRole("button",{name:"Hiện định nghĩa tiếng Anh"}));
+ fireEvent.click(await screen.findByRole("button",{name:/Hiện định nghĩa tiếng Anh/}));
  fireEvent.click(screen.getByRole("button",{name:"Nhớ được"}));
  await waitFor(()=>expect(api.lexicon).toHaveBeenLastCalledWith(expect.objectContaining({offset:0,state:"new"}),expect.any(AbortSignal)));
  await screen.findByRole("heading",{name:"smartphone"});

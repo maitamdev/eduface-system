@@ -1,6 +1,6 @@
 {
   "version": "dhv-toeic-2026.10-v4",
-  "notice": "Học liệu DHV và câu hỏi MIT từ TOEIC Question Ocean được rà soát, có lời giải tiếng Việt. Không phải đề ETS; mục tiêu 900 không bảo đảm kết quả. Audio tổng hợp; ảnh Part 1 gồm minh họa, cảnh AI và ảnh Pexels ghi nguồn. Kho từ NGSL/TSL dùng định nghĩa tiếng Anh theo CC BY-SA 4.0. Điểm bài luyện là số câu đúng, không quy đổi điểm TOEIC chính thức.",
+  "notice": "Học liệu DHV và câu hỏi MIT từ TOEIC Question Ocean được rà soát, có lời giải tiếng Việt. Không phải đề ETS; mục tiêu 900 không bảo đảm kết quả. Audio tổng hợp; ảnh Part 1 gồm minh họa, cảnh AI và ảnh Pexels ghi nguồn. Sổ tra từ song ngữ NGSL/TSL kết hợp định nghĩa tiếng Anh, nghĩa tiếng Việt (CC BY-SA 4.0) và phiên âm IPA (MIT). Điểm bài luyện là số câu đúng, không quy đổi điểm TOEIC chính thức.",
   "stages": [
     {
       "id": 0,
@@ -194,21 +194,30 @@
     },
     {
       "id": "ngsl",
-      "title": "NGSL 1.2 · Từ vựng nền tảng",
+      "title": "NGSL 1.2 · Từ vựng nền tảng song ngữ Anh–Việt",
       "url": "https://www.newgeneralservicelist.com/new-general-service-list",
       "provider": "Browne, Culligan & Phillips",
-      "access": "CC BY-SA 4.0 · từ và định nghĩa tiếng Anh",
+      "access": "CC BY-SA 4.0 · song ngữ Anh–Việt + IPA",
       "stage": "Nền tảng / mọi level",
-      "usage": "Đã nhập 2.809 từ theo bảng tần suất và định nghĩa của tác giả. Tìm kiếm và ôn thẻ trong Kho từ mở; thứ hạng không phải điểm TOEIC."
+      "usage": "Đã nhập 2.809 từ theo bảng tần suất và định nghĩa gốc của tác giả, bổ sung nghĩa tiếng Việt (Wiktionary/DHV · CC BY-SA 4.0), từ loại và phiên âm IPA (ipa-dict · MIT)."
     },
     {
       "id": "tsl",
-      "title": "TOEIC Service List 1.2 · Từ vựng bổ trợ",
+      "title": "TOEIC Service List 1.2 · Từ vựng công sở song ngữ Anh–Việt",
       "url": "https://www.newgeneralservicelist.com/toeic-service-list",
       "provider": "Browne & Culligan",
-      "access": "CC BY-SA 4.0 · từ và định nghĩa tiếng Anh",
+      "access": "CC BY-SA 4.0 · song ngữ Anh–Việt + IPA",
       "stage": "Sau nền tảng / ôn TOEIC",
-      "usage": "Đã nhập 1.250 từ xếp hạng, bổ sung các mục chỉ có trong bảng định nghĩa và ghi rõ phần DHV bổ sung. Đây là danh sách từ, không phải đề thi ETS."
+      "usage": "Đã nhập 1.250 từ xếp hạng và 2 mục bổ sung kèm nghĩa tiếng Việt, từ loại, phiên âm IPA và định nghĩa tiếng Anh. Đây là danh sách từ, không phải đề thi ETS."
+    },
+    {
+      "id": "wiktionary-ipa",
+      "title": "Vietnamese Wiktionary & ipa-dict · Dữ liệu từ điển song ngữ & phiên âm",
+      "url": "https://vi.wiktionary.org/",
+      "provider": "Wiktionary / Kaikki.org & open-dict-data",
+      "access": "CC BY-SA 4.0 & MIT · tích hợp trong Sổ tra từ",
+      "stage": "Tra từ & phát âm mọi level",
+      "usage": "Cung cấp nghĩa tiếng Việt, phân loại từ loại (POS) và phiên âm IPA tiếng Anh Mỹ cho toàn bộ 4.060 mục từ trong Sổ tra từ song ngữ."
     },
     {
       "id": "toeic-practice-reference",
@@ -35805,1400 +35814,2256 @@
       "lesson_id": "f01",
       "term": "appointment",
       "meaning": "cuộc hẹn",
-      "example": "My appointment is at half past nine."
+      "example": "My appointment is at half past nine.",
+      "ipa": "/əˈpɔɪntmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f01-v02",
       "lesson_id": "f01",
       "term": "schedule",
       "meaning": "lịch trình",
-      "example": "Please check the schedule before leaving."
+      "example": "Please check the schedule before leaving.",
+      "ipa": "/ˈskɛdʒuɫ/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "f01-v03",
       "lesson_id": "f01",
       "term": "quarter",
       "meaning": "một phần tư; mười lăm phút",
-      "example": "The train leaves at a quarter to ten."
+      "example": "The train leaves at a quarter to ten.",
+      "ipa": "/ˈkwɔɹtɝ/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "f01-v04",
       "lesson_id": "f01",
       "term": "receipt",
       "meaning": "biên lai",
-      "example": "Keep the receipt for your records."
+      "example": "Keep the receipt for your records.",
+      "ipa": "/ɹiˈsit/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "f01-v05",
       "lesson_id": "f01",
       "term": "reception",
       "meaning": "quầy tiếp tân",
-      "example": "Your visitor is waiting at reception."
+      "example": "Your visitor is waiting at reception.",
+      "ipa": "/ɹiˈsɛpʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f01-v06",
       "lesson_id": "f01",
       "term": "duration",
       "meaning": "khoảng thời gian kéo dài",
-      "example": "The duration of the tour is two hours."
+      "example": "The duration of the tour is two hours.",
+      "ipa": "/ˈdʊˈɹeɪʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f01-v07",
       "lesson_id": "f01",
       "term": "address",
       "meaning": "địa chỉ",
-      "example": "Could you repeat the delivery address?"
+      "example": "Could you repeat the delivery address?",
+      "ipa": "/ˈæˌdɹɛs/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "f01-v08",
       "lesson_id": "f01",
       "term": "extension",
       "meaning": "số máy lẻ",
-      "example": "Call extension thirty-two for help."
+      "example": "Call extension thirty-two for help.",
+      "ipa": "/ɪkˈstɛnʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f01-v09",
       "lesson_id": "f01",
       "term": "available",
       "meaning": "có sẵn; rảnh",
-      "example": "The manager is available after lunch."
+      "example": "The manager is available after lunch.",
+      "ipa": "/əˈveɪɫəbəɫ/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "f01-v10",
       "lesson_id": "f01",
       "term": "colleague",
       "meaning": "đồng nghiệp",
-      "example": "A colleague will show you the meeting room."
+      "example": "A colleague will show you the meeting room.",
+      "ipa": "/ˈkɑɫiɡ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f02-v01",
       "lesson_id": "f02",
       "term": "assistant",
       "meaning": "trợ lý",
-      "example": "The assistant checks every appointment."
+      "example": "The assistant checks every appointment.",
+      "ipa": "/əˈsɪstənt/",
+      "pos": [
+        "n",
+        "adj"
+      ]
     },
     {
       "id": "f02-v02",
       "lesson_id": "f02",
       "term": "accurate",
       "meaning": "chính xác",
-      "example": "We need an accurate list of names."
+      "example": "We need an accurate list of names.",
+      "ipa": "/ˈækjɝət/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "f02-v03",
       "lesson_id": "f02",
       "term": "carefully",
       "meaning": "một cách cẩn thận",
-      "example": "Read the instructions carefully."
+      "example": "Read the instructions carefully.",
+      "ipa": "/ˈkɛɹfəɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "f02-v04",
       "lesson_id": "f02",
       "term": "instruction",
       "meaning": "chỉ dẫn",
-      "example": "Each instruction describes one step."
+      "example": "Each instruction describes one step.",
+      "ipa": "/ˌɪnˈstɹəkʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f02-v05",
       "lesson_id": "f02",
       "term": "organize",
       "meaning": "sắp xếp; tổ chức",
-      "example": "We organize the files by date."
+      "example": "We organize the files by date.",
+      "ipa": "/ˈɔɹɡəˌnaɪz/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "f02-v06",
       "lesson_id": "f02",
       "term": "monthly",
       "meaning": "hằng tháng",
-      "example": "The monthly report is ready."
+      "example": "The monthly report is ready.",
+      "ipa": "/ˈmənθɫi/",
+      "pos": [
+        "adv",
+        "adj",
+        "n"
+      ]
     },
     {
       "id": "f02-v07",
       "lesson_id": "f02",
       "term": "efficient",
       "meaning": "hiệu quả, ít lãng phí",
-      "example": "The new process is more efficient."
+      "example": "The new process is more efficient.",
+      "ipa": "/ɪˈfɪʃənt/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "f02-v08",
       "lesson_id": "f02",
       "term": "employee",
       "meaning": "nhân viên",
-      "example": "Each employee has a personal badge."
+      "example": "Each employee has a personal badge.",
+      "ipa": "/ɛmˈpɫɔɪi/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f02-v09",
       "lesson_id": "f02",
       "term": "prepare",
       "meaning": "chuẩn bị",
-      "example": "Please prepare the room for visitors."
+      "example": "Please prepare the room for visitors.",
+      "ipa": "/pɹiˈpɛɹ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "f02-v10",
       "lesson_id": "f02",
       "term": "responsible",
       "meaning": "chịu trách nhiệm",
-      "example": "Nina is responsible for the equipment."
+      "example": "Nina is responsible for the equipment.",
+      "ipa": "/ɹiˈspɑnsəbəɫ/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "f03-v01",
       "lesson_id": "f03",
       "term": "attach",
       "meaning": "đính kèm",
-      "example": "Attach the invoice to your email."
+      "example": "Attach the invoice to your email.",
+      "ipa": "/əˈtætʃ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "f03-v02",
       "lesson_id": "f03",
       "term": "deadline",
       "meaning": "hạn chót",
-      "example": "The team met the Friday deadline."
+      "example": "The team met the Friday deadline.",
+      "ipa": "/ˈdɛdˌɫaɪn/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f03-v03",
       "lesson_id": "f03",
       "term": "printer",
       "meaning": "máy in",
-      "example": "The printer is out of paper."
+      "example": "The printer is out of paper.",
+      "ipa": "/ˈpɹɪnɝ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f03-v04",
       "lesson_id": "f03",
       "term": "supplies",
       "meaning": "vật tư",
-      "example": "Office supplies are stored downstairs."
+      "example": "Office supplies are stored downstairs.",
+      "ipa": "/səˈpɫaɪz/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "f03-v05",
       "lesson_id": "f03",
       "term": "appointment book",
       "meaning": "sổ ghi lịch hẹn",
-      "example": "The appointment book is on the counter."
+      "example": "The appointment book is on the counter.",
+      "ipa": "/əˈpɔɪntmənt ˈbʊk/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f03-v06",
       "lesson_id": "f03",
       "term": "invoice",
       "meaning": "hóa đơn yêu cầu thanh toán",
-      "example": "The invoice includes the delivery fee."
+      "example": "The invoice includes the delivery fee.",
+      "ipa": "/ˈɪnvɔɪs/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "f03-v07",
       "lesson_id": "f03",
       "term": "file",
       "meaning": "hồ sơ; lưu hồ sơ",
-      "example": "Please file these documents by month."
+      "example": "Please file these documents by month.",
+      "ipa": "/ˈfaɪɫ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f03-v08",
       "lesson_id": "f03",
       "term": "stationery",
       "meaning": "văn phòng phẩm",
-      "example": "We ordered stationery for the new office."
+      "example": "We ordered stationery for the new office.",
+      "ipa": "/ˈsteɪʃəˌnɛɹi/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f03-v09",
       "lesson_id": "f03",
       "term": "attend",
       "meaning": "tham dự",
-      "example": "All supervisors will attend the meeting."
+      "example": "All supervisors will attend the meeting.",
+      "ipa": "/əˈtɛnd/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "f03-v10",
       "lesson_id": "f03",
       "term": "reimburse",
       "meaning": "hoàn trả khoản đã chi",
-      "example": "The company will reimburse travel costs."
+      "example": "The company will reimburse travel costs.",
+      "ipa": "/ˌɹiɪmˈbɝs/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "f04-v01",
       "lesson_id": "f04",
       "term": "entrance",
       "meaning": "lối vào",
-      "example": "Use the entrance beside the bookstore."
+      "example": "Use the entrance beside the bookstore.",
+      "ipa": "/ˈɛntɹəns/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "f04-v02",
       "lesson_id": "f04",
       "term": "repair",
       "meaning": "sửa chữa",
-      "example": "The elevator is closed for repair."
+      "example": "The elevator is closed for repair.",
+      "ipa": "/ɹɪˈpɛɹ/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "f04-v03",
       "lesson_id": "f04",
       "term": "notice",
       "meaning": "thông báo",
-      "example": "A notice explains the new opening hours."
+      "example": "A notice explains the new opening hours.",
+      "ipa": "/ˈnoʊtəs/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "f04-v04",
       "lesson_id": "f04",
       "term": "visitor",
       "meaning": "khách đến thăm",
-      "example": "Every visitor must sign in."
+      "example": "Every visitor must sign in.",
+      "ipa": "/ˈvɪzɪtɝ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f04-v05",
       "lesson_id": "f04",
       "term": "permit",
       "meaning": "giấy phép; cho phép",
-      "example": "A parking permit is required here."
+      "example": "A parking permit is required here.",
+      "ipa": "/ˈpɝˌmɪt/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "f04-v06",
       "lesson_id": "f04",
       "term": "delivery",
       "meaning": "việc giao hàng",
-      "example": "Today's delivery will arrive at noon."
+      "example": "Today's delivery will arrive at noon.",
+      "ipa": "/dɪˈɫɪvɝi/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "f04-v07",
       "lesson_id": "f04",
       "term": "counter",
       "meaning": "quầy",
-      "example": "Collect your order at the service counter."
+      "example": "Collect your order at the service counter.",
+      "ipa": "/ˈkaʊntɝ/",
+      "pos": [
+        "n",
+        "adj",
+        "adv"
+      ]
     },
     {
       "id": "f04-v08",
       "lesson_id": "f04",
       "term": "temporarily",
       "meaning": "tạm thời",
-      "example": "The west entrance is temporarily closed."
+      "example": "The west entrance is temporarily closed.",
+      "ipa": "/ˌtɛmpɝˈɛɹəɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "f04-v09",
       "lesson_id": "f04",
       "term": "reserve",
       "meaning": "đặt trước",
-      "example": "Reserve your seat before Thursday."
+      "example": "Reserve your seat before Thursday.",
+      "ipa": "/ɹiˈzɝv/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "f04-v10",
       "lesson_id": "f04",
       "term": "cancel",
       "meaning": "hủy",
-      "example": "Please call if you need to cancel."
+      "example": "Please call if you need to cancel.",
+      "ipa": "/ˈkænsəɫ/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "b01-v01",
       "lesson_id": "b01",
       "term": "carry",
       "meaning": "mang; vác",
-      "example": "A worker is carrying a box."
+      "example": "A worker is carrying a box.",
+      "ipa": "/ˈkæɹi/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "b01-v02",
       "lesson_id": "b01",
       "term": "stack",
       "meaning": "xếp chồng",
-      "example": "The trays are stacked on a shelf."
+      "example": "The trays are stacked on a shelf.",
+      "ipa": "/ˈstæk/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "b01-v03",
       "lesson_id": "b01",
       "term": "lean against",
       "meaning": "tựa vào",
-      "example": "A bicycle is leaning against the wall."
+      "example": "A bicycle is leaning against the wall.",
+      "ipa": "/ˈɫin əˈɡeɪnst/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b01-v04",
       "lesson_id": "b01",
       "term": "arrange",
       "meaning": "sắp xếp",
-      "example": "The chairs are arranged around a table."
+      "example": "The chairs are arranged around a table.",
+      "ipa": "/ɝˈeɪndʒ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b01-v05",
       "lesson_id": "b01",
       "term": "shelf",
       "meaning": "kệ",
-      "example": "The books are on the top shelf."
+      "example": "The books are on the top shelf.",
+      "ipa": "/ˈʃɛɫf/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b01-v06",
       "lesson_id": "b01",
       "term": "ladder",
       "meaning": "thang",
-      "example": "The painter is standing beside a ladder."
+      "example": "The painter is standing beside a ladder.",
+      "ipa": "/ˈɫædɝ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b01-v07",
       "lesson_id": "b01",
       "term": "cross",
       "meaning": "băng qua",
-      "example": "Two pedestrians are crossing the street."
+      "example": "Two pedestrians are crossing the street.",
+      "ipa": "/ˈkɹɔs/",
+      "pos": [
+        "v",
+        "n",
+        "adj"
+      ]
     },
     {
       "id": "b01-v08",
       "lesson_id": "b01",
       "term": "water",
       "meaning": "tưới nước",
-      "example": "A gardener is watering the plants."
+      "example": "A gardener is watering the plants.",
+      "ipa": "/ˈwɔtɝ/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "b01-v09",
       "lesson_id": "b01",
       "term": "beside",
       "meaning": "bên cạnh",
-      "example": "The cart is beside the entrance."
+      "example": "The cart is beside the entrance.",
+      "ipa": "/ˌbiˈsaɪd/",
+      "pos": [
+        "prep"
+      ]
     },
     {
       "id": "b01-v10",
       "lesson_id": "b01",
       "term": "reflection",
       "meaning": "hình phản chiếu",
-      "example": "The window shows a reflection of the trees."
+      "example": "The window shows a reflection of the trees.",
+      "ipa": "/ɹɪˈfɫɛkʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b02-v01",
       "lesson_id": "b02",
       "term": "prefer",
       "meaning": "thích hơn",
-      "example": "Would you prefer a seat near the window?"
+      "example": "Would you prefer a seat near the window?",
+      "ipa": "/pɹəˈfɝ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b02-v02",
       "lesson_id": "b02",
       "term": "copy",
       "meaning": "bản sao",
-      "example": "I need three copies of the form."
+      "example": "I need three copies of the form.",
+      "ipa": "/ˈkɑpi/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "b02-v03",
       "lesson_id": "b02",
       "term": "request",
       "meaning": "yêu cầu",
-      "example": "We received your request this morning."
+      "example": "We received your request this morning.",
+      "ipa": "/ɹiˈkwɛst/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "b02-v04",
       "lesson_id": "b02",
       "term": "borrow",
       "meaning": "mượn",
-      "example": "May I borrow your stapler?"
+      "example": "May I borrow your stapler?",
+      "ipa": "/ˈbɑˌɹoʊ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b02-v05",
       "lesson_id": "b02",
       "term": "return",
       "meaning": "trả lại; quay lại",
-      "example": "Please return the key before six."
+      "example": "Please return the key before six.",
+      "ipa": "/ɹiˈtɝn/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "b02-v06",
       "lesson_id": "b02",
       "term": "confirm",
       "meaning": "xác nhận",
-      "example": "Could you confirm the room number?"
+      "example": "Could you confirm the room number?",
+      "ipa": "/kənˈfɝm/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b02-v07",
       "lesson_id": "b02",
       "term": "reschedule",
       "meaning": "đổi lịch",
-      "example": "We need to reschedule the interview."
+      "example": "We need to reschedule the interview.",
+      "ipa": "/ɹiˈskɛdʒuɫ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b02-v08",
       "lesson_id": "b02",
       "term": "instead",
       "meaning": "thay vào đó",
-      "example": "Let's meet on Tuesday instead."
+      "example": "Let's meet on Tuesday instead.",
+      "ipa": "/ˌɪnˈstɛd/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "b02-v09",
       "lesson_id": "b02",
       "term": "either",
       "meaning": "một trong hai; cái nào cũng được",
-      "example": "Either room is suitable for the workshop."
+      "example": "Either room is suitable for the workshop.",
+      "ipa": "/ˈaɪðɝ/",
+      "pos": [
+        "n",
+        "adj",
+        "conj"
+      ]
     },
     {
       "id": "b02-v10",
       "lesson_id": "b02",
       "term": "neither",
       "meaning": "không cái nào trong hai",
-      "example": "Neither printer has enough paper."
+      "example": "Neither printer has enough paper.",
+      "ipa": "/ˈnaɪðɝ/",
+      "pos": [
+        "det",
+        "adv",
+        "conj"
+      ]
     },
     {
       "id": "b03-v01",
       "lesson_id": "b03",
       "term": "recently",
       "meaning": "gần đây",
-      "example": "We have recently opened a new branch."
+      "example": "We have recently opened a new branch.",
+      "ipa": "/ˈɹisənɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "b03-v02",
       "lesson_id": "b03",
       "term": "since",
       "meaning": "kể từ",
-      "example": "She has managed the store since May."
+      "example": "She has managed the store since May.",
+      "ipa": "/ˈsɪns/",
+      "pos": [
+        "adv",
+        "prep",
+        "conj"
+      ]
     },
     {
       "id": "b03-v03",
       "lesson_id": "b03",
       "term": "already",
       "meaning": "đã, trước thời điểm dự kiến",
-      "example": "The courier has already left."
+      "example": "The courier has already left.",
+      "ipa": "/ɔˈɹɛdi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "b03-v04",
       "lesson_id": "b03",
       "term": "currently",
       "meaning": "hiện tại",
-      "example": "The team is currently testing the software."
+      "example": "The team is currently testing the software.",
+      "ipa": "/ˈkɝəntɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "b03-v05",
       "lesson_id": "b03",
       "term": "supplier",
       "meaning": "nhà cung cấp",
-      "example": "Our supplier sent the samples yesterday."
+      "example": "Our supplier sent the samples yesterday.",
+      "ipa": "/səˈpɫaɪɝ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b03-v06",
       "lesson_id": "b03",
       "term": "shipment",
       "meaning": "lô hàng",
-      "example": "The shipment reached the warehouse on Monday."
+      "example": "The shipment reached the warehouse on Monday.",
+      "ipa": "/ˈʃɪpmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b03-v07",
       "lesson_id": "b03",
       "term": "annually",
       "meaning": "hằng năm",
-      "example": "The equipment is inspected annually."
+      "example": "The equipment is inspected annually.",
+      "ipa": "/ˈænjuəɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "b03-v08",
       "lesson_id": "b03",
       "term": "regularly",
       "meaning": "đều đặn",
-      "example": "Staff members regularly update the directory."
+      "example": "Staff members regularly update the directory.",
+      "ipa": "/ˈɹɛɡjəɫɝɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "b03-v09",
       "lesson_id": "b03",
       "term": "remain",
       "meaning": "vẫn còn; ở lại",
-      "example": "The office remains open during renovation."
+      "example": "The office remains open during renovation.",
+      "ipa": "/ɹiˈmeɪn/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "b03-v10",
       "lesson_id": "b03",
       "term": "announce",
       "meaning": "thông báo",
-      "example": "The director will announce the results tomorrow."
+      "example": "The director will announce the results tomorrow.",
+      "ipa": "/əˈnaʊns/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b04-v01",
       "lesson_id": "b04",
       "term": "application",
       "meaning": "đơn đăng ký; hồ sơ ứng tuyển",
-      "example": "We received your application yesterday."
+      "example": "We received your application yesterday.",
+      "ipa": "/ˌæpɫəˈkeɪʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b04-v02",
       "lesson_id": "b04",
       "term": "quotation",
       "meaning": "báo giá",
-      "example": "The revised quotation includes installation."
+      "example": "The revised quotation includes installation.",
+      "ipa": "/kwoʊˈteɪʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b04-v03",
       "lesson_id": "b04",
       "term": "revision",
       "meaning": "sự chỉnh sửa; bản chỉnh sửa",
-      "example": "The final revision removes the old address."
+      "example": "The final revision removes the old address.",
+      "ipa": "/ɹiˈvɪʒən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b04-v04",
       "lesson_id": "b04",
       "term": "recipient",
       "meaning": "người nhận",
-      "example": "Check the recipient before sending the email."
+      "example": "Check the recipient before sending the email.",
+      "ipa": "/ɹəˈsɪpiənt/",
+      "pos": [
+        "n",
+        "adj"
+      ]
     },
     {
       "id": "b04-v05",
       "lesson_id": "b04",
       "term": "enquiry",
       "meaning": "yêu cầu thông tin",
-      "example": "Thank you for your enquiry about our course."
+      "example": "Thank you for your enquiry about our course.",
+      "ipa": "/ɪnˈkwaɪˌɹi/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "b04-v06",
       "lesson_id": "b04",
       "term": "enclose",
       "meaning": "gửi kèm",
-      "example": "We enclose a copy of the agreement."
+      "example": "We enclose a copy of the agreement.",
+      "ipa": "/ɪnˈkɫoʊz/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b04-v07",
       "lesson_id": "b04",
       "term": "regarding",
       "meaning": "về; liên quan đến",
-      "example": "I am writing regarding your reservation."
+      "example": "I am writing regarding your reservation.",
+      "ipa": "/ɹɪˈɡɑɹdɪŋ/",
+      "pos": [
+        "prep"
+      ]
     },
     {
       "id": "b04-v08",
       "lesson_id": "b04",
       "term": "notify",
       "meaning": "thông báo cho",
-      "example": "Please notify us of any dietary restrictions."
+      "example": "Please notify us of any dietary restrictions.",
+      "ipa": "/ˈnoʊtəˌfaɪ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b04-v09",
       "lesson_id": "b04",
       "term": "acknowledge",
       "meaning": "xác nhận đã nhận",
-      "example": "The office acknowledged receipt of the documents."
+      "example": "The office acknowledged receipt of the documents.",
+      "ipa": "/ækˈnɑɫɪdʒ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "b04-v10",
       "lesson_id": "b04",
       "term": "postpone",
       "meaning": "hoãn lại",
-      "example": "The event has been postponed until July."
+      "example": "The event has been postponed until July.",
+      "ipa": "/poʊˈspoʊn/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "i01-v01",
       "lesson_id": "i01",
       "term": "booked",
       "meaning": "đã được đặt",
-      "example": "The large room is booked until noon."
+      "example": "The large room is booked until noon.",
+      "ipa": "/ˈbʊkt/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "i01-v02",
       "lesson_id": "i01",
       "term": "parcel",
       "meaning": "bưu kiện",
-      "example": "A parcel is waiting at reception."
+      "example": "A parcel is waiting at reception.",
+      "ipa": "/ˈpɑɹsəɫ/",
+      "pos": [
+        "n",
+        "v",
+        "adv"
+      ]
     },
     {
       "id": "i01-v03",
       "lesson_id": "i01",
       "term": "delegate",
       "meaning": "giao việc; đại biểu",
-      "example": "Can you delegate the task to someone else?"
+      "example": "Can you delegate the task to someone else?",
+      "ipa": "/ˈdɛɫəˌɡeɪt/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "i01-v04",
       "lesson_id": "i01",
       "term": "tentative",
       "meaning": "tạm thời, chưa chốt",
-      "example": "This is a tentative schedule."
+      "example": "This is a tentative schedule.",
+      "ipa": "/ˈtɛnətɪv/",
+      "pos": [
+        "n",
+        "adj"
+      ]
     },
     {
       "id": "i01-v05",
       "lesson_id": "i01",
       "term": "alternative",
       "meaning": "phương án thay thế",
-      "example": "We need an alternative meeting place."
+      "example": "We need an alternative meeting place.",
+      "ipa": "/ɔɫˈtɝnətɪv/",
+      "pos": [
+        "n",
+        "adj",
+        "v"
+      ]
     },
     {
       "id": "i01-v06",
       "lesson_id": "i01",
       "term": "overlap",
       "meaning": "trùng thời gian hoặc phạm vi",
-      "example": "The two workshops overlap by thirty minutes."
+      "example": "The two workshops overlap by thirty minutes.",
+      "ipa": "/ˈoʊvɝˌɫæp/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "i01-v07",
       "lesson_id": "i01",
       "term": "overlook",
       "meaning": "bỏ sót",
-      "example": "We overlooked a small error in the address."
+      "example": "We overlooked a small error in the address.",
+      "ipa": "/ˈoʊvɝˌɫʊk/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "i01-v08",
       "lesson_id": "i01",
       "term": "arrangement",
       "meaning": "sự sắp xếp",
-      "example": "The travel arrangement has not been confirmed."
+      "example": "The travel arrangement has not been confirmed.",
+      "ipa": "/ɝˈeɪndʒmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i01-v09",
       "lesson_id": "i01",
       "term": "unavailable",
       "meaning": "không có sẵn; không rảnh",
-      "example": "The technician is unavailable this afternoon."
+      "example": "The technician is unavailable this afternoon.",
+      "ipa": "/ˌənəˈveɪɫəbəɫ/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "i01-v10",
       "lesson_id": "i01",
       "term": "handle",
       "meaning": "xử lý; phụ trách",
-      "example": "Our support team handles urgent requests."
+      "example": "Our support team handles urgent requests.",
+      "ipa": "/ˈhændəɫ/",
+      "pos": [
+        "v",
+        "n"
+      ]
     },
     {
       "id": "i02-v01",
       "lesson_id": "i02",
       "term": "replacement",
       "meaning": "vật hoặc người thay thế",
-      "example": "A replacement cable will arrive tomorrow."
+      "example": "A replacement cable will arrive tomorrow.",
+      "ipa": "/ɹɪˈpɫeɪsmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i02-v02",
       "lesson_id": "i02",
       "term": "technician",
       "meaning": "kỹ thuật viên",
-      "example": "The technician will inspect the printer."
+      "example": "The technician will inspect the printer.",
+      "ipa": "/tɛkˈnɪʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i02-v03",
       "lesson_id": "i02",
       "term": "reservation",
       "meaning": "việc đặt chỗ",
-      "example": "Your reservation is for a table of six."
+      "example": "Your reservation is for a table of six.",
+      "ipa": "/ˌɹɛzɝˈveɪʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i02-v04",
       "lesson_id": "i02",
       "term": "maintenance",
       "meaning": "bảo trì",
-      "example": "The elevator needs routine maintenance."
+      "example": "The elevator needs routine maintenance.",
+      "ipa": "/ˈmeɪntənəns/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i02-v05",
       "lesson_id": "i02",
       "term": "estimate",
       "meaning": "ước tính; báo giá dự kiến",
-      "example": "The estimate covers parts and labor."
+      "example": "The estimate covers parts and labor.",
+      "ipa": "/ˈɛstəˌmeɪt/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "i02-v06",
       "lesson_id": "i02",
       "term": "warehouse",
       "meaning": "kho hàng",
-      "example": "The boxes are still at the warehouse."
+      "example": "The boxes are still at the warehouse.",
+      "ipa": "/ˈwɛɹˌhaʊs/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "i02-v07",
       "lesson_id": "i02",
       "term": "inventory",
       "meaning": "hàng tồn; kiểm kê",
-      "example": "We check the inventory every Friday."
+      "example": "We check the inventory every Friday.",
+      "ipa": "/ˌɪnvənˈtɔɹi/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "i02-v08",
       "lesson_id": "i02",
       "term": "venue",
       "meaning": "địa điểm tổ chức",
-      "example": "The venue is a short walk from the station."
+      "example": "The venue is a short walk from the station.",
+      "ipa": "/ˈvɛnju/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i02-v09",
       "lesson_id": "i02",
       "term": "refund",
       "meaning": "hoàn tiền",
-      "example": "The refund will appear on your next statement."
+      "example": "The refund will appear on your next statement.",
+      "ipa": "/ˈɹiˌfənd/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "i02-v10",
       "lesson_id": "i02",
       "term": "procedure",
       "meaning": "quy trình",
-      "example": "The procedure takes about ten minutes."
+      "example": "The procedure takes about ten minutes.",
+      "ipa": "/pɹəˈsidʒɝ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i03-v01",
       "lesson_id": "i03",
       "term": "authorize",
       "meaning": "cho phép chính thức",
-      "example": "Only a supervisor can authorize the purchase."
+      "example": "Only a supervisor can authorize the purchase.",
+      "ipa": "/ˈɔθɝˌaɪz/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "i03-v02",
       "lesson_id": "i03",
       "term": "requirement",
       "meaning": "yêu cầu; điều kiện cần",
-      "example": "A valid ID is a registration requirement."
+      "example": "A valid ID is a registration requirement.",
+      "ipa": "/ɹɪˈkwaɪɹmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i03-v03",
       "lesson_id": "i03",
       "term": "despite",
       "meaning": "mặc dù; theo sau bởi cụm danh từ",
-      "example": "Despite the delay, the guests remained calm."
+      "example": "Despite the delay, the guests remained calm.",
+      "ipa": "/dɪˈspaɪt/",
+      "pos": [
+        "n",
+        "prep"
+      ]
     },
     {
       "id": "i03-v04",
       "lesson_id": "i03",
       "term": "although",
       "meaning": "mặc dù; theo sau bởi mệnh đề",
-      "example": "Although it rained, the tour continued."
+      "example": "Although it rained, the tour continued.",
+      "ipa": "/ˌɔɫˈðoʊ/",
+      "pos": [
+        "conj"
+      ]
     },
     {
       "id": "i03-v05",
       "lesson_id": "i03",
       "term": "eligible",
       "meaning": "đủ điều kiện",
-      "example": "Part-time staff are eligible for the discount."
+      "example": "Part-time staff are eligible for the discount.",
+      "ipa": "/ˈɛɫədʒəbəɫ/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "i03-v06",
       "lesson_id": "i03",
       "term": "approve",
       "meaning": "phê duyệt",
-      "example": "The manager approved the revised budget."
+      "example": "The manager approved the revised budget.",
+      "ipa": "/əˈpɹuv/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "i03-v07",
       "lesson_id": "i03",
       "term": "inspect",
       "meaning": "kiểm tra",
-      "example": "The machines are inspected every month."
+      "example": "The machines are inspected every month.",
+      "ipa": "/ˌɪnˈspɛkt/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "i03-v08",
       "lesson_id": "i03",
       "term": "submit",
       "meaning": "nộp",
-      "example": "Submit your application before Friday."
+      "example": "Submit your application before Friday.",
+      "ipa": "/səbˈmɪt/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "i03-v09",
       "lesson_id": "i03",
       "term": "replacement part",
       "meaning": "linh kiện thay thế",
-      "example": "The replacement part is covered by the warranty."
+      "example": "The replacement part is covered by the warranty.",
+      "ipa": "/ɹɪˈpɫeɪsmənt ˈpɑɹt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i03-v10",
       "lesson_id": "i03",
       "term": "whose",
       "meaning": "của người hoặc vật nào",
-      "example": "The employee whose badge was lost contacted security."
+      "example": "The employee whose badge was lost contacted security.",
+      "ipa": "/ˈhuz/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i04-v01",
       "lesson_id": "i04",
       "term": "therefore",
       "meaning": "vì vậy",
-      "example": "Demand increased; therefore, we extended our hours."
+      "example": "Demand increased; therefore, we extended our hours.",
+      "ipa": "/ˈðɛɹˌfɔɹ/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "i04-v02",
       "lesson_id": "i04",
       "term": "however",
       "meaning": "tuy nhiên",
-      "example": "The service is free; however, booking is required."
+      "example": "The service is free; however, booking is required.",
+      "ipa": "/ˌhaʊˈɛvɝ/",
+      "pos": [
+        "adv",
+        "conj"
+      ]
     },
     {
       "id": "i04-v03",
       "lesson_id": "i04",
       "term": "furthermore",
       "meaning": "hơn nữa",
-      "example": "The room is larger; furthermore, it has a projector."
+      "example": "The room is larger; furthermore, it has a projector.",
+      "ipa": "/ˈfɝðɝˌmɔɹ/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "i04-v04",
       "lesson_id": "i04",
       "term": "otherwise",
       "meaning": "nếu không thì",
-      "example": "Register today; otherwise, you may lose your place."
+      "example": "Register today; otherwise, you may lose your place.",
+      "ipa": "/ˈəðɝˌwaɪz/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "i04-v05",
       "lesson_id": "i04",
       "term": "renovation",
       "meaning": "việc cải tạo",
-      "example": "The renovation will finish in September."
+      "example": "The renovation will finish in September.",
+      "ipa": "/ˌɹɛnəˈveɪʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i04-v06",
       "lesson_id": "i04",
       "term": "relocate",
       "meaning": "chuyển địa điểm",
-      "example": "The reception desk will relocate to the lobby."
+      "example": "The reception desk will relocate to the lobby.",
+      "ipa": "/ˌɹiˈɫoʊkeɪt/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "i04-v07",
       "lesson_id": "i04",
       "term": "access",
       "meaning": "quyền hoặc lối truy cập",
-      "example": "Use your badge to gain access to the building."
+      "example": "Use your badge to gain access to the building.",
+      "ipa": "/ˈækˌsɛs/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "i04-v08",
       "lesson_id": "i04",
       "term": "restriction",
       "meaning": "hạn chế",
-      "example": "The notice lists all parking restrictions."
+      "example": "The notice lists all parking restrictions.",
+      "ipa": "/ɹiˈstɹɪkʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i04-v09",
       "lesson_id": "i04",
       "term": "extension period",
       "meaning": "khoảng thời gian gia hạn",
-      "example": "The extension period ends on Monday."
+      "example": "The extension period ends on Monday.",
+      "ipa": "/ɪkˈstɛnʃən ˈpɪɹiəd/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "i04-v10",
       "lesson_id": "i04",
       "term": "arrange for",
       "meaning": "thu xếp để",
-      "example": "We will arrange for a courier to collect the parcel."
+      "example": "We will arrange for a courier to collect the parcel.",
+      "ipa": "/ɝˈeɪndʒ ˈfɔɹ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u01-v01",
       "lesson_id": "u01",
       "term": "imply",
       "meaning": "hàm ý",
-      "example": "Her comment implies that more staff are needed."
+      "example": "Her comment implies that more staff are needed.",
+      "ipa": "/ˌɪmˈpɫaɪ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "u01-v02",
       "lesson_id": "u01",
       "term": "priority",
       "meaning": "việc ưu tiên",
-      "example": "Safety is our first priority."
+      "example": "Safety is our first priority.",
+      "ipa": "/pɹaɪˈɔɹəti/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u01-v03",
       "lesson_id": "u01",
       "term": "commitment",
       "meaning": "cam kết; nghĩa vụ đã nhận",
-      "example": "A previous commitment prevents me from attending."
+      "example": "A previous commitment prevents me from attending.",
+      "ipa": "/kəˈmɪtmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u01-v04",
       "lesson_id": "u01",
       "term": "deposit",
       "meaning": "tiền đặt cọc",
-      "example": "We paid a deposit to reserve the room."
+      "example": "We paid a deposit to reserve the room.",
+      "ipa": "/dəˈpɑzɪt/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "u01-v05",
       "lesson_id": "u01",
       "term": "feasible",
       "meaning": "khả thi",
-      "example": "The plan is feasible within our current budget."
+      "example": "The plan is feasible within our current budget.",
+      "ipa": "/ˈfizəbəɫ/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "u01-v06",
       "lesson_id": "u01",
       "term": "contingency",
       "meaning": "phương án cho tình huống bất ngờ",
-      "example": "We prepared a contingency plan for rain."
+      "example": "We prepared a contingency plan for rain.",
+      "ipa": "/kənˈtɪndʒənsi/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u01-v07",
       "lesson_id": "u01",
       "term": "backlog",
       "meaning": "khối lượng việc tồn đọng",
-      "example": "Extra staff helped clear the backlog."
+      "example": "Extra staff helped clear the backlog.",
+      "ipa": "/ˈbæˌkɫɑɡ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u01-v08",
       "lesson_id": "u01",
       "term": "short notice",
       "meaning": "sự báo trước trong thời gian ngắn",
-      "example": "Thank you for coming at such short notice."
+      "example": "Thank you for coming at such short notice.",
+      "ipa": "/ˈʃɔɹt ˈnoʊtəs/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u01-v09",
       "lesson_id": "u01",
       "term": "clarify",
       "meaning": "làm rõ",
-      "example": "Could you clarify the delivery instructions?"
+      "example": "Could you clarify the delivery instructions?",
+      "ipa": "/ˈkɫɛɹəˌfaɪ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "u01-v10",
       "lesson_id": "u01",
       "term": "allocate",
       "meaning": "phân bổ",
-      "example": "The manager allocated more time to testing."
+      "example": "The manager allocated more time to testing.",
+      "ipa": "/ˈæɫəˌkeɪt/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "u02-v01",
       "lesson_id": "u02",
       "term": "reminder",
       "meaning": "lời nhắc",
-      "example": "This is a reminder about tomorrow's safety training."
+      "example": "This is a reminder about tomorrow's safety training.",
+      "ipa": "/ɹiˈmaɪndɝ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u02-v02",
       "lesson_id": "u02",
       "term": "platform",
       "meaning": "sân ga",
-      "example": "The express train now departs from platform four."
+      "example": "The express train now departs from platform four.",
+      "ipa": "/ˈpɫætˌfɔɹm/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "u02-v03",
       "lesson_id": "u02",
       "term": "due to",
       "meaning": "do; vì",
-      "example": "The entrance is closed due to maintenance."
+      "example": "The entrance is closed due to maintenance.",
+      "ipa": "/ˈdju ˈtu/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u02-v04",
       "lesson_id": "u02",
       "term": "designated",
       "meaning": "được chỉ định",
-      "example": "Please use the designated waiting area."
+      "example": "Please use the designated waiting area.",
+      "ipa": "/ˈdɛzɪɡˌneɪtɪd/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "u02-v05",
       "lesson_id": "u02",
       "term": "refreshments",
       "meaning": "đồ ăn nhẹ và đồ uống",
-      "example": "Refreshments will be served after the presentation."
+      "example": "Refreshments will be served after the presentation.",
+      "ipa": "/ɹəˈfɹɛʃmənts/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u02-v06",
       "lesson_id": "u02",
       "term": "detour",
       "meaning": "đường vòng",
-      "example": "Follow the signs for the temporary detour."
+      "example": "Follow the signs for the temporary detour.",
+      "ipa": "/ˈditʊɹ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u02-v07",
       "lesson_id": "u02",
       "term": "admission",
       "meaning": "quyền hoặc phí vào cửa",
-      "example": "Admission is free for registered volunteers."
+      "example": "Admission is free for registered volunteers.",
+      "ipa": "/ædˈmɪʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u02-v08",
       "lesson_id": "u02",
       "term": "enrollment",
       "meaning": "việc ghi danh",
-      "example": "Enrollment closes at the end of the week."
+      "example": "Enrollment closes at the end of the week.",
+      "ipa": "/ɛnˈɹoʊɫmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u02-v09",
       "lesson_id": "u02",
       "term": "recipient department",
       "meaning": "bộ phận nhận",
-      "example": "Write the recipient department on each package."
+      "example": "Write the recipient department on each package.",
+      "ipa": "/ɹəˈsɪpiənt dɪˈpɑɹtmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u02-v10",
       "lesson_id": "u02",
       "term": "in advance",
       "meaning": "trước",
-      "example": "Book in advance to guarantee a place."
+      "example": "Book in advance to guarantee a place.",
+      "ipa": "/ˈɪn ədˈvæns/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u03-v01",
       "lesson_id": "u03",
       "term": "complimentary",
       "meaning": "miễn phí, được tặng",
-      "example": "Guests receive a complimentary breakfast."
+      "example": "Guests receive a complimentary breakfast.",
+      "ipa": "/ˌkɑmpɫəˈmɛntɝi/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "u03-v02",
       "lesson_id": "u03",
       "term": "complementary",
       "meaning": "bổ trợ lẫn nhau",
-      "example": "The two teams have complementary skills."
+      "example": "The two teams have complementary skills.",
+      "ipa": "/ˌkɑmpɫəˈmɛntɹi/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "u03-v03",
       "lesson_id": "u03",
       "term": "economical",
       "meaning": "tiết kiệm",
-      "example": "The smaller vehicle is more economical to operate."
+      "example": "The smaller vehicle is more economical to operate.",
+      "ipa": "/ˌɛkəˈnɑmɪkəɫ/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "u03-v04",
       "lesson_id": "u03",
       "term": "economic",
       "meaning": "thuộc kinh tế",
-      "example": "The report describes recent economic trends."
+      "example": "The report describes recent economic trends.",
+      "ipa": "/ˌɛkəˈnɑmɪk/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "u03-v05",
       "lesson_id": "u03",
       "term": "provided that",
       "meaning": "với điều kiện là",
-      "example": "You may leave early provided that the work is finished."
+      "example": "You may leave early provided that the work is finished.",
+      "ipa": "/pɹəˈvaɪdɪd ˈðæt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u03-v06",
       "lesson_id": "u03",
       "term": "unless",
       "meaning": "trừ khi; nếu không",
-      "example": "The order will be held unless payment is received."
+      "example": "The order will be held unless payment is received.",
+      "ipa": "/ənˈɫɛs/",
+      "pos": [
+        "conj"
+      ]
     },
     {
       "id": "u03-v07",
       "lesson_id": "u03",
       "term": "nevertheless",
       "meaning": "tuy nhiên, dù vậy",
-      "example": "The task was difficult; nevertheless, we completed it."
+      "example": "The task was difficult; nevertheless, we completed it.",
+      "ipa": "/ˌnɛvɝðəˈɫɛs/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "u03-v08",
       "lesson_id": "u03",
       "term": "contingent on",
       "meaning": "phụ thuộc vào điều kiện",
-      "example": "The offer is contingent on a successful inspection."
+      "example": "The offer is contingent on a successful inspection.",
+      "ipa": "/kənˈtɪndʒənt ˈɑn/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u03-v09",
       "lesson_id": "u03",
       "term": "compliance",
       "meaning": "việc tuân thủ",
-      "example": "The audit checks compliance with safety rules."
+      "example": "The audit checks compliance with safety rules.",
+      "ipa": "/kəmˈpɫaɪəns/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u03-v10",
       "lesson_id": "u03",
       "term": "substantial",
       "meaning": "đáng kể",
-      "example": "The change produced a substantial reduction in waste."
+      "example": "The change produced a substantial reduction in waste.",
+      "ipa": "/səbˈstænʃəɫ/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "u04-v01",
       "lesson_id": "u04",
       "term": "exception",
       "meaning": "ngoại lệ",
-      "example": "The policy allows one exception for urgent repairs."
+      "example": "The policy allows one exception for urgent repairs.",
+      "ipa": "/ɪkˈsɛpʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v02",
       "lesson_id": "u04",
       "term": "eligible applicant",
       "meaning": "ứng viên đủ điều kiện",
-      "example": "Eligible applicants will receive an invitation."
+      "example": "Eligible applicants will receive an invitation.",
+      "ipa": "/ˈɛɫədʒəbəɫ ˈæpɫɪkənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v03",
       "lesson_id": "u04",
       "term": "trial period",
       "meaning": "giai đoạn thử nghiệm",
-      "example": "The trial period has been extended by two weeks."
+      "example": "The trial period has been extended by two weeks.",
+      "ipa": "/ˈtɹaɪəɫ ˈpɪɹiəd/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v04",
       "lesson_id": "u04",
       "term": "no later than",
       "meaning": "không muộn hơn",
-      "example": "Return the form no later than June tenth."
+      "example": "Return the form no later than June tenth.",
+      "ipa": "/ˈnoʊ ˈɫeɪtɝ ˈðæn/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v05",
       "lesson_id": "u04",
       "term": "at least",
       "meaning": "ít nhất",
-      "example": "Each group must contain at least five people."
+      "example": "Each group must contain at least five people.",
+      "ipa": "/ˈæt ˈɫist/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v06",
       "lesson_id": "u04",
       "term": "subject to",
       "meaning": "tùy thuộc; chịu sự điều chỉnh",
-      "example": "All bookings are subject to availability."
+      "example": "All bookings are subject to availability.",
+      "ipa": "/ˈsəbdʒɪkt ˈtu/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v07",
       "lesson_id": "u04",
       "term": "waiver",
       "meaning": "sự miễn trừ; văn bản miễn trừ",
-      "example": "Students may request a fee waiver."
+      "example": "Students may request a fee waiver.",
+      "ipa": "/ˈweɪvɝ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v08",
       "lesson_id": "u04",
       "term": "restriction period",
       "meaning": "thời gian áp dụng hạn chế",
-      "example": "The restriction period ends after the inspection."
+      "example": "The restriction period ends after the inspection.",
+      "ipa": "/ɹiˈstɹɪkʃən ˈpɪɹiəd/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v09",
       "lesson_id": "u04",
       "term": "renewal",
       "meaning": "sự gia hạn",
-      "example": "Membership renewal is available online."
+      "example": "Membership renewal is available online.",
+      "ipa": "/ɹɪˈnuəɫ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "u04-v10",
       "lesson_id": "u04",
       "term": "retain",
       "meaning": "giữ lại",
-      "example": "Please retain a copy of your confirmation."
+      "example": "Please retain a copy of your confirmation.",
+      "ipa": "/ɹiˈteɪn/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a01-v01",
       "lesson_id": "a01",
       "term": "provisional",
       "meaning": "tạm thời, còn có thể thay đổi",
-      "example": "The opening date is provisional."
+      "example": "The opening date is provisional.",
+      "ipa": "/pɹəˈvɪʒənəɫ/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "a01-v02",
       "lesson_id": "a01",
       "term": "accommodate",
       "meaning": "đáp ứng; thu xếp chỗ cho",
-      "example": "We can accommodate your request for an earlier delivery."
+      "example": "We can accommodate your request for an earlier delivery.",
+      "ipa": "/əˈkɑməˌdeɪt/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a01-v03",
       "lesson_id": "a01",
       "term": "waive",
       "meaning": "miễn một khoản hoặc yêu cầu",
-      "example": "The bank agreed to waive the service fee."
+      "example": "The bank agreed to waive the service fee.",
+      "ipa": "/ˈweɪv/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a01-v04",
       "lesson_id": "a01",
       "term": "at no additional cost",
       "meaning": "không phát sinh phí thêm",
-      "example": "Installation is included at no additional cost."
+      "example": "Installation is included at no additional cost.",
+      "ipa": "/ˈæt ˈnoʊ əˈdɪʃənəɫ ˈkɑst/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a01-v05",
       "lesson_id": "a01",
       "term": "pending",
       "meaning": "đang chờ xử lý hoặc quyết định",
-      "example": "The application is pending final approval."
+      "example": "The application is pending final approval.",
+      "ipa": "/ˈpɛndɪŋ/",
+      "pos": [
+        "n",
+        "v",
+        "adj"
+      ]
     },
     {
       "id": "a01-v06",
       "lesson_id": "a01",
       "term": "revised estimate",
       "meaning": "ước tính đã điều chỉnh",
-      "example": "The revised estimate includes weekend labor."
+      "example": "The revised estimate includes weekend labor.",
+      "ipa": "/ɹiˈvaɪzd ˈɛstəˌmeɪt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a01-v07",
       "lesson_id": "a01",
       "term": "expedite",
       "meaning": "đẩy nhanh",
-      "example": "The warehouse will expedite the replacement shipment."
+      "example": "The warehouse will expedite the replacement shipment.",
+      "ipa": "/ˈɛkspɪˌdaɪt/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a01-v08",
       "lesson_id": "a01",
       "term": "discretion",
       "meaning": "quyền tự quyết theo cân nhắc",
-      "example": "Extensions may be granted at the manager's discretion."
+      "example": "Extensions may be granted at the manager's discretion.",
+      "ipa": "/dɪsˈkɹɛʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a01-v09",
       "lesson_id": "a01",
       "term": "reassure",
       "meaning": "trấn an; bảo đảm lại",
-      "example": "The speaker reassured customers about their bookings."
+      "example": "The speaker reassured customers about their bookings.",
+      "ipa": "/ˌɹiəˈʃʊɹ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a01-v10",
       "lesson_id": "a01",
       "term": "offset",
       "meaning": "bù đắp",
-      "example": "Lower energy costs will offset the initial expense."
+      "example": "Lower energy costs will offset the initial expense.",
+      "ipa": "/ˈɔfˌsɛt/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "a02-v01",
       "lesson_id": "a02",
       "term": "consequently",
       "meaning": "do đó, kết quả là",
-      "example": "The room is unavailable; consequently, we must relocate."
+      "example": "The room is unavailable; consequently, we must relocate.",
+      "ipa": "/ˈkɑnsəˌkwɛntɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "a02-v02",
       "lesson_id": "a02",
       "term": "in contrast",
       "meaning": "ngược lại",
-      "example": "The first option is cheaper; in contrast, the second is faster."
+      "example": "The first option is cheaper; in contrast, the second is faster.",
+      "ipa": "/ˈɪn ˈkɑntɹæst/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a02-v03",
       "lesson_id": "a02",
       "term": "such an arrangement",
       "meaning": "một cách sắp xếp như vậy",
-      "example": "Such an arrangement would reduce waiting time."
+      "example": "Such an arrangement would reduce waiting time.",
+      "ipa": "/ˈsətʃ ˈæn ɝˈeɪndʒmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a02-v04",
       "lesson_id": "a02",
       "term": "this provision",
       "meaning": "điều khoản này",
-      "example": "This provision applies only to annual subscriptions."
+      "example": "This provision applies only to annual subscriptions.",
+      "ipa": "/ˈðɪs pɹəˈvɪʒən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a02-v05",
       "lesson_id": "a02",
       "term": "consolidate",
       "meaning": "gộp; hợp nhất",
-      "example": "We will consolidate the deliveries into one shipment."
+      "example": "We will consolidate the deliveries into one shipment.",
+      "ipa": "/kənˈsɑɫɪˌdeɪt/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a02-v06",
       "lesson_id": "a02",
       "term": "accordingly",
       "meaning": "theo đó; cho phù hợp",
-      "example": "The timetable has been adjusted accordingly."
+      "example": "The timetable has been adjusted accordingly.",
+      "ipa": "/əˈkɔɹdɪŋɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "a02-v07",
       "lesson_id": "a02",
       "term": "notwithstanding",
       "meaning": "mặc dù; bất chấp",
-      "example": "The event will proceed notwithstanding the repairs nearby."
+      "example": "The event will proceed notwithstanding the repairs nearby.",
+      "ipa": "/ˌnɑtwɪθˈstændɪŋ/",
+      "pos": [
+        "adv",
+        "prep",
+        "conj"
+      ]
     },
     {
       "id": "a02-v08",
       "lesson_id": "a02",
       "term": "hereby",
       "meaning": "bằng văn bản hoặc hành động này",
-      "example": "We hereby confirm your reservation."
+      "example": "We hereby confirm your reservation.",
+      "ipa": "/hɪɹˈbaɪ/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "a02-v09",
       "lesson_id": "a02",
       "term": "subsequent",
       "meaning": "xảy ra tiếp theo",
-      "example": "Subsequent requests will be handled next week."
+      "example": "Subsequent requests will be handled next week.",
+      "ipa": "/ˈsəbsəkwənt/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "a02-v10",
       "lesson_id": "a02",
       "term": "mutually beneficial",
       "meaning": "có lợi cho cả hai bên",
-      "example": "The teams agreed on a mutually beneficial arrangement."
+      "example": "The teams agreed on a mutually beneficial arrangement.",
+      "ipa": "/ˈmjutʃuəɫi ˌbɛnəˈfɪʃəɫ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a03-v01",
       "lesson_id": "a03",
       "term": "cross-reference",
       "meaning": "đối chiếu giữa các nguồn",
-      "example": "Cross-reference the email with the price list."
+      "example": "Cross-reference the email with the price list.",
+      "ipa": "/ˈkɹɔsˌɹɛfɝəns/",
+      "pos": [
+        "n",
+        "v"
+      ]
     },
     {
       "id": "a03-v02",
       "lesson_id": "a03",
       "term": "amendment",
       "meaning": "sự sửa đổi; bản bổ sung",
-      "example": "The amendment changes the delivery address only."
+      "example": "The amendment changes the delivery address only.",
+      "ipa": "/əˈmɛndmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a03-v03",
       "lesson_id": "a03",
       "term": "qualify for",
       "meaning": "đủ điều kiện nhận",
-      "example": "Your order qualifies for free delivery."
+      "example": "Your order qualifies for free delivery.",
+      "ipa": "/ˈkwɑɫəˌfaɪ ˈfɔɹ/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a03-v04",
       "lesson_id": "a03",
       "term": "itemized",
       "meaning": "được liệt kê từng mục",
-      "example": "Please send an itemized invoice."
+      "example": "Please send an itemized invoice.",
+      "ipa": "/ˈaɪtəˌmaɪzd/",
+      "pos": [
+        "adj"
+      ]
     },
     {
       "id": "a03-v05",
       "lesson_id": "a03",
       "term": "inclusive of",
       "meaning": "đã bao gồm",
-      "example": "The quoted price is inclusive of installation."
+      "example": "The quoted price is inclusive of installation.",
+      "ipa": "/ˌɪnˈkɫusɪv ˈəv/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a03-v06",
       "lesson_id": "a03",
       "term": "on behalf of",
       "meaning": "thay mặt",
-      "example": "I am writing on behalf of the organizing team."
+      "example": "I am writing on behalf of the organizing team.",
+      "ipa": "/ˈɑn bɪˈhæf ˈəv/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a03-v07",
       "lesson_id": "a03",
       "term": "valid through",
       "meaning": "có hiệu lực đến hết",
-      "example": "The discount is valid through the end of July."
+      "example": "The discount is valid through the end of July.",
+      "ipa": "/ˈvæɫɪd ˈθɹu/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a03-v08",
       "lesson_id": "a03",
       "term": "redeem",
       "meaning": "đổi hoặc sử dụng phiếu ưu đãi",
-      "example": "You can redeem the voucher at any branch."
+      "example": "You can redeem the voucher at any branch.",
+      "ipa": "/ɹɪˈdim/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a03-v09",
       "lesson_id": "a03",
       "term": "reconcile",
       "meaning": "đối chiếu để thống nhất",
-      "example": "We need to reconcile the invoice with the order."
+      "example": "We need to reconcile the invoice with the order.",
+      "ipa": "/ˈɹɛkənˌsaɪɫ/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a03-v10",
       "lesson_id": "a03",
       "term": "supersede",
       "meaning": "thay thế văn bản hoặc quy định trước",
-      "example": "This schedule supersedes the version sent yesterday."
+      "example": "This schedule supersedes the version sent yesterday.",
+      "ipa": "/ˌsupɝˈsid/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a04-v01",
       "lesson_id": "a04",
       "term": "finalize",
       "meaning": "hoàn tất; chốt",
-      "example": "We will finalize the guest list on Thursday."
+      "example": "We will finalize the guest list on Thursday.",
+      "ipa": "/ˈfaɪnəˌɫaɪz/",
+      "pos": [
+        "v"
+      ]
     },
     {
       "id": "a04-v02",
       "lesson_id": "a04",
       "term": "outstanding balance",
       "meaning": "số tiền còn phải trả",
-      "example": "The outstanding balance is due next week."
+      "example": "The outstanding balance is due next week.",
+      "ipa": "/ˌaʊtˈstændɪŋ ˈbæɫəns/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a04-v03",
       "lesson_id": "a04",
       "term": "respectively",
       "meaning": "lần lượt",
-      "example": "The two rooms hold thirty and fifty guests, respectively."
+      "example": "The two rooms hold thirty and fifty guests, respectively.",
+      "ipa": "/ɹɪˈspɛktɪvɫi/",
+      "pos": [
+        "adv"
+      ]
     },
     {
       "id": "a04-v04",
       "lesson_id": "a04",
       "term": "irrespective of",
       "meaning": "bất kể",
-      "example": "The fee applies irrespective of group size."
+      "example": "The fee applies irrespective of group size.",
+      "ipa": "/ˌɪɹəˈspɛktɪv ˈəv/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a04-v05",
       "lesson_id": "a04",
       "term": "in lieu of",
       "meaning": "thay cho",
-      "example": "Guests received a voucher in lieu of a refund."
+      "example": "Guests received a voucher in lieu of a refund.",
+      "ipa": "/ˈɪn ˈɫju ˈəv/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a04-v06",
       "lesson_id": "a04",
       "term": "prior authorization",
       "meaning": "sự cho phép trước",
-      "example": "Changes require prior authorization from the coordinator."
+      "example": "Changes require prior authorization from the coordinator.",
+      "ipa": "/ˈpɹaɪɝ ˌɔθɝəˈzeɪʃən/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a04-v07",
       "lesson_id": "a04",
       "term": "discrepancy",
       "meaning": "sự chênh lệch; điểm không khớp",
-      "example": "The clerk noticed a discrepancy in the quantities."
+      "example": "The clerk noticed a discrepancy in the quantities.",
+      "ipa": "/dɪsˈkɹɛpənsi/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a04-v08",
       "lesson_id": "a04",
       "term": "reimbursement claim",
       "meaning": "đề nghị hoàn trả chi phí",
-      "example": "Submit the reimbursement claim with your receipts."
+      "example": "Submit the reimbursement claim with your receipts.",
+      "ipa": "/ˌɹiɪmˈbɝsmənt ˈkɫeɪm/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a04-v09",
       "lesson_id": "a04",
       "term": "fulfillment",
       "meaning": "việc hoàn thành hoặc xử lý đơn hàng",
-      "example": "Order fulfillment will resume after the holiday."
+      "example": "Order fulfillment will resume after the holiday.",
+      "ipa": "/fʊɫˈfɪɫmənt/",
+      "pos": [
+        "n"
+      ]
     },
     {
       "id": "a04-v10",
       "lesson_id": "a04",
       "term": "turnaround time",
       "meaning": "thời gian xử lý từ nhận đến trả kết quả",
-      "example": "The usual turnaround time is three working days."
+      "example": "The usual turnaround time is three working days.",
+      "ipa": "/ˈtɝnɝˌaʊnd ˈtaɪm/",
+      "pos": [
+        "n"
+      ]
     }
   ],
   "curriculum": {

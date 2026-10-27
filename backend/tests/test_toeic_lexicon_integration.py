@@ -19,7 +19,11 @@ async def test_lexicon_pagination_search_and_private_progress(live):
     assert not {w["id"] for w in first["items"]} & {w["id"] for w in second["items"]}
     assert first["items"][0]["term"] == "the" and first["license"] == "CC BY-SA 4.0"
     cafe = (await http.get("/api/toeic/lexicon", params={"deck":"tsl", "q":"cafe"}, headers=headers)).json()
-    assert any(w["term"] == "café" and w["meaning_language"] == "en" for w in cafe["items"])
+    assert any(w["term"] == "café" and w["meaning_language"] == "en" and w["ipa"] == "/kæˈfeɪ/" for w in cafe["items"])
+    vi_search = (await http.get("/api/toeic/lexicon", params={"deck":"tsl", "q":"hoa don"}, headers=headers)).json()
+    assert any(w["term"] == "invoice" and "hóa đơn" in w["meaning_vi"] for w in vi_search["items"])
+    pos_letter = (await http.get("/api/toeic/lexicon", params={"deck":"tsl", "pos":"v", "letter":"r"}, headers=headers)).json()
+    assert pos_letter["total"] > 0 and all("v" in w["pos"] and w["term"].startswith("r") for w in pos_letter["items"])
     legacy = (await http.get("/api/toeic/vocabulary", headers=headers)).json()
     assert len(legacy) == 200 and all(not w["id"].startswith("lex-") for w in legacy)
     catalog = (await http.get("/api/toeic/catalog", headers=headers)).json()

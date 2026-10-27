@@ -86,7 +86,12 @@ def test_search_matches_accents_aliases_and_definitions_without_fabricating_exam
     assert search_words("all", "e-mail")[0]["term"] == "email"
     assert any(w["term"] == "café" for w in search_words("tsl", "cafe"))
     assert any(w["term"] == "smartphone" for w in search_words("tsl", "applications"))
+    assert any(w["term"] == "invoice" for w in search_words("tsl", "hóa đơn"))
+    assert any(w["term"] == "invoice" for w in search_words("tsl", "hoa don"))
+    assert all("v" in w["pos"] for w in search_words("tsl", pos="v"))
+    assert all(w["term"].startswith("c") for w in search_words("tsl", letter="c"))
     assert search_words("all", "no-match-xyz-9911") == []
     card = card_view(search_words("tsl", "smartphone")[0])
     assert card["meaning_language"] == "en" and card["example"] == ""
+    assert card["meaning_vi"] == "điện thoại thông minh" and card["ipa"] == "/ˈsmɑɹtˌfoʊn/" and card["pos"] == ["n"]
     assert card["due"] is None and card["reviews"] == card["version"] == 0

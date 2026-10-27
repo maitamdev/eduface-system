@@ -20,7 +20,7 @@ Tính năng nằm trong ứng dụng EduFace hiện có, tại `/toeic`. Tài kh
 - **Luyện tập & 9 mã đề cố định:** khảo sát 25 câu/25 phút, bài theo từng Part, luyện theo dạng bài, sổ câu sai (từ 50 lượt nộp gần nhất) và 9 mã đề cố định (gồm **3 đề toàn phần 200 câu/120 phút không trùng ID câu**, 4 đề mini 50 câu/35 phút, 1 đề Listening 100 câu/45 phút, 1 đề Reading 100 câu/75 phút). Part 1–2 chỉ hiện nhãn A/B/C/D trước khi nộp để luyện nghe; Part 3–4 dùng audio chung theo nhóm. Đáp án, giải thích và transcript được mở sau khi nộp.
 - **Tiếp tục bài:** dùng “Lưu & về góc học tập”, vào **Tiến độ → Bài đang làm → Tiếp tục**. Thời gian vẫn chạy khi rời trang. Bài hết hạn được chấm từ đáp án đã lưu trên máy chủ; không chấp nhận thay đáp án sau hạn (có 3 giây đệm cho yêu cầu nộp).
 - **Lưu lỗi:** đáp án trên màn hình vẫn giữ để thử lại. Không đóng tab khi đang báo “Chưa lưu được”. Nếu hai cửa sổ cùng sửa một bài, server chặn bản ghi cũ; nút lấy bản đã lưu sẽ thay bản chưa lưu hiện tại bằng bản trên server.
-- **Từ vựng (200 thẻ DHV + 4.060 từ Kho từ mở NGSL/TSL):** tự nhớ rồi lật thẻ; chọn Học lại/Khó/Nhớ được/Dễ. FSRS lên lịch theo mức nhớ cho cả bộ thẻ tiếng Việt DHV lẫn Kho từ mở định nghĩa tiếng Anh (NGSL 1.2 + TOEIC Service List 1.2, CC BY-SA 4.0). Từ đến hạn được ưu tiên trước từ mới. Từ chưa đến hạn vẫn xem lại được nhưng không ghi thêm một lượt ôn quá sớm.
+- **Từ vựng (200 thẻ DHV + Sổ tra từ song ngữ 4.060 từ NGSL/TSL):** hỗ trợ 2 chế độ xem (**Thẻ lật FSRS** và **Sổ tra từ song ngữ 30 từ/trang**), tra cứu hai chiều Anh–Việt (có/không dấu), lọc theo bảng chữ cái A–Z và từ loại (`Danh từ`, `Động từ`, `Tính từ`, `Trạng từ`, `Từ chức năng`), kèm phiên âm IPA chuẩn Mỹ (`open-dict-data/ipa-dict`, MIT), nghĩa tiếng Việt (`Vietnamese Wiktionary / Kaikki.org` & biên tập DHV, CC BY-SA 4.0) và định nghĩa tiếng Anh gốc (`NGSL 1.2 + TSL 1.2`, CC BY-SA 4.0). Có thể tải trọn bộ [Sổ tay từ vựng song ngữ (.md)](SO_TAY_TU_VUNG.md) hoặc JSON.
 - **Tiến độ:** mục tiêu 350/550/650/750/900, 15/30/45/60 phút mỗi ngày, chuỗi ngày học theo giờ Việt Nam, 20 lượt gần nhất, 90 ngày có hoạt động gần nhất và gợi ý Part cần củng cố.
 - **Nguồn học:** link ETS, IIG, British Council, Cambridge, TOEIC Question Ocean (MIT), NGSL/TSL (CC BY-SA 4.0), Awesome TOEIC, EdNet và mã nguồn FSRS, có phân biệt nguồn tái sử dụng, nguồn tham khảo và khóa có phí.
 
@@ -37,8 +37,8 @@ Tính năng nằm trong ứng dụng EduFace hiện có, tại `/toeic`. Tài kh
 | Câu hỏi có chấm điểm và lời giải tiếng Việt | 1.376 |
 | Part 1 / 2 / 3 / 4 / 5 / 6 / 7 | 33 / 151 / 135 / 117 / 400 / 96 / 444 |
 | Mã đề cố định (3 đề toàn phần 200 câu không trùng ID) | 9 |
-| Thẻ từ vựng tiếng Việt DHV có câu ví dụ | 200 |
-| Kho từ mở NGSL 1.2 + TSL 1.2 (định nghĩa tiếng Anh, CC BY-SA 4.0) | 4.060 |
+| Thẻ từ vựng tiếng Việt DHV có câu ví dụ, IPA & từ loại | 200 |
+| Sổ tra từ song ngữ NGSL 1.2 + TSL 1.2 (Anh–Việt + IPA + từ loại, CC BY-SA 4.0 & MIT) | 4.060 |
 | Audio tổng hợp dựng sẵn | 268 WAV, khoảng 71,44 phút, 137,17 MB |
 | Hình Part 1 | 33 (8 SVG + 20 JPG AI theo MIT + 5 JPG Pexels) |
 

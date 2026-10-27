@@ -128,6 +128,11 @@ def expand_sources(data):
     assert imported_ids == REVIEWS.keys() - EXCLUDED.keys(), "Review/source inventory drift"
     assert len(snapshot["questions"]) == len(existing) + len(imported) + len(excluded)
     data["questions"].extend(imported)
+    bilingual = json.loads((ROOT / "backend/data/toeic/vendor/ngsl-tsl/bilingual_enrichment.json").read_text(encoding="utf-8"))["entries"]
+    for card in data["vocabulary"]:
+        extra = bilingual.get(card["term"].strip().lower(), {})
+        card["ipa"] = extra.get("ipa", "")
+        card["pos"] = extra.get("pos", ["n"])
     data["version"] = "dhv-toeic-2026.10-v4"
     data["lexicon_count"] = json.loads((ROOT / "backend/data/toeic/lexicon.json").read_text(encoding="utf-8"))["word_count"]
     data["expansion"].update({
@@ -138,12 +143,13 @@ def expand_sources(data):
     ocean = next(s for s in data["sources"] if s["id"] == "ocean-mit")
     ocean["usage"] = f"Đối chiếu toàn bộ {len(snapshot['questions'])} câu ở revision đã chốt; {len(existing) + len(imported)} câu được dùng sau rà soát, có lời giải tiếng Việt. Loại {len(excluded)} câu có vấn đề. Ảnh gồm cảnh AI theo MIT và 5 ảnh Pexels có ghi nguồn riêng; audio tổng hợp lại từ transcript."
     data["sources"].extend([
-        {"id": "ngsl", "title": "NGSL 1.2 · Từ vựng nền tảng", "url": "https://www.newgeneralservicelist.com/new-general-service-list", "provider": "Browne, Culligan & Phillips", "access": "CC BY-SA 4.0 · từ và định nghĩa tiếng Anh", "stage": "Nền tảng / mọi level", "usage": "Đã nhập 2.809 từ theo bảng tần suất và định nghĩa của tác giả. Tìm kiếm và ôn thẻ trong Kho từ mở; thứ hạng không phải điểm TOEIC."},
-        {"id": "tsl", "title": "TOEIC Service List 1.2 · Từ vựng bổ trợ", "url": "https://www.newgeneralservicelist.com/toeic-service-list", "provider": "Browne & Culligan", "access": "CC BY-SA 4.0 · từ và định nghĩa tiếng Anh", "stage": "Sau nền tảng / ôn TOEIC", "usage": "Đã nhập 1.250 từ xếp hạng, bổ sung các mục chỉ có trong bảng định nghĩa và ghi rõ phần DHV bổ sung. Đây là danh sách từ, không phải đề thi ETS."},
+        {"id": "ngsl", "title": "NGSL 1.2 · Từ vựng nền tảng song ngữ Anh–Việt", "url": "https://www.newgeneralservicelist.com/new-general-service-list", "provider": "Browne, Culligan & Phillips", "access": "CC BY-SA 4.0 · song ngữ Anh–Việt + IPA", "stage": "Nền tảng / mọi level", "usage": "Đã nhập 2.809 từ theo bảng tần suất và định nghĩa gốc của tác giả, bổ sung nghĩa tiếng Việt (Wiktionary/DHV · CC BY-SA 4.0), từ loại và phiên âm IPA (ipa-dict · MIT)."},
+        {"id": "tsl", "title": "TOEIC Service List 1.2 · Từ vựng công sở song ngữ Anh–Việt", "url": "https://www.newgeneralservicelist.com/toeic-service-list", "provider": "Browne & Culligan", "access": "CC BY-SA 4.0 · song ngữ Anh–Việt + IPA", "stage": "Sau nền tảng / ôn TOEIC", "usage": "Đã nhập 1.250 từ xếp hạng và 2 mục bổ sung kèm nghĩa tiếng Việt, từ loại, phiên âm IPA và định nghĩa tiếng Anh. Đây là danh sách từ, không phải đề thi ETS."},
+        {"id": "wiktionary-ipa", "title": "Vietnamese Wiktionary & ipa-dict · Dữ liệu từ điển song ngữ & phiên âm", "url": "https://vi.wiktionary.org/", "provider": "Wiktionary / Kaikki.org & open-dict-data", "access": "CC BY-SA 4.0 & MIT · tích hợp trong Sổ tra từ", "stage": "Tra từ & phát âm mọi level", "usage": "Cung cấp nghĩa tiếng Việt, phân loại từ loại (POS) và phiên âm IPA tiếng Anh Mỹ cho toàn bộ 4.060 mục từ trong Sổ tra từ song ngữ."},
         {"id": "toeic-practice-reference", "title": "TOEIC Practice · Phạm vi dữ liệu và giấy phép", "url": "https://github.com/seikaikyo/toeic-practice", "provider": "seikaikyo", "access": "Mã và ngân hàng đề: độc quyền · từ vựng có thông báo riêng", "stage": "Tham khảo nguồn", "usage": "Không nhập mã nguồn hoặc ngân hàng câu hỏi độc quyền. Dữ liệu NGSL/TSL dùng trong DHV được lấy trực tiếp từ tác giả theo CC BY-SA 4.0; không coi toàn bộ repository là nguồn mở."},
         {"id": "awesome-toeic", "title": "Awesome TOEIC · Danh mục tài nguyên", "url": "https://github.com/thu-tram/awesome-toeic", "provider": "thu-tram / cộng đồng", "access": "Liên kết tham khảo tại nguồn", "stage": "Listening & Reading", "usage": "Danh mục giúp tìm website, bài nghe và đề luyện. Không phải một ngân hàng được cấp phép để tải toàn bộ vào DHV; mở nguồn đích để học theo điều kiện của từng nơi."},
         {"id": "ednet-research", "title": "EdNet · Dữ liệu nghiên cứu hành vi học", "url": "https://github.com/riiid/ednet", "provider": "Riiid", "access": "CC BY-NC 4.0 · mục đích nghiên cứu", "stage": "Tham khảo nghiên cứu", "usage": "Dữ liệu tương tác và metadata không cung cấp đầy đủ đề, lựa chọn và audio. Chưa nhập vào ngân hàng luyện thi; chỉ dẫn nguồn nghiên cứu, không tạo câu hỏi từ metadata."},
     ])
-    data["notice"] = "Học liệu DHV và câu hỏi MIT từ TOEIC Question Ocean được rà soát, có lời giải tiếng Việt. Không phải đề ETS; mục tiêu 900 không bảo đảm kết quả. Audio tổng hợp; ảnh Part 1 gồm minh họa, cảnh AI và ảnh Pexels ghi nguồn. Kho từ NGSL/TSL dùng định nghĩa tiếng Anh theo CC BY-SA 4.0. Điểm bài luyện là số câu đúng, không quy đổi điểm TOEIC chính thức."
+    data["notice"] = "Học liệu DHV và câu hỏi MIT từ TOEIC Question Ocean được rà soát, có lời giải tiếng Việt. Không phải đề ETS; mục tiêu 900 không bảo đảm kết quả. Audio tổng hợp; ảnh Part 1 gồm minh họa, cảnh AI và ảnh Pexels ghi nguồn. Sổ tra từ song ngữ NGSL/TSL kết hợp định nghĩa tiếng Anh, nghĩa tiếng Việt (CC BY-SA 4.0) và phiên âm IPA (MIT). Điểm bài luyện là số câu đúng, không quy đổi điểm TOEIC chính thức."
     add_third_form(data)
     return data
