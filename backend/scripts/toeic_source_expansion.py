@@ -134,7 +134,7 @@ def expand_sources(data):
         card["ipa"] = extra.get("ipa", "")
         card["pos"] = extra.get("pos", ["n"])
     data["version"] = "dhv-toeic-2026.10-v4"
-    data["lexicon_count"] = json.loads((ROOT / "backend/data/toeic/lexicon.json").read_text(encoding="utf-8"))["word_count"]
+    data["lexicon_count"] = json.loads((ROOT / "backend/data/toeic/dictionary-meta.json").read_text(encoding="utf-8"))["word_count"]
     data["expansion"].update({
         "version": "2026.10-v4", "adapted_questions": len(existing) + len(imported),
         "new_questions": len(imported), "upstream_total": len(snapshot["questions"]),

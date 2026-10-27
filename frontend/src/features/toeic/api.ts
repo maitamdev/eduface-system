@@ -1,13 +1,13 @@
 import { apiFetch } from "@/api/client";
 
 export type Stage = { id: number; title: string; range: string; focus: string; weeks: string };
-export type PosTag = "n" | "v" | "adj" | "adv" | "prep" | "conj" | "pron" | "det" | "interj";
+export type PosTag = "n" | "v" | "adj" | "adv" | "prep" | "conj" | "pron" | "det" | "interj" | "num" | "phrase" | "abbr" | "particle" | "prefix" | "suffix" | "other";
 export type Card = { id: string; lesson_id: string; term: string; ipa?: string; pos?: PosTag[]; meaning: string; example: string; version: number; due: string | null; reviews: number };
 export type LexiconSource = {id: string; name: string; authors: string; url: string; license: string; license_url: string};
-export type LexiconWord = {id: string; term: string; ipa?: string; pos?: PosTag[]; meaning_vi?: string; example?: string; vi_source?: string; inflections?: string[]; meaning_language: "en"; definitions: {source_id: string; text: string; source_term: string; adapted_by_dhv: boolean}[]; lists: {id: string; rank: number | null; tier?: number; supplemental: boolean}[]};
-export type LexiconCard = Card & LexiconWord & {meaning_en?: string};
-export type LexiconFilters = {deck: "all" | "core" | "ngsl" | "tsl" | "thichhoc"; q: string; state: "all" | "due" | "new" | "learned"; pos?: "all" | "n" | "v" | "adj" | "adv" | "func"; letter?: string; offset: number; limit: number};
-export type LexiconPage = {version: string; total: number; word_count: number; offset: number; limit: number; due_count: number; new_count: number; items: LexiconCard[]; license: string; license_url: string; sources: LexiconSource[]; download_url: string; handbook_url?: string; attribution_url: string};
+export type LexiconWord = {id: string; term: string; ipa?: string; ipa_source?: string; pos?: PosTag[]; meaning_vi?: string; example?: string; vi_source?: string; inflections?: string[]; aliases?: string[]; meaning_language: "en" | "vi"; source_url?: string; translation_status?: "machine" | "community" | "edited"; senses_vi?: {pos: PosTag; text: string; source: string}[]; examples?: {en: string; vi: string; source: string}[]; definitions: {source_id: string; text: string; source_term: string; adapted_by_dhv: boolean}[]; lists: {id: string; rank: number | null; tier?: number; supplemental: boolean}[]};
+export type LexiconCard = Card & LexiconWord & {meaning_en?: string; match_kind?: "headword" | "form" | null};
+export type LexiconFilters = {deck: "all" | "core" | "ngsl" | "tsl" | "thichhoc" | "wiktionary" | "dhv"; q: string; state: "all" | "due" | "new" | "learned"; scope?: "lookup" | "full"; pos?: "all" | "n" | "v" | "adj" | "adv" | "func"; letter?: string; offset: number; limit: number};
+export type LexiconPage = {version: string; total: number; word_count: number; offset: number; limit: number; due_count: number; new_count: number; items: LexiconCard[]; suggestions?: string[]; global_total?: number | null; matched_count?: number; deck_counts?: Record<string, number>; license: string; license_url: string; sources: LexiconSource[]; download_url: string; handbook_url?: string; attribution_url: string};
 export type Lesson = { id: string; title: string; stage: number; part: number; minutes: number; question_count: number; objectives: string[]; sections?: {title: string; body: string}[]; practice_rule: string; vocabulary?: Card[] };
 export type StudySession = {
   id: string; level_id: string; number: number; title: string; skill: string; minutes: number;
@@ -50,6 +50,6 @@ export const toeicApi = {
   review: (id: string, rating: number, expected_version: number, event_id: string) => call<{due: string; version: number}>(`/vocabulary/${id}/review`, "POST", {rating, expected_version, event_id}),
 };
 export const partNames = ["", "Mô tả hình", "Hỏi – đáp", "Hội thoại", "Bài nói", "Hoàn thành câu", "Hoàn thành đoạn", "Đọc hiểu"];
-export const posNames: Record<string, string> = {n: "Danh từ", v: "Động từ", adj: "Tính từ", adv: "Trạng từ", prep: "Giới từ", conj: "Liên từ", pron: "Đại từ", det: "Hạn định từ", interj: "Thán từ"};
+export const posNames: Record<string, string> = {n: "Danh từ", v: "Động từ", adj: "Tính từ", adv: "Trạng từ", prep: "Giới từ", conj: "Liên từ", pron: "Đại từ", det: "Hạn định từ", interj: "Thán từ", num: "Số từ", phrase: "Cụm từ", abbr: "Từ viết tắt", particle: "Tiểu từ", prefix: "Tiền tố", suffix: "Hậu tố", other: "Khác"};
 export const dateTime = (value: string) => new Date(value).toLocaleString("vi-VN", {dateStyle: "short", timeStyle: "short"});
 export const kindName = (kind: string) => ({lesson: "Bài học", part: "Luyện Part", diagnostic: "Khảo sát đầu vào", mock: "Đề luyện 200 câu", topic: "Ôn theo dạng", exam: "Đề thi thử", review: "Ôn câu sai"}[kind] || kind);

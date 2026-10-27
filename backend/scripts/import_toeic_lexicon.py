@@ -105,13 +105,13 @@ def build_handbook(ordered):
         return str(text).replace("|", "\\|").replace("\n", " ")
 
     lines = [
-        "# Đại Từ Điển Song Ngữ Anh–Việt & Sổ Tay Từ Vựng TOEIC (147.245 Mục Từ)",
+        "# Sổ tay từ vựng trọng tâm NGSL/TSL · Bản trích lịch sử",
         "",
         "> **Giấy phép & Ghi nguồn:** Dữ liệu từ điển song ngữ trên hệ thống kết hợp **NGSL 1.2** (Charles Browne, Brent Culligan, Joseph Phillips — `CC BY-SA 4.0`), **TOEIC Service List 1.2** (Charles Browne, Brent Culligan — `CC BY-SA 4.0`), **Từ điển Anh–Việt thichhoc.com (`thichhoc-dict v0.9.0`, `CC BY-SA 4.0`, nguồn gốc: Princeton WordNet 3.1, CMUdict, Wiktionary)**, nghĩa tiếng Việt từ **Vietnamese Wiktionary / Kaikki.org** & biên tập ngữ cảnh **DHV English Studio** (`CC BY-SA 4.0`), cùng phiên âm Mỹ từ **open-dict-data/ipa-dict** (`MIT`). Bản tổng hợp được phát hành theo giấy phép [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).",
         "",
         "## Tổng quan",
-        "- **Tổng số mục từ độc lập trên hệ thống:** `147.245` mục từ (`4.060` từ trọng tâm NGSL 1.2 + TSL 1.2 kết hợp `143.185` mục từ mở rộng từ `thichhoc-dict` v0.9.0).",
-        "- **Đầy đủ 100% thông tin tra cứu:** Từ vựng (`term`), Phiên âm Quốc tế tiếng Anh Mỹ (`IPA`), Từ loại (`POS`), Nghĩa tiếng Việt (`meaning_vi`), Định nghĩa tiếng Anh gốc (`definitions`), các dạng biến thể từ (`inflections`) và câu ví dụ ngữ cảnh (với nhóm từ trọng tâm).",
+        "- Sổ tay này trích nhóm từ trọng tâm từ bản dữ liệu trước. Để xem nghĩa được cập nhật và toàn bộ kho, mở **Từ vựng → Từ điển Anh–Việt** trong ứng dụng.",
+        "- Không phải mọi mục từ đều có IPA hoặc ví dụ đã dịch. Số liệu, nguồn và công bố chất lượng hiện hành có trong `/toeic/licenses/DICTIONARY.md`; bản đầy đủ tại `/toeic/dictionary/dictionary.json.gz`.",
         "",
         "---",
         "",
@@ -135,7 +135,7 @@ def build_handbook(ordered):
         "",
         "## Phần 2 · 600 Từ vựng Nền tảng Tần suất Cao nhất (NGSL 1.2 Top 600)",
         "",
-        "*(Trọn bộ 147.245 mục từ song ngữ Anh–Việt và Việt–Anh có thể tra cứu trực tiếp theo chữ cái A–Z, từ loại, nghĩa tiếng Việt và ôn thẻ FSRS trong mục **Từ vựng → Đại từ điển Anh–Việt · 147.245 từ** trên ứng dụng)*",
+        "*(Tra kho đầy đủ và nghĩa cập nhật tại **Từ vựng → Từ điển Anh–Việt** trên ứng dụng.)*",
         "",
         "| Hạng NGSL | Từ vựng | Phiên âm (IPA) | Từ loại | Nghĩa tiếng Việt | Định nghĩa tiếng Anh (NGSL) |",
         "|---:|---|---|---|---|---|",

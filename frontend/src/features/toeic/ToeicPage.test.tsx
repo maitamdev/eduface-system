@@ -3,13 +3,14 @@ import {afterEach,beforeEach,expect,it,vi} from "vitest";
 import {cleanup,fireEvent,render,screen,waitFor,within} from "@testing-library/react";
 import {ToeicPage} from "./ToeicPage";
 import catalog from "./previewCatalog.json";
-const api=vi.hoisted(()=>({catalog:vi.fn(),progress:vi.fn(),lesson:vi.fn(),vocabulary:vi.fn(),review:vi.fn(),reviewBook:vi.fn(),start:vi.fn(),completeSession:vi.fn()}));
+const api=vi.hoisted(()=>({catalog:vi.fn(),progress:vi.fn(),lesson:vi.fn(),vocabulary:vi.fn(),lexicon:vi.fn(),review:vi.fn(),reviewBook:vi.fn(),start:vi.fn(),completeSession:vi.fn()}));
 vi.mock("./api",async importOriginal=>({...await importOriginal<typeof import("./api")>(),toeicApi:api}));
 beforeEach(()=>{
  vi.clearAllMocks(); window.scrollTo=vi.fn();
  api.start.mockReset(); api.reviewBook.mockReset();
  api.reviewBook.mockResolvedValue({window:50,count:0,parts:[],items:[]});
  api.catalog.mockResolvedValue(catalog);
+ api.lexicon.mockResolvedValue({items:[],total:0,word_count:catalog.lexicon_count,due_count:0,new_count:0,offset:0,limit:30,sources:[]});
  api.progress.mockResolvedValue({target:650,daily_minutes:30,lessons:{},recent:[],active:[],days:[],streak:0,cards_learned:0,cards_due:0});
  api.vocabulary.mockResolvedValue([{id:"f01-v01",lesson_id:"f01",term:"appointment",meaning:"cuộc hẹn",example:"My appointment is tomorrow.",version:0,due:null,reviews:0}]);
 });
@@ -103,6 +104,8 @@ it("requires revealing a flashcard before rating and persists the FSRS review",a
  api.review.mockResolvedValue({version:1,due:new Date(Date.now()+600000).toISOString()});
  render(<ToeicPage/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
  fireEvent.click(screen.getByRole("button",{name:"Từ vựng"}));
+ expect(screen.getByRole("button",{name:/Từ điển Anh–Việt ·/}).getAttribute("aria-pressed")).toBe("true");
+ fireEvent.click(screen.getByRole("button",{name:/Ôn theo bài · 200 thẻ DHV/}));
  await screen.findByRole("button",{name:"Hiện nghĩa & ví dụ"});
  expect(screen.queryByRole("button",{name:"Nhớ được"})).toBeNull();
  fireEvent.click(screen.getByRole("button",{name:"Hiện nghĩa & ví dụ"}));
@@ -110,6 +113,20 @@ it("requires revealing a flashcard before rating and persists the FSRS review",a
  fireEvent.click(screen.getByRole("button",{name:"Nhớ được"}));
  await waitFor(()=>expect(api.review).toHaveBeenCalledWith("f01-v01",3,0,expect.any(String)));
  expect(await screen.findByText("Đã ôn xong các thẻ đang đến hạn.")).toBeTruthy();
+});
+
+it("finds unaccented Vietnamese context cards and carries the query into the complete dictionary",async()=>{
+ render(<ToeicPage/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
+ fireEvent.click(screen.getByRole("button",{name:"Từ vựng"}));
+ fireEvent.click(screen.getByRole("button",{name:/Ôn theo bài · 200 thẻ DHV/}));
+ await screen.findByRole("heading",{name:"appointment"});
+ fireEvent.change(screen.getByLabelText("Tìm từ hoặc nghĩa"),{target:{value:"cuoc hen"}});
+ expect(screen.getByRole("heading",{name:"appointment"})).toBeTruthy();
+ fireEvent.change(screen.getByLabelText("Tìm từ hoặc nghĩa"),{target:{value:"social media"}});
+ expect(screen.getByText("Chưa có từ khớp bộ lọc.")).toBeTruthy();
+ fireEvent.click(screen.getByRole("button",{name:"Tra trong toàn bộ từ điển"}));
+ await waitFor(()=>expect(api.lexicon).toHaveBeenLastCalledWith(expect.objectContaining({q:"social media",deck:"all"}),expect.any(AbortSignal)));
+ expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("social media");
 });
 
 it("preserves the requested 24 and 12 sessions and exposes advanced levels and schedule",async()=>{

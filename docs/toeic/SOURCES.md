@@ -1,5 +1,12 @@
 # Nguồn nghiên cứu cho TOEIC cùng DHV
 
+## Cập nhật từ điển · 28/10/2026
+
+Kho hiện hành có **191.864 mục từ, 259.107 nghĩa tiếng Việt và 24.576 ví dụ song ngữ**. Nguồn bổ sung là Wiktionary tiếng Việt qua Kaikki/Wiktextract (CC BY-SA 4.0), đối chiếu thichhoc-dict ở revision cố định, giữ NGSL/TSL và các ghi nhận ipa-dict/CMUdict. Phần dịch máy được gắn nhãn, không xem là đã có người duyệt. [Báo cáo, nguồn chi tiết, checksum và nơi lưu dữ liệu](BAO_CAO_TU_DIEN_2026_10_28.md).
+
+Các mục bên dưới ghi lại từng đợt phát triển trước; số liệu lịch sử không thay thế thống kê hiện tại.
+
+
 ## Mở rộng ôn tập và kho từ mở v4 · 27/10/2026
 
 Bản v4 (`dhv-toeic-2026.10-v4`) đã đối chiếu toàn bộ **1.107 câu** trong 12 gói dữ liệu của [TOEIC Question Ocean](https://github.com/kdeppaei/toeic-question-ocean) ở revision `a940bb8b479ef4d06af468015d757041c3d2e457` theo [MIT](https://github.com/kdeppaei/toeic-question-ocean/blob/a940bb8b479ef4d06af468015d757041c3d2e457/LICENSE): đưa vào sử dụng **1.048 câu** có lời giải tiếng Việt (399 câu ở v3 + 649 câu bổ sung ở v4), loại **59 câu** không đạt yêu cầu, giữ **20 cảnh AI theo MIT** và **5 ảnh chụp theo Pexels License** (ghi nguồn tác giả riêng). Thêm 60 câu DHV, 38 hướng dẫn dạng bài, **9 mã đề cố định** (gồm **3 đề toàn phần 200 câu không trùng ID**) và sổ câu sai.

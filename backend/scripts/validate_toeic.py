@@ -2,6 +2,7 @@
 import array
 import json
 import hashlib
+import gzip
 import sys
 import wave
 from collections import Counter
@@ -10,7 +11,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
 from core.toeic_content import content, select_questions, PART_COUNTS, study_catalog
-from core.toeic_lexicon import lexicon
+from core.toeic_lexicon import lexicon, all_words
+from core.dictionary_text import valid_ipa
 
 data = content()
 audio = {q["audio_id"] for q in data["questions"] if q.get("audio_id")}
@@ -65,9 +67,20 @@ assert (ROOT / "backend/data/toeic/vendor/ngsl-tsl/LICENSE.md").read_bytes() == 
 assert (ROOT / "backend/data/toeic/vendor/ngsl-tsl/IPA-MIT-LICENSE.txt").read_bytes() == (ROOT / "frontend/public/toeic/licenses/IPA-MIT-LICENSE.txt").read_bytes()
 assert (ROOT / "backend/data/toeic/vendor/ngsl-tsl/THICHHOC-LICENSE-DATA.md").read_bytes() == (ROOT / "frontend/public/toeic/licenses/THICHHOC-LICENSE-DATA.md").read_bytes()
 assert (ROOT / "docs/toeic/SO_TAY_TU_VUNG.md").read_bytes() == (ROOT / "frontend/public/toeic/so-tay-tu-vung-song-ngu.md").read_bytes()
-assert preview["lexicon_count"] == lex["word_count"] == len(lex["words"])
-assert len({w["id"] for w in lex["words"]}) == lex["word_count"]
-assert all(w.get("ipa") and w.get("pos") and w.get("meaning_vi") for w in lex["words"])
+assert preview["lexicon_count"] == lex["word_count"]
+ids = set()
+for word in all_words():
+    assert word["id"] not in ids
+    ids.add(word["id"])
+    assert word.get("pos") and word.get("meaning_vi") and word.get("senses_vi")
+    assert not word.get("ipa") or (valid_ipa(word["ipa"]) and word.get("ipa_source"))
+assert len(ids) == lex["word_count"]
+assert (ROOT / "backend/data/toeic/dictionary-meta.json").read_bytes() == (ROOT / "frontend/public/toeic/dictionary-meta.json").read_bytes()
+for name, expected in lex["files"].items():
+    path = ROOT / "frontend/public/toeic/dictionary" / name
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == expected["sha256"]
+    with gzip.open(path, "rb") as stream:
+        assert hashlib.file_digest(stream, "sha256").hexdigest() == expected["decoded_sha256"]
 assert all(c.get("ipa") and c.get("pos") and c.get("meaning") for c in data["vocabulary"])
 for source in lex["source_files"]:
     assert hashlib.sha256((ROOT / "backend/data/toeic/vendor/ngsl-tsl" / source["file"]).read_bytes()).hexdigest() == source["sha256"]

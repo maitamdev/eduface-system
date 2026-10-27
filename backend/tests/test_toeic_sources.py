@@ -5,7 +5,7 @@ from collections import Counter
 from pathlib import Path
 
 from core.toeic_content import content, select_questions, PART_COUNTS
-from core.toeic_lexicon import lexicon, search_words, card_view
+from core.toeic_lexicon import lexicon, search_words, card_view, all_words, connection
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -66,37 +66,40 @@ def test_real_photos_keep_their_own_license_and_image_credit():
 
 def test_lexicon_keeps_ranks_extra_entries_definitions_and_sharealike_notice():
     data = lexicon()
-    assert data["word_count"] == len(data["words"]) == 147245
+    with connection() as db:
+        assert data["word_count"] == db.execute("SELECT count(*) FROM words").fetchone()[0]
+    assert data["word_count"] > 190000
     assert data["core_word_count"] == 4060 and data["extended_word_count"] == 143185
     assert data["license"] == "CC BY-SA 4.0"
     assert data["ranked_counts"] == {"ngsl": 2809, "tsl": 1250}
-    words = {w["term"]: w for w in data["words"]}
+    needed = {"thichhoc", "word", "criteria", "born"}
+    words = {w["term"]: w for w in all_words() if w["term"] in needed}
     assert "thichhoc" in words and "CC BY-SA 4.0" in words["thichhoc"]["meaning_vi"]
     assert words["word"]["definitions"][0]["text"] != "Definition"
     assert len(words["criteria"]["definitions"]) == 2
     assert words["born"]["lists"] == [{"id": "tsl", "rank": None, "supplemental": True}]
-    adapted = {w["term"] for w in data["words"] if any(d["adapted_by_dhv"] for d in w["definitions"])}
+    adapted = {w["term"] for w in all_words() if any(d["adapted_by_dhv"] for d in w["definitions"])}
     assert adapted == {"by-law", "café", "e-book", "entrée", "résumé", "smartphone"}
     assert len(search_words("ngsl")) == 2809 and len(search_words("tsl")) == 1252
     assert len(search_words("core")) == 4060 and len(search_words("thichhoc")) == 143185
     for deck, count in data["ranked_counts"].items():
-        ranks = [s["rank"] for w in data["words"] for s in w["lists"] if s["id"] == deck and s["rank"]]
+        ranks = [s["rank"] for w in search_words(deck) for s in w["lists"] if s["id"] == deck and s["rank"]]
         assert sorted(ranks) == list(range(1, count + 1))
     assert (ROOT / "backend/data/toeic/lexicon.json").read_bytes() == (ROOT / "frontend/public/toeic/lexicon.json").read_bytes()
     assert (ROOT / "backend/data/toeic/lexicon_100k.json.gz").read_bytes() == (ROOT / "frontend/public/toeic/lexicon_100k.json.gz").read_bytes()
 
 
 def test_search_matches_accents_aliases_and_definitions_without_fabricating_examples():
-    assert search_words("all", "e-mail")[0]["term"] == "email"
+    assert search_words("all", "e-mail")[0]["term"] in {"email", "e-mail"}
     assert search_words("thichhoc", "thichhoc")[0]["term"] == "thichhoc"
     assert any(w["term"] == "café" for w in search_words("tsl", "cafe"))
-    assert any(w["term"] == "smartphone" for w in search_words("tsl", "applications"))
+    assert any(w["term"] == "smartphone" for w in search_words("tsl", "applications", scope="full"))
     assert any(w["term"] == "invoice" for w in search_words("tsl", "hóa đơn"))
     assert any(w["term"] == "invoice" for w in search_words("tsl", "hoa don"))
     assert all("v" in w["pos"] for w in search_words("tsl", pos="v"))
     assert all(w["term"].startswith("c") for w in search_words("tsl", letter="c"))
     assert search_words("core", "no-match-xyz-9911") == []
     card = card_view(search_words("tsl", "smartphone")[0])
-    assert card["meaning_language"] == "en" and card["example"] == ""
+    assert card["meaning_language"] == "vi" and card["example"] == ""
     assert card["meaning_vi"] == "điện thoại thông minh" and card["ipa"] == "/ˈsmɑɹtˌfoʊn/" and card["pos"] == ["n"]
     assert card["due"] is None and card["reviews"] == card["version"] == 0

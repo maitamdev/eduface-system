@@ -5,6 +5,7 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictBool
 from pymongo.errors import DuplicateKeyError
 from fsrs import Card, Rating, Scheduler
@@ -12,7 +13,7 @@ from fsrs import Card, Rating, Scheduler
 from core.auth import require_authenticated
 from core.database import get_db, get_write_db, VN_TZ
 from core.toeic_content import content, public_question, select_questions, grade, study_catalog
-from core.toeic_lexicon import lexicon, index as lexicon_index, search_words, card_view
+from core.toeic_lexicon import lexicon, has_word, lookup_result, read_words, card_view
 from core.rate_limit import limiter
 
 router = APIRouter(dependencies=[Depends(require_authenticated)])
@@ -299,32 +300,36 @@ async def vocabulary(request: Request, lesson_id: str | None = None, db=Depends(
 
 
 @router.get("/lexicon")
-async def open_lexicon(request: Request, deck: Literal["all", "core", "ngsl", "tsl", "thichhoc"] = "all",
+async def open_lexicon(request: Request, deck: Literal["all", "core", "ngsl", "tsl", "thichhoc", "wiktionary", "dhv"] = "all",
                        q: str = Query("", max_length=120), state: Literal["all", "due", "new", "learned"] = "all",
                        pos: Literal["all", "n", "v", "adj", "adv", "func"] = "all",
                        letter: str = Query("all", pattern=r"^(all|[a-zA-Z])$"),
-                       offset: int = Query(0, ge=0, le=200000), limit: int = Query(30, ge=1, le=50), db=Depends(get_db)):
+                       scope: Literal["lookup", "full"] = "lookup",
+                       offset: int = Query(0, ge=0, le=300000), limit: int = Query(30, ge=1, le=50), db=Depends(get_db)):
     uid, timestamp = learner(request), now()
-    words = search_words(deck, q, pos=pos, letter=letter.lower())
-    ids = {w["id"] for w in words}
+    word_ids, alternatives, global_total = await run_in_threadpool(lookup_result, deck, q, pos, letter.lower(), scope)
+    ids = set(word_ids)
     stored = {d["vocabulary_id"]: d async for d in db.toeic_cards.find({"user_id": uid}) if d["vocabulary_id"] in ids} if ids else {}
     due = {key for key, value in stored.items() if value["due"] <= timestamp}
-    selected = [w for w in words if state == "all" or (state == "due" and w["id"] in due)
-                or (state == "new" and w["id"] not in stored) or (state == "learned" and w["id"] in stored)]
+    selected = [wid for wid in word_ids if state == "all" or (state == "due" and wid in due)
+                or (state == "new" and wid not in stored) or (state == "learned" and wid in stored)]
     if state == "due":
-        selected.sort(key=lambda w: stored[w["id"]]["due"])
+        selected.sort(key=lambda wid: stored[wid]["due"])
+    page = await run_in_threadpool(read_words, selected[offset:offset + limit])
     return {"version": lexicon()["version"], "total": len(selected), "word_count": lexicon()["word_count"],
-            "offset": offset, "limit": limit, "due_count": len(due), "new_count": len(words) - len(stored),
-            "items": [card_view(w, stored.get(w["id"])) for w in selected[offset:offset + limit]],
+            "offset": offset, "limit": limit, "due_count": len(due), "new_count": len(word_ids) - len(stored),
+            "items": [card_view(w, stored.get(w["id"]), q) for w in page],
+            "suggestions": list(alternatives), "global_total": global_total,
+            "matched_count": len(word_ids), "deck_counts": lexicon()["deck_counts"],
             "license": lexicon()["license"], "license_url": lexicon()["license_url"], "sources": lexicon()["sources"],
-            "download_url": "/toeic/lexicon.json", "handbook_url": "/toeic/so-tay-tu-vung-song-ngu.md",
-            "attribution_url": "/toeic/licenses/NGSL-TSL.md"}
+            "download_url": lexicon()["download_url"], "handbook_url": "/toeic/so-tay-tu-vung-song-ngu.md",
+            "attribution_url": lexicon()["attribution_url"]}
 
 
 @router.post("/vocabulary/{card_id}/review")
 async def review(card_id: str, body: Review, request: Request, db=Depends(get_write_db, scope="function")):
     uid = learner(request)
-    if card_id not in {c["id"] for c in content()["vocabulary"]} and card_id not in lexicon_index():
+    if card_id not in {c["id"] for c in content()["vocabulary"]} and not await run_in_threadpool(has_word, card_id):
         raise HTTPException(404, "Không tìm thấy từ vựng.")
     key = f"{uid}:{card_id}"
     previous = await db.toeic_cards.find_one({"_id": key})
