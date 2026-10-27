@@ -48,7 +48,9 @@
     {
       "file": "NGSL_12_stats.csv",
       "sha256": "2098bab8955a120a9766c6282a51d7d578c6cb0a7d946600d2ffb73ba25a0b44",
-      "url": "https://www.newgeneralservicelist.com/s/NGSL_12_stats.csv"
+      "url": "https://www.newgeneralservicelist.com/s/NGSL_12_stats.csv",
+      "repository_sha256": "af00443ff394cbd18546612ce935498f3ccc8465bb2d4a47f576d7da51e7a3d6",
+      "repository_normalization": "CRLF to LF"
     },
     {
       "file": "NGSL_12_with_English_definitions.xlsx",
@@ -58,7 +60,9 @@
     {
       "file": "TSL_12_stats.csv",
       "sha256": "2259df25a1077b04067ef0c0e9e4c98b46c91e4d539741dfaceba88651ff486d",
-      "url": "https://www.newgeneralservicelist.com/s/TSL_12_stats.csv"
+      "url": "https://www.newgeneralservicelist.com/s/TSL_12_stats.csv",
+      "repository_sha256": "7177b675c156bfa12830c9f35ff0e10cc68dea9b79da8173b095c8efef83b757",
+      "repository_normalization": "CRLF to LF"
     },
     {
       "file": "TSL_12_definitions.xlsx",
@@ -68,17 +72,23 @@
     {
       "file": "bilingual_enrichment.json",
       "sha256": "3c88dd478221d26074320bb71b88851bb594b531305d8a4e7a9c17baf947901d",
-      "url": "https://vi.wiktionary.org/"
+      "url": "https://vi.wiktionary.org/",
+      "repository_sha256": "4416d231e6cb0f6466a39131fab24e17054dd557c403030d814e6031cf2541d0",
+      "repository_normalization": "CRLF to LF"
     },
     {
       "file": "IPA-MIT-LICENSE.txt",
       "sha256": "2c6a7e4c71f834a8fc0114fa4f65ca85e80bc4b4dc7ed08746963a09a7b0d177",
-      "url": "https://github.com/open-dict-data/ipa-dict/blob/master/LICENSE.txt"
+      "url": "https://github.com/open-dict-data/ipa-dict/blob/master/LICENSE.txt",
+      "repository_sha256": "2c6a7e4c71f834a8fc0114fa4f65ca85e80bc4b4dc7ed08746963a09a7b0d177",
+      "repository_normalization": "CRLF to LF"
     },
     {
       "file": "THICHHOC-LICENSE-DATA.md",
       "sha256": "2725831420daae51f62bf704bd57182c65ac4b9a85eb082c614a1e342fb82661",
-      "url": "https://github.com/thichhoc-org/thichhoc-dict/blob/main/dict-en-vi/LICENSE-DATA"
+      "url": "https://github.com/thichhoc-org/thichhoc-dict/blob/main/dict-en-vi/LICENSE-DATA",
+      "repository_sha256": "1a0af5e6a0da3bbab502e9a71269d30af2fa97a09721190233cd4a7d26b72430",
+      "repository_normalization": "CRLF to LF"
     }
   ],
   "extended_file": {

@@ -54,6 +54,8 @@ Giữ toàn bộ **147.245 ID cũ**, 4.060 từ trọng tâm NGSL/TSL và 200 th
 
 Thông báo phân phối tại [`DICTIONARY.md`](../../frontend/public/toeic/licenses/DICTIONARY.md); URL tải nguồn, revision và SHA-256 tại [`dictionary-meta.json`](../../backend/data/toeic/dictionary-meta.json).
 
+Với file nguồn dạng văn bản cũ, metadata giữ checksum gốc và thêm checksum bản chuẩn hóa xuống dòng LF của repository. Điều này cho phép kiểm tra chính xác sau khi Git checkout trên Windows hoặc Linux; các file nhị phân vẫn kiểm tra nguyên byte.
+
 Kho rộng hơn nhưng **không phải mọi từ tiếng Anh đều có trong một từ điển**, và số lượng lớn không đồng nghĩa mọi bản dịch đã được giáo viên duyệt. Nhãn `edited/community/machine` mô tả nguồn nghĩa, không chứng nhận chính xác tuyệt đối. Không tự lấy bản dịch của từ gần giống để gán cho một từ chưa tìm thấy; giao diện dẫn sang Wiktionary khi cần tra thêm.
 
 ## Dữ liệu lưu ở đâu

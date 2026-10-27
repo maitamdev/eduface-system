@@ -258,6 +258,13 @@ def publish(words, legacy, skipped):
              "translation_status":dict(Counter(w["translation_status"] for w in rows)),
              "editorial_entries":len(EDITORIAL), "skipped":dict(skipped)}
     meta = {k:v for k,v in legacy.items() if k not in ("words", "changes", "version", "word_count")}
+    # .gitattributes normalizes text to LF. Keep the upstream byte fingerprint
+    # and separately record the canonical repository representation.
+    for source in meta["source_files"]:
+        path = DATA / "vendor/ngsl-tsl" / source["file"]
+        if path.suffix in {".csv", ".json", ".txt", ".md"}:
+            source["repository_sha256"] = hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+            source["repository_normalization"] = "CRLF to LF"
     meta.update({"version":"dhv-dictionary-2026.10.28-v2", "word_count":len(rows), "stats":stats,
                  "inputs":[{"file":name,"sha256":sha,"url":url} for name,(sha,url) in INPUTS.items()],
                  "database":{"file":"dictionary.sqlite3.gz","sha256":digest(DATA/"dictionary.sqlite3.gz")},

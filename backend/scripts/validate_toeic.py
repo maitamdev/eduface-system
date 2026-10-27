@@ -83,7 +83,10 @@ for name, expected in lex["files"].items():
         assert hashlib.file_digest(stream, "sha256").hexdigest() == expected["decoded_sha256"]
 assert all(c.get("ipa") and c.get("pos") and c.get("meaning") for c in data["vocabulary"])
 for source in lex["source_files"]:
-    assert hashlib.sha256((ROOT / "backend/data/toeic/vendor/ngsl-tsl" / source["file"]).read_bytes()).hexdigest() == source["sha256"]
+    payload = (ROOT / "backend/data/toeic/vendor/ngsl-tsl" / source["file"]).read_bytes()
+    if source.get("repository_normalization") == "CRLF to LF":
+        payload = payload.replace(b"\r\n", b"\n")
+    assert hashlib.sha256(payload).hexdigest() == source.get("repository_sha256", source["sha256"]), f"Changed source: {source['file']}"
 guide = (ROOT / "docs/toeic/LO_TRINH_CHI_TIET.md").read_text(encoding="utf-8")
 public_guide = (ROOT / "frontend/public/toeic/lo-trinh-dhv.md").read_text(encoding="utf-8")
 assert guide.count("### Buổi ") == len(data["curriculum"]["sessions"])
