@@ -1,0 +1,49 @@
+.toeic-practice-nav{display:flex;gap:6px;overflow:auto;margin:0 0 24px;padding:5px;background:var(--ui-soft);border:1px solid var(--ui-border);border-radius:12px}
+.toeic-practice-nav button{padding:12px 18px;border:0;border-radius:8px;background:transparent;color:var(--ui-muted);font:inherit;font-weight:600;white-space:nowrap;cursor:pointer}
+.toeic-practice-nav button[aria-current=page]{background:var(--ui-surface);color:var(--ui-text);box-shadow:0 1px 5px #0001}
+.toeic-study-filters{display:flex;gap:18px;align-items:end;flex-wrap:wrap;margin:20px 0}
+.toeic-study-filters label{display:grid;gap:7px;min-width:190px;flex:1;font-size:14px;font-weight:600}
+.toeic-study-filters input,.toeic-study-filters select{width:100%;padding:11px 12px;border:1px solid var(--ui-border);border-radius:8px;color:var(--ui-text);background:var(--ui-surface);font:inherit;min-height:44px}
+.toeic-study-filters>p{flex:2;min-width:200px;color:var(--ui-muted);font-size:14px}
+.toeic-topic-layout{display:grid;grid-template-columns:285px minmax(0,1fr);gap:26px;align-items:start}
+.toeic-topic-list{position:sticky;top:18px;max-height:75vh;overflow:auto;padding-right:8px}
+.toeic-topic-list>p{font-size:13px;color:var(--ui-muted);padding:0 8px}
+.toeic-topic-list button{display:grid;gap:6px;width:100%;padding:14px;text-align:left;border:1px solid transparent;border-radius:9px;background:none;color:var(--ui-text);font:inherit;cursor:pointer;margin-bottom:6px}
+.toeic-topic-list button small{color:var(--ui-muted);font-size:10px;letter-spacing:.04em}
+.toeic-topic-list button[aria-pressed=true]{border-color:var(--ui-border);background:var(--ui-soft)}
+.toeic-topic-detail{padding:28px;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);scroll-margin-top:20px;min-width:0}
+.toeic-topic-detail header h3{font-size:26px;line-height:1.35;margin:10px 0}
+.toeic-topic-detail p,.toeic-topic-detail li{line-height:1.8;color:var(--ui-muted);font-size:15px}
+.toeic-topic-detail section{margin-top:28px}
+.toeic-topic-detail h4{font-size:17px;margin:0 0 12px;color:var(--ui-text)}
+.toeic-topic-detail ol,.toeic-topic-detail ul{padding-left:22px}
+.toeic-topic-detail li+li{margin-top:9px}
+.toeic-topic-example{padding:22px;background:var(--ui-soft);border-radius:12px}
+.toeic-topic-example p[lang=en]{color:var(--ui-text);font-weight:500}
+.toeic-topic-sources{margin-top:20px;color:var(--ui-muted);font-size:14px}
+.toeic-topic-sources a{display:block;margin-top:10px}
+.toeic-exam-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.toeic-exam-cards article{display:flex;flex-direction:column;align-items:start;padding:26px;border:1px solid var(--ui-border);border-radius:14px;background:var(--ui-surface);min-width:0}
+.toeic-exam-cards h3{font-size:21px;line-height:1.45;margin:12px 0}
+.toeic-exam-facts{display:flex;gap:16px;align-items:center;color:var(--ui-text);font-size:16px}
+.toeic-exam-facts span{color:var(--ui-muted);font-size:14px}
+.toeic-exam-cards p,.toeic-exam-cards li{color:var(--ui-muted);font-size:14px;line-height:1.8}
+.toeic-exam-cards details{margin:6px 0 22px;width:100%;font-size:14px;color:var(--ui-muted)}
+.toeic-exam-cards details small{overflow-wrap:anywhere}
+.toeic-exam-cards .toeic-button{margin-top:auto}
+.toeic-study-attribution{margin-top:28px!important;line-height:1.8;font-size:12px;color:var(--ui-muted)}
+.toeic-study-attribution a,.toeic-topic-sources a{color:var(--toeic-green);text-decoration:underline;text-underline-offset:3px}
+.toeic-mistake-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.toeic-mistake-list>div{padding:18px;background:var(--ui-surface);border:1px solid var(--ui-border);border-radius:10px;min-width:0}
+.toeic-mistake-list p{line-height:1.7;font-size:14px;overflow-wrap:anywhere}
+.toeic-mistake-list small{color:var(--ui-muted);font-size:11px}
+.toeic-graphic{overflow:auto;margin:20px 0;border:1px solid var(--ui-border);border-radius:10px}
+.toeic-graphic table{width:100%;border-collapse:collapse;font-size:14px;color:var(--ui-text)}
+.toeic-graphic caption{text-align:left;font-weight:700;padding:15px}
+.toeic-graphic th,.toeic-graphic td{padding:12px;text-align:left;border-top:1px solid var(--ui-border);min-width:90px}
+.toeic-graphic th{background:var(--ui-soft)}
+.toeic-evidence{padding:15px;border-left:3px solid #168879;background:var(--ui-soft);white-space:pre-wrap}
+@media(max-width:1050px){.toeic-topic-layout{grid-template-columns:245px minmax(0,1fr)}.toeic-topic-detail{padding:22px}.toeic-exam-cards article{padding:22px}}
+@media(max-width:760px){.toeic-topic-layout{grid-template-columns:1fr}.toeic-topic-list{position:static;max-height:260px}.toeic-topic-detail{padding:20px}.toeic-topic-detail header h3{font-size:23px}.toeic-exam-cards,.toeic-mistake-list{grid-template-columns:1fr}.toeic-study-filters label{min-width:100%}.toeic-practice-nav button{padding:10px 12px}}
+
+.toeic-page .toeic-topic-detail p+p{margin-top:12px}.toeic-page .toeic-exam-cards h3{font-size:21px;margin:12px 0}.toeic-page .toeic-exam-cards>article>p{margin:16px 0}.toeic-page .toeic-study-filters>p{margin:0}.toeic-page .toeic-mistake-list p{margin:10px 0}

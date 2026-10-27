@@ -16,11 +16,16 @@ export type Curriculum = {
   levels: {id: string; name: string; title: string; target: string; session_count: number; entry: string; outcomes: string[]; exit: string; checkpoints: number[]}[];
   sessions: StudySession[];
 };
-export type Catalog = { version: string; notice: string; stages: Stage[]; lessons: Lesson[]; question_count: number; vocabulary_count: number; curriculum?: Curriculum; sources: {id: string; title: string; url: string; provider: string; access: string; stage: string; usage: string}[] };
+export type PracticeMode = "topics" | "exams" | "review" | "parts";
+export type Topic = {id: string; part: number; title: string; recognition: string; rules: string[]; steps: string[]; traps: string[]; example: {text: string; explanation: string}; source_ids: string[]; question_count: number};
+export type Exam = {id: string; title: string; type: "full" | "mini" | "listening" | "reading"; minutes: number; description: string; notice: string; question_count: number; parts: {part: number; count: number}[]};
+export type StartOptions = {topic_id?: string; exam_id?: string};
+export type ReviewBook = {window: number; count: number; parts: {part: number; count: number}[]; items: {id: string; part: number; prompt: string; topic_ids: string[]}[]};
+export type Catalog = { version: string; notice: string; stages: Stage[]; lessons: Lesson[]; question_count: number; vocabulary_count: number; curriculum?: Curriculum; topics?: Topic[]; exams?: Exam[]; sources: {id: string; title: string; url: string; provider: string; access: string; stage: string; usage: string}[] };
 export type Result = { correct: number; total: number; percent: number; parts: {part: number; correct: number; total: number; percent: number}[]; suggested_stage: number; score_notice: string };
-export type Question = { id: string; lesson_id: string; part: number; prompt: string; options: string[]; passage?: string; group_id?: string; audio_id?: string; image?: string; correct?: number; explanation?: string; transcript?: string };
+export type Question = { id: string; lesson_id: string; part: number; prompt: string; options: string[]; passage?: string; group_id?: string; audio_id?: string; image?: string; image_credit?: string; correct?: number; explanation?: string; transcript?: string; evidence?: string; graphic?: {title: string; columns: string[]; rows: string[][]}; provenance?: {provider: string; url?: string; license?: string} };
 export type Answers = Record<string, number | null>;
-export type Attempt = { id: string; kind: string; lesson_id?: string; status: "active" | "submitted"; started_at: string; deadline: string; server_now: string; revision: number; answers: Answers; questions: Question[]; result?: Result };
+export type Attempt = { id: string; kind: string; title?: string; topic_id?: string; exam_id?: string; lesson_id?: string; status: "active" | "submitted"; started_at: string; deadline: string; server_now: string; revision: number; answers: Answers; questions: Question[]; result?: Result };
 export type Progress = { target: number; daily_minutes: number; lessons: Record<string, number>; curriculum_completed?: string[]; recent: (Omit<Attempt, "questions"> & {submitted_at: string})[]; active: Omit<Attempt, "questions">[]; streak: number; cards_learned: number; cards_due: number; days: {day: string; questions?: number; reviews?: number}[] };
 const call = <T>(path: string, method = "GET", body?: unknown) => apiFetch<T>(`/api/toeic${path}`, {method, ...(body === undefined ? {} : {body: JSON.stringify(body)})});
 export const toeicApi = {
@@ -29,7 +34,8 @@ export const toeicApi = {
   lesson: (id: string) => call<Lesson>(`/lessons/${encodeURIComponent(id)}`),
   preferences: (target: number, daily_minutes: number) => call("/preferences", "PUT", {target, daily_minutes}),
   completeSession: (id: string, completed: boolean) => call<{session_id: string; completed: boolean}>(`/curriculum/sessions/${encodeURIComponent(id)}`, "PUT", {completed}),
-  start: (kind: string, request_id: string, lesson_id?: string, part?: number) => call<Attempt>("/attempts", "POST", {kind, request_id, ...(lesson_id ? {lesson_id} : {}), ...(part ? {part} : {})}),
+  start: (kind: string, request_id: string, lesson_id?: string, part?: number, options?: StartOptions) => call<Attempt>("/attempts", "POST", {kind, request_id, ...(lesson_id ? {lesson_id} : {}), ...(part ? {part} : {}), ...options}),
+  reviewBook: () => call<ReviewBook>("/review"),
   attempt: (id: string) => call<Attempt>(`/attempts/${id}`),
   save: (id: string, answers: Answers, revision: number) => call<{revision: number}>(`/attempts/${id}/answers`, "PUT", {answers, revision}),
   submit: (id: string, answers: Answers, revision: number) => call<Attempt>(`/attempts/${id}/submit`, "POST", {answers, revision}),
@@ -38,4 +44,4 @@ export const toeicApi = {
 };
 export const partNames = ["", "Mô tả hình", "Hỏi – đáp", "Hội thoại", "Bài nói", "Hoàn thành câu", "Hoàn thành đoạn", "Đọc hiểu"];
 export const dateTime = (value: string) => new Date(value).toLocaleString("vi-VN", {dateStyle: "short", timeStyle: "short"});
-export const kindName = (kind: string) => ({lesson: "Bài học", part: "Luyện Part", diagnostic: "Khảo sát đầu vào", mock: "Đề luyện 200 câu"}[kind] || kind);
+export const kindName = (kind: string) => ({lesson: "Bài học", part: "Luyện Part", diagnostic: "Khảo sát đầu vào", mock: "Đề luyện 200 câu", topic: "Ôn theo dạng", exam: "Đề thi thử", review: "Ôn câu sai"}[kind] || kind);

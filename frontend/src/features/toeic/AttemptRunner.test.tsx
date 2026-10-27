@@ -9,6 +9,22 @@ const makeAttempt = (): Attempt => ({id:"test",kind:"lesson",status:"active",sta
 beforeEach(()=>{vi.clearAllMocks();api.save.mockResolvedValue({revision:1});});
 afterEach(cleanup);
 
+it("renders listening graphics and only shows evidence and credit after grading",async()=>{
+ const attempt=makeAttempt(); attempt.kind="topic"; attempt.title="Nghe kết hợp bảng";
+ Object.assign(attempt.questions[0],{part:3,graphic:{title:"Shuttle timetable",columns:["Time","Destination"],rows:[["12:30","Airport"]]},evidence:"Take the 12:30 shuttle.",provenance:{provider:"DHV / MIT source",url:"https://example.com/source",license:"MIT"}});
+ api.submit.mockResolvedValue({...attempt,status:"submitted",result:{correct:0,total:2,percent:0,parts:[],suggested_stage:0,score_notice:"Luyện tập"},questions:attempt.questions.map(q=>({...q,correct:0,explanation:"Lời giải có bằng chứng"}))});
+ render(<AttemptRunner initial={attempt} onExit={vi.fn()} onComplete={vi.fn()}/>);
+ expect(screen.getByRole("table",{name:"Shuttle timetable"})).toBeTruthy();
+ expect(screen.getByRole("columnheader",{name:"Destination"})).toBeTruthy();
+ expect(screen.getByRole("cell",{name:"Airport"})).toBeTruthy();
+ expect(screen.queryByText("Take the 12:30 shuttle.")).toBeNull();
+ expect(screen.queryByRole("link",{name:/Nguồn câu hỏi/})).toBeNull();
+ fireEvent.click(screen.getByRole("button",{name:"Nộp bài"}));
+ fireEvent.click(screen.getByRole("button",{name:"Xác nhận nộp"}));
+ expect(await screen.findByText("Take the 12:30 shuttle.")).toBeTruthy();
+ expect(screen.getByRole("link",{name:/Nguồn câu hỏi/}).getAttribute("href")).toBe("https://example.com/source");
+});
+
 it("hides listening response text and reveals explanations only after grading", async()=>{
  const attempt=makeAttempt();
  api.submit.mockResolvedValue({...attempt,status:"submitted",answers:{q1:1},result:{correct:1,total:2,percent:50,parts:[],suggested_stage:2,score_notice:"Kết quả luyện tập nội bộ"},questions:attempt.questions.map((q,i)=>({...q,correct:i?0:1,explanation:"Giải thích tiếng Việt",transcript:i?undefined:"What time? Two."}))});

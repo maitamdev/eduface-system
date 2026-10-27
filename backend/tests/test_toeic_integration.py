@@ -71,7 +71,7 @@ async def test_toeic_auth_private_ownership_and_hidden_answers(live):
     uid,headers=await student(db)
     _,other=await student(db,"another")
     catalog=(await http.get("/api/toeic/catalog",headers=headers)).json()
-    assert catalog["question_count"]==268 and "questions" not in catalog
+    assert catalog["question_count"]==727 and "questions" not in catalog
     attempt,_=await start(http,headers)
     assert all("correct" not in q and "transcript" not in q for q in attempt["questions"])
     assert (await http.get(f"/api/toeic/attempts/{attempt['id']}",headers=other)).status_code==404

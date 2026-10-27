@@ -15,7 +15,7 @@ CURRICULUM = {
     "title": "Từ nền tảng đến mục tiêu 900",
     "reviewed_on": "2026-10-27",
     "description": "24 buổi Level 1 xây nền và 12 buổi Level 2 luyện đủ 7 Part, nối tiếp bằng 20 buổi nâng cao. Học theo năng lực và điều chỉnh nhịp sau mỗi mốc đánh giá.",
-    "notice": "Các mốc điểm là mục tiêu định hướng, không phải quy đổi CEFR hay cam kết đầu ra. 56 buổi là kế hoạch học; bộ luyện chấm điểm hiện có gồm 20 bài, 268 câu và 200 thẻ từ. Bài tự kiểm tra trong từng buổi dùng để hiểu bài, không dùng dự đoán điểm thi.",
+    "notice": "Các mốc điểm là mục tiêu định hướng, không phải quy đổi CEFR hay cam kết đầu ra. 56 buổi là kế hoạch học; dùng thêm thư viện chuyên đề, đề luyện và sổ câu sai để củng cố. Bài tự kiểm tra trong từng buổi dùng để hiểu bài, không dùng dự đoán điểm thi.",
     "entry": [
         "Người mới bắt đầu học Level 1 từ buổi 1; trước mỗi buổi dành 10 phút nghe âm, trọng âm, số và giờ.",
         "Đã học tiếng Anh: làm khảo sát 25 câu trong DHV, xem lỗi theo Part, rồi đọc thử mục tiêu và bài tự kiểm tra của level dự định học. Khảo sát ngắn chỉ giúp định hướng.",

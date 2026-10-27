@@ -11,13 +11,13 @@ from uuid import uuid4
 
 def test_complete_course_and_public_preview_have_no_answer_keys():
     data = content()
-    assert (len(data["lessons"]), len(data["questions"]), len(data["vocabulary"])) == (20,268,200)
+    assert (len(data["lessons"]), len(data["questions"]), len(data["vocabulary"])) == (27,727,200)
     preview = json.loads((Path(__file__).resolve().parents[2]/"frontend/src/features/toeic/previewCatalog.json").read_text(encoding="utf-8"))
     assert "questions" not in preview
-    assert len(preview["lessons"]) == 20
+    assert len(preview["lessons"]) == 27
     for q in data["questions"]:
         public = public_question(q)
-        assert not {"correct", "explanation", "transcript"} & public.keys()
+        assert not {"correct", "explanation", "transcript", "evidence"} & public.keys()
         assert public_question(q, review=True)["correct"] == q["correct"]
 
 

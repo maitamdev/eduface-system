@@ -79,6 +79,7 @@ export async function previewRequest(path: string, init: RequestInit = {}): Prom
     if (method !== "GET") throw new Error("Bản xem thử TOEIC chỉ đọc. Đăng nhập để lưu tiến độ và làm bài.");
     const data = (await import("@/features/toeic/previewCatalog.json")).default;
     if (route === "/api/toeic/catalog") return data;
+    if (route === "/api/toeic/review") return {window:50,count:0,items:[],parts:[]};
     if (route === "/api/toeic/progress") return {target: 650, daily_minutes: 30, lessons: {}, recent: [], active: [], days: [], streak: 0, cards_learned: 0, cards_due: 0};
     if (route === "/api/toeic/vocabulary") return data.vocabulary.map(c => ({...c, version: 0, due: null, reviews: 0}));
     if (route.startsWith("/api/toeic/lessons/")) { const id = route.split("/").pop(); const lesson = data.lessons.find(x => x.id === id); if (!lesson) throw new Error("Không tìm thấy bài học"); return {...lesson, vocabulary: data.vocabulary.filter(c => c.lesson_id === id)}; }

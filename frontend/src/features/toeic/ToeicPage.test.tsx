@@ -3,10 +3,12 @@ import {afterEach,beforeEach,expect,it,vi} from "vitest";
 import {cleanup,fireEvent,render,screen,waitFor,within} from "@testing-library/react";
 import {ToeicPage} from "./ToeicPage";
 import catalog from "./previewCatalog.json";
-const api=vi.hoisted(()=>({catalog:vi.fn(),progress:vi.fn(),lesson:vi.fn(),vocabulary:vi.fn(),review:vi.fn(),start:vi.fn(),completeSession:vi.fn()}));
+const api=vi.hoisted(()=>({catalog:vi.fn(),progress:vi.fn(),lesson:vi.fn(),vocabulary:vi.fn(),review:vi.fn(),reviewBook:vi.fn(),start:vi.fn(),completeSession:vi.fn()}));
 vi.mock("./api",async importOriginal=>({...await importOriginal<typeof import("./api")>(),toeicApi:api}));
 beforeEach(()=>{
  vi.clearAllMocks(); window.scrollTo=vi.fn();
+ api.start.mockReset(); api.reviewBook.mockReset();
+ api.reviewBook.mockResolvedValue({window:50,count:0,parts:[],items:[]});
  api.catalog.mockResolvedValue(catalog);
  api.progress.mockResolvedValue({target:650,daily_minutes:30,lessons:{},recent:[],active:[],days:[],streak:0,cards_learned:0,cards_due:0});
  api.vocabulary.mockResolvedValue([{id:"f01-v01",lesson_id:"f01",term:"appointment",meaning:"cuộc hẹn",example:"My appointment is tomorrow.",version:0,due:null,reviews:0}]);
@@ -16,9 +18,86 @@ it("loads real course metadata and keeps preview practice read-only",async()=>{
  render(<ToeicPage preview/>);
  expect(await screen.findByText("Học theo buổi, biết rõ việc cần làm.")).toBeTruthy();
  fireEvent.click(screen.getByRole("button",{name:"Luyện tập"}));
- expect(screen.getByRole("button",{name:/Bắt đầu 200 câu/}).hasAttribute("disabled")).toBe(true);
- expect(screen.getAllByText(/Giọng tổng hợp|Audio tổng hợp/).length).toBeGreaterThan(0);
+ expect(screen.getByRole("button",{name:/Luyện dạng này/}).hasAttribute("disabled")).toBe(true);
+ fireEvent.click(screen.getByRole("button",{name:"Đề thi thử"}));
+ expect(screen.getByRole("button",{name:/Ghép một đề ngẫu nhiên/}).hasAttribute("disabled")).toBe(true);
+ expect(screen.getAllByText(/audio điều khiển thủ công/i).length).toBeGreaterThan(0);
  expect(api.start).not.toHaveBeenCalled();
+});
+
+it("finds accented grammar topics, shows the full guide and retries the same request",async()=>{
+ api.start.mockRejectedValue(new Error("Mất kết nối thử nghiệm"));
+ render(<ToeicPage/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
+ fireEvent.click(screen.getByRole("button",{name:"Luyện tập"}));
+ fireEvent.change(screen.getByLabelText("Dạng bài theo Part"),{target:{value:"5"}});
+ fireEvent.change(screen.getByLabelText("Tìm chuyên đề"),{target:{value:"bi dong"}});
+ expect(screen.getByRole("heading",{name:"Hiểu bản chất"})).toBeTruthy();
+ expect(screen.getByRole("heading",{name:"Ví dụ có phân tích"})).toBeTruthy();
+ fireEvent.click(screen.getByRole("button",{name:/Luyện dạng này/}));
+ await screen.findByRole("alert");
+ const requestId=api.start.mock.calls[0][1];
+ expect(api.start).toHaveBeenLastCalledWith("topic",requestId,undefined,undefined,{topic_id:"p5-passive"});
+ fireEvent.click(screen.getByRole("button",{name:/Luyện dạng này/}));
+ await waitFor(()=>expect(api.start).toHaveBeenCalledTimes(2));
+ expect(api.start.mock.calls[1][1]).toBe(requestId);
+ expect(screen.getByRole("link",{name:"Tải sổ tay"}).getAttribute("href")).toBe("/toeic/so-tay-dang-bai.md");
+});
+
+it("filters fixed exam types and starts the chosen code",async()=>{
+ api.start.mockResolvedValue(undefined);
+ render(<ToeicPage/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
+ fireEvent.click(screen.getByRole("button",{name:"Luyện tập"}));
+ fireEvent.click(screen.getByRole("button",{name:"Đề thi thử"}));
+ expect(screen.getAllByRole("article")).toHaveLength(8);
+ fireEvent.change(screen.getByLabelText("Loại đề"),{target:{value:"listening"}});
+ expect(screen.getAllByRole("article")).toHaveLength(1);
+ expect(screen.getByText("45 phút")).toBeTruthy();
+ fireEvent.click(screen.getByRole("button",{name:"Làm bài thi"}));
+ await waitFor(()=>expect(api.start).toHaveBeenCalledWith("exam",expect.any(String),undefined,undefined,{exam_id:"dhv-listening-01-v1"}));
+});
+
+it("loads a private mistake book, filters parts and starts review",async()=>{
+ api.reviewBook.mockResolvedValue({window:50,count:2,parts:[{part:3,count:1},{part:5,count:1}],items:[{id:"q3",part:3,prompt:"What will the man do?",topic_ids:[]},{id:"q5",part:5,prompt:"The request was _____.",topic_ids:[]}]});
+ render(<ToeicPage/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
+ fireEvent.click(screen.getByRole("button",{name:"Luyện tập"}));
+ fireEvent.click(screen.getByRole("button",{name:"Ôn câu sai"}));
+ await screen.findByText("2 câu cần ôn lại");
+ fireEvent.change(screen.getByLabelText("Lọc câu sai theo Part"),{target:{value:"5"}});
+ expect(screen.queryByText("What will the man do?")).toBeNull();
+ expect(screen.getByText("The request was _____.")).toBeTruthy();
+ fireEvent.click(screen.getByRole("button",{name:/Ôn lại · tối đa 30 câu/}));
+ await waitFor(()=>expect(api.start).toHaveBeenCalledWith("review",expect.any(String),undefined,5,undefined));
+});
+
+it("recovers a failed mistake-book load and handles an empty history",async()=>{
+ api.reviewBook.mockRejectedValueOnce(new Error("Không tải được lịch sử"));
+ render(<ToeicPage/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
+ fireEvent.click(screen.getByRole("button",{name:"Luyện tập"}));
+ fireEvent.click(screen.getByRole("button",{name:"Ôn câu sai"}));
+ await screen.findByRole("alert");
+ fireEvent.click(screen.getByRole("button",{name:"Tải lại sổ câu sai"}));
+ await screen.findByText("0 câu cần ôn lại");
+ expect(screen.getByRole("button",{name:/Ôn lại · tối đa 30 câu/}).hasAttribute("disabled")).toBe(true);
+ expect(api.reviewBook).toHaveBeenCalledTimes(2);
+});
+
+it("does not fetch personal mistake history in preview",async()=>{
+ render(<ToeicPage preview/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
+ fireEvent.click(screen.getByRole("button",{name:"Luyện tập"}));
+ fireEvent.click(screen.getByRole("button",{name:"Ôn câu sai"}));
+ expect(screen.getByText("Sổ câu sai theo tài khoản")).toBeTruthy();
+ expect(api.reviewBook).not.toHaveBeenCalled();
+});
+
+it("offers a usable empty-search recovery and all seven part drills",async()=>{
+ render(<ToeicPage preview/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
+ fireEvent.click(screen.getByRole("button",{name:"Luyện tập"}));
+ fireEvent.change(screen.getByLabelText("Tìm chuyên đề"),{target:{value:"no-match-xyz"}});
+ expect(screen.getByText("Chưa tìm thấy dạng bài phù hợp")).toBeTruthy();
+ fireEvent.click(screen.getByRole("button",{name:"Xóa bộ lọc"}));
+ expect(screen.getByText("38 chuyên đề khớp bộ lọc")).toBeTruthy();
+ fireEvent.click(screen.getByRole("button",{name:"Luyện từng Part"}));
+ expect(screen.getAllByRole("button",{name:/Luyện phần này/})).toHaveLength(7);
 });
 it("requires revealing a flashcard before rating and persists the FSRS review",async()=>{
  api.review.mockResolvedValue({version:1,due:new Date(Date.now()+600000).toISOString()});

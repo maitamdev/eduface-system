@@ -141,6 +141,7 @@ async def init_db() -> None:
     await db.auth_challenges.create_index("expires_at", expireAfterSeconds=0)
 
     await db.toeic_attempts.create_index([("user_id", 1), ("status", 1), ("started_at", -1)])
+    await db.toeic_attempts.create_index([("user_id", 1), ("status", 1), ("submitted_at", -1), ("_id", -1)], name="toeic_recent_submission")
     await db.toeic_cards.create_index([("user_id", 1), ("due", 1)])
     await db.toeic_activity.create_index([("user_id", 1), ("day", -1)])
 

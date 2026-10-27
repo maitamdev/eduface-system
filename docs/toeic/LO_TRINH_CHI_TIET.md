@@ -4,7 +4,7 @@
 
 Đối chiếu nguồn ngày 27/10/2026. Các mục tiêu, thời lượng, bài tập và tiêu chí chuyển level dưới đây là thiết kế của DHV, không phải cam kết của ETS hay nguồn tham khảo.
 
-Các mốc điểm là mục tiêu định hướng, không phải quy đổi CEFR hay cam kết đầu ra. 56 buổi là kế hoạch học; bộ luyện chấm điểm hiện có gồm 20 bài, 268 câu và 200 thẻ từ. Bài tự kiểm tra trong từng buổi dùng để hiểu bài, không dùng dự đoán điểm thi.
+Các mốc điểm là mục tiêu định hướng, không phải quy đổi CEFR hay cam kết đầu ra. 56 buổi là kế hoạch học; dùng thêm thư viện chuyên đề, đề luyện và sổ câu sai để củng cố. Bài tự kiểm tra trong từng buổi dùng để hiểu bài, không dùng dự đoán điểm thi.
 
 ## Chọn nhịp học
 

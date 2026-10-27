@@ -1,4 +1,4 @@
-"""Build the original DHV learning pack. No scraped exercises or third-party answer banks.
+"""Build DHV material and the explicitly licensed, curated expansion.
 
 The educational text is authored for this project. Deterministic IDs allow progress
 to survive rebuilds. Review factual/pedagogical changes before increasing version.
@@ -7,6 +7,7 @@ import json
 import hashlib
 from pathlib import Path
 from toeic_curriculum import curriculum, guide_markdown
+from toeic_expansion import expand_course, topic_handbook
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = {"version": "dhv-toeic-2026.10-v1", "notice": "Học liệu tự biên soạn, không phải đề ETS. Mục tiêu 900 là định hướng học, không bảo đảm kết quả. ‘Từ 0’ nghĩa là bắt đầu từ nền tảng; điểm TOEIC L&R chính thức là 10–990. Âm thanh là giọng tổng hợp; Part 1 dùng hình minh họa.", "stages": [
@@ -160,7 +161,7 @@ lesson("a04", 4, "Part 7 · Ba văn bản và chiến lược 900", 7,
 for name in ("toeic_vocabulary.py", "toeic_questions_basic.py", "toeic_questions_context.py"):
     exec(compile((Path(__file__).parent / name).read_text(encoding="utf-8"), name, "exec"))
 
-DATA["version"] = "dhv-toeic-2026.10-v2"
+DATA["version"] = "dhv-toeic-2026.10-v3"
 DATA["sources"].extend([
     {"id": "bc-reference", "title": "British Council · English grammar reference", "url": "https://learnenglish.britishcouncil.org/free-resources/grammar/english-grammar-reference", "provider": "British Council", "access": "Bài học công khai", "stage": "Level 1–2", "usage": "Tra cấu trúc câu, từ loại, đại từ, thì và giới từ trên trang gốc."},
     {"id": "bc-b1", "title": "British Council · B1–B2 grammar", "url": "https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2", "provider": "British Council", "access": "Bài học công khai", "stage": "Level 2–4", "usage": "Bổ trợ bị động, điều kiện và liên kết ý; chọn bài theo nhu cầu, không quy đổi CEFR thành điểm TOEIC."},
@@ -172,15 +173,17 @@ DATA["sources"].extend([
     {"id": "cambridge-dictionary", "title": "Cambridge Dictionary · Tra nghĩa và cách dùng", "url": "https://dictionary.cambridge.org/", "provider": "Cambridge", "access": "Tra cứu tại nguồn", "stage": "Mọi level", "usage": "Kiểm tra nghĩa, phát âm và cụm từ; tự viết ví dụ để kiểm tra hiểu."},
 ])
 DATA["curriculum"] = curriculum()
+expand_course(DATA)
 
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, str(ROOT / "backend"))
-    from core.toeic_content import validate_content
+    from core.toeic_content import validate_content, study_catalog
     validate_content(DATA)
     target = ROOT / "backend/data/toeic/course.json"
     target.write_text(json.dumps(DATA, ensure_ascii=False, indent=2), encoding="utf-8")
-    preview = {k: v for k, v in DATA.items() if k != "questions"}
+    preview = {k: v for k, v in DATA.items() if k not in {"questions", "exams", "topics", "expansion"}}
+    preview.update(study_catalog(DATA))
     preview["question_count"] = len(DATA["questions"])
     preview["vocabulary_count"] = len(DATA["vocabulary"])
     for row in preview["lessons"]:
@@ -192,4 +195,7 @@ if __name__ == "__main__":
     for filename in ("SOURCES.md", "THIET_KE_CHUONG_TRINH.md", "README.md"):
         public_guide = public_guide.replace(f"]({filename})", f"](https://github.com/maitamdev/eduface-system/blob/main/docs/toeic/{filename})")
     (ROOT / "frontend/public/toeic/lo-trinh-dhv.md").write_text(public_guide, encoding="utf-8")
+    handbook = topic_handbook()
+    (ROOT / "frontend/public/toeic/so-tay-dang-bai.md").write_text(handbook, encoding="utf-8")
+    (ROOT / "docs/toeic/SO_TAY_DANG_BAI.md").write_text(handbook, encoding="utf-8")
     print(f"Built {len(DATA['lessons'])} lessons, {len(DATA['questions'])} questions, {len(DATA['vocabulary'])} vocabulary cards")

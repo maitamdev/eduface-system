@@ -1,5 +1,13 @@
 # Nguồn nghiên cứu cho TOEIC cùng DHV
 
+## Mở rộng ôn tập v3 · 27/10/2026
+
+Bản v3 đã nhập có chọn lọc **399 câu và 10 cảnh AI** từ [TOEIC Question Ocean](https://github.com/kdeppaei/toeic-question-ocean) ở revision `a940bb8b479ef4d06af468015d757041c3d2e457`, theo [MIT](https://github.com/kdeppaei/toeic-question-ocean/blob/a940bb8b479ef4d06af468015d757041c3d2e457/LICENSE). Thêm 60 câu DHV, 38 hướng dẫn dạng bài, 8 mã đề và sổ câu sai. [Báo cáo nguồn, phần loại bỏ, các điều chỉnh và nơi lưu dữ liệu](MO_RONG_ON_TAP.md) mô tả phạm vi hiện tại.
+
+Đã đối chiếu [IIBC format](https://www.iibc-global.org/english/toeic/test/lr/about/format.html), [ETS preparation](https://www.ets.org/toeic/test-takers/prepare.html), [British Council B1–B2](https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2), [Moodle quiz](https://docs.moodle.org/503/en/Building_Quiz) và [H5P Question Set](https://h5p.org/tutorial-question-set). Moodle/H5P là tham khảo thiết kế, không nhập code. Những nguồn dẫn link không tự động được coi là nguồn cho phép phân phối lại.
+
+Các phần dưới là **lịch sử nghiên cứu của v1/v2**. Các câu “không nhập học liệu/media” trong lịch sử mô tả phiên bản cũ; phạm vi v3 ở trên và CONTENT_LICENSES.md là thông tin hiện hành.
+
 ## Bổ sung nghiên cứu cho lộ trình 56 buổi
 
 Đối chiếu lại ngày 27/10/2026 bằng trang nhà cung cấp, README và file cấp phép trên GitHub. Đây là khảo sát **có chọn lọc**, không phải tuyên bố đã đọc hết mọi repository/nền tảng. [Bản thiết kế](THIET_KE_CHUONG_TRINH.md) giải thích cách giữ 24/12 buổi gốc và bổ sung 12/8 buổi nâng cao; [bản chi tiết](LO_TRINH_CHI_TIET.md) chứa toàn bộ buổi, ví dụ và tự kiểm tra.

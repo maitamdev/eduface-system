@@ -11,7 +11,7 @@ from fsrs import Card, Rating, Scheduler
 
 from core.auth import require_authenticated
 from core.database import get_db, get_write_db, VN_TZ
-from core.toeic_content import content, public_question, select_questions, grade
+from core.toeic_content import content, public_question, select_questions, grade, study_catalog
 from core.rate_limit import limiter
 
 router = APIRouter(dependencies=[Depends(require_authenticated)])
@@ -40,9 +40,11 @@ class SessionCompletion(StrictBody):
 
 
 class Start(StrictBody):
-    kind: Literal["lesson", "part", "diagnostic", "mock"]
+    kind: Literal["lesson", "part", "diagnostic", "mock", "topic", "exam", "review"]
     lesson_id: str | None = Field(None, max_length=60)
     part: int | None = Field(None, ge=1, le=7)
+    topic_id: str | None = Field(None, max_length=60)
+    exam_id: str | None = Field(None, max_length=60)
     request_id: UUID
 
 
@@ -66,6 +68,7 @@ def now():
 def attempt_view(doc):
     done = doc["status"] == "submitted"
     return {"id": doc["_id"], "kind": doc["kind"], "lesson_id": doc.get("lesson_id"),
+            "title": doc.get("title"), "topic_id": doc.get("topic_id"), "exam_id": doc.get("exam_id"),
             "status": doc["status"], "started_at": doc["started_at"], "deadline": doc["deadline"],
             "server_now": now(), "revision": doc.get("revision", 0), "answers": doc.get("answers", {}), "result": doc.get("result"),
             "questions": [public_question(q, review=done) for q in doc["questions"]]}
@@ -96,7 +99,7 @@ async def activity(db, uid, field, amount, timestamp):
 async def catalog():
     data = content()
     return {"version": data["version"], "stages": data["stages"], "sources": data["sources"],
-            "curriculum": data["curriculum"],
+            "curriculum": data["curriculum"], **study_catalog(data),
             "notice": data["notice"], "question_count": len(data["questions"]),
             "vocabulary_count": len(data["vocabulary"]),
             "lessons": [{k: v for k, v in lesson.items() if k != "sections"} |
@@ -162,6 +165,35 @@ async def complete_session(session_id: str, body: SessionCompletion, request: Re
     return {"session_id": session_id, "completed": body.completed}
 
 
+async def recent_mistakes(db, uid):
+    """Latest submitted answer wins, across the learner's last 50 submissions."""
+    rows = await db.toeic_attempts.find({"user_id": uid, "status": "submitted"},
+        {"questions.id": 1, "questions.correct": 1, "answers": 1}).sort([("submitted_at", -1), ("_id", -1)]).limit(50).to_list(50)
+    seen, wrong = set(), set()
+    for row in rows:
+        for question in row["questions"]:
+            qid = question["id"]
+            if qid in seen:
+                continue
+            seen.add(qid)
+            if row.get("answers", {}).get(qid) != question["correct"]:
+                wrong.add(qid)
+    return wrong
+
+
+@router.get("/review")
+async def review_book(request: Request, db=Depends(get_db)):
+    ids = await recent_mistakes(db, learner(request))
+    items = [{"id": q["id"], "part": q["part"], "prompt": q["prompt"], "topic_ids": q.get("topic_ids", [])}
+             for q in content()["questions"] if q["id"] in ids]
+    return {"window": 50, "count": len(items), "items": items,
+            "parts": [{"part": p, "count": sum(q["part"] == p for q in items)} for p in range(1, 8)]}
+
+
+def start_signature(row):
+    return tuple(row.get(k) for k in ("kind", "lesson_id", "part", "topic_id", "exam_id"))
+
+
 @router.post("/attempts")
 @limiter.limit("20/minute")
 async def start_attempt(body: Start, request: Request, db=Depends(get_db)):
@@ -170,27 +202,42 @@ async def start_attempt(body: Start, request: Request, db=Depends(get_db)):
         raise HTTPException(422, "Chọn một bài học hợp lệ.")
     if body.kind == "part" and body.part is None:
         raise HTTPException(422, "Chọn Part 1–7.")
-    if (body.kind != "lesson" and body.lesson_id is not None) or (body.kind != "part" and body.part is not None):
-        raise HTTPException(422, "Tham số bài học hoặc Part không phù hợp loại bài.")
+    if body.kind == "topic" and body.topic_id not in {t["id"] for t in content()["topics"]}:
+        raise HTTPException(422, "Chọn một dạng bài hợp lệ.")
+    if body.kind == "exam" and body.exam_id not in {e["id"] for e in content()["exams"]}:
+        raise HTTPException(422, "Chọn một mã đề hợp lệ.")
+    allowed = {"lesson": {"lesson_id"}, "part": {"part"}, "topic": {"topic_id"}, "exam": {"exam_id"}, "review": {"part"}}
+    if any(getattr(body, k) is not None and k not in allowed.get(body.kind, set()) for k in ("lesson_id", "part", "topic_id", "exam_id")):
+        raise HTTPException(422, "Tham số không phù hợp với loại bài đã chọn.")
     aid = hashlib.sha256(f"{uid}:{body.request_id}".encode()).hexdigest()[:40]
     existing = await db.toeic_attempts.find_one({"_id": aid, "user_id": uid})
     if existing:
-        if (existing["kind"], existing.get("lesson_id"), existing.get("part")) != (body.kind, body.lesson_id, body.part):
+        if start_signature(existing) != start_signature(body.model_dump()):
             raise HTTPException(409, "Mã yêu cầu đã được dùng cho một đề khác.")
         return attempt_view(existing)
     if await db.toeic_attempts.count_documents({"user_id": uid, "status": "active", "deadline": {"$gt": now()}}) >= 5:
         raise HTTPException(409, "Bạn đang có 5 bài chưa kết thúc. Tiếp tục và nộp một bài trong mục Tiến độ trước khi mở bài mới.")
-    questions = select_questions(body.kind, body.lesson_id, body.part, seed=aid)
+    mistakes = await recent_mistakes(db, uid) if body.kind == "review" else None
+    questions = select_questions(body.kind, body.lesson_id, body.part, seed=aid, topic_id=body.topic_id, exam_id=body.exam_id, mistake_ids=mistakes)
+    if not questions:
+        raise HTTPException(422, "Chưa có câu phù hợp. Hãy làm và nộp một bài luyện trước khi ôn câu sai.")
     minutes = 120 if body.kind == "mock" else 25 if body.kind == "diagnostic" else max(10, len(questions) * 2)
+    title = None
+    if body.kind == "exam":
+        exam = next(e for e in content()["exams"] if e["id"] == body.exam_id)
+        minutes, title = exam["minutes"], exam["title"]
+    elif body.kind == "topic":
+        title = next(t["title"] for t in content()["topics"] if t["id"] == body.topic_id)
     timestamp = now()
     doc = {"_id": aid, "user_id": uid, "kind": body.kind, "lesson_id": body.lesson_id, "part": body.part,
+           "topic_id": body.topic_id, "exam_id": body.exam_id, "title": title,
            "content_version": content()["version"], "started_at": timestamp,
            "deadline": timestamp + timedelta(minutes=minutes), "status": "active", "revision": 0, "questions": questions, "answers": {}}
     try:
         await db.toeic_attempts.insert_one(doc)
     except DuplicateKeyError:
         existing = await owned_attempt(db, uid, aid)
-        if (existing["kind"], existing.get("lesson_id"), existing.get("part")) != (body.kind, body.lesson_id, body.part):
+        if start_signature(existing) != start_signature(body.model_dump()):
             raise HTTPException(409, "Mã yêu cầu đã được dùng cho một đề khác.")
         return attempt_view(existing)
     return attempt_view(doc)

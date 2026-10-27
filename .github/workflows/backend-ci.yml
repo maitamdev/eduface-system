@@ -120,4 +120,4 @@ jobs:
           MONGODB_URL: mongodb://localhost:27017/?replicaSet=eduface-test
           MONGODB_INTEGRATION_URI: mongodb://localhost:27017/?replicaSet=eduface-test
           APP_ENV: test
-        run: pytest tests/test_mongo_integration.py tests/test_toeic_integration.py -v
+        run: pytest tests/test_mongo_integration.py tests/test_toeic_integration.py tests/test_toeic_library_integration.py -v

@@ -1,6 +1,6 @@
 {
-  "version": "dhv-toeic-2026.10-v2",
-  "notice": "Học liệu tự biên soạn, không phải đề ETS. Mục tiêu 900 là định hướng học, không bảo đảm kết quả. ‘Từ 0’ nghĩa là bắt đầu từ nền tảng; điểm TOEIC L&R chính thức là 10–990. Âm thanh là giọng tổng hợp; Part 1 dùng hình minh họa.",
+  "version": "dhv-toeic-2026.10-v3",
+  "notice": "Học liệu DHV tự biên soạn và nội dung MIT từ TOEIC Question Ocean được chọn lọc, bổ sung lời giải tiếng Việt. Không phải đề ETS. Mục tiêu 900 là định hướng, không bảo đảm kết quả. Audio tổng hợp; hình Part 1 là minh họa hoặc cảnh mô phỏng tạo bằng AI. Điểm hiển thị là số câu đúng, không quy đổi điểm TOEIC chính thức.",
   "stages": [
     {
       "id": 0,
@@ -182,6 +182,15 @@
       "access": "Tra cứu tại nguồn",
       "stage": "Mọi level",
       "usage": "Kiểm tra nghĩa, phát âm và cụm từ; tự viết ví dụ để kiểm tra hiểu."
+    },
+    {
+      "id": "ocean-mit",
+      "title": "TOEIC Question Ocean · nguồn MIT được chọn lọc",
+      "url": "https://github.com/kdeppaei/toeic-question-ocean",
+      "provider": "Chun-Hsiung Luo / DHV",
+      "access": "MIT · có bản ghi nguồn và điều chỉnh",
+      "stage": "Ôn dạng bài / đề luyện",
+      "usage": "Đã nhập phần nội dung tự biên soạn được cấp phép MIT, bổ sung lời giải tiếng Việt và loại câu có vấn đề. Ảnh mới là cảnh tạo bằng AI từ nguồn; audio được tạo lại từ transcript. Xem thông báo MIT và ghi nguồn ở chân mục ôn tập."
     }
   ],
   "lessons": [
@@ -724,6 +733,270 @@
       ],
       "practice_rule": "Đọc bài → ôn từ → làm bài không xem lời giải → ghi lại lý do sai. Từ 70% được đánh dấu hoàn thành; có thể luyện lại mọi lúc.",
       "question_count": 20
+    },
+    {
+      "id": "lab-p1",
+      "stage": 1,
+      "title": "Chuyên đề Part 1 · Hình và hành động",
+      "part": 1,
+      "minutes": 45,
+      "objectives": [
+        "Nhận diện các dạng câu hỏi và chọn cách xử lý phù hợp.",
+        "Giải thích đáp án bằng ngữ pháp hoặc bằng chứng cụ thể.",
+        "Dùng mục Ôn theo dạng để luyện từng kỹ năng rồi mở đề tổng hợp."
+      ],
+      "sections": [
+        {
+          "title": "Người và hành động đang diễn ra",
+          "body": "Hình có một hoặc nhiều người: nghe chủ thể, động tác và vật chịu tác động.\n\nS + be + V-ing mô tả hành động đang diễn ra; chú ý bàn tay, tư thế và hướng nhìn.\n\nPhân biệt wearing (đang mặc sẵn) và putting on (đang đưa đồ lên người), holding và handing.\n\nCâu đúng chỉ cần mô tả một chi tiết nhìn thấy; không cần kể toàn bộ hình.\n\nCách làm: Quan sát người và đồ vật trong vài giây. → Dự đoán 2–3 động từ có thể mô tả. → Nghe đủ từng câu rồi đối chiếu cả chủ thể lẫn động tác.\n\nTránh lỗi: Một danh từ trùng hình không cứu được động từ sai. Không suy ra nghề nghiệp, mục đích hoặc cuộc hẹn từ trang phục.\n\nA worker is fastening a strap around a carton.\n\nCần thấy người đang siết dây quanh thùng; a worker is opening a carton sai nếu không có thao tác mở."
+        },
+        {
+          "title": "Đồ vật, trạng thái và vị trí",
+          "body": "Hình ít người hoặc không có người: đồ đạc, đường phố, khu vực làm việc.\n\nBe + V3 có thể mô tả trạng thái kết quả: chairs are arranged; be being + V3 nhấn mạnh hành động đang được thực hiện.\n\nThere is/are xác nhận sự hiện diện; không tự thêm người đang thao tác.\n\nBeside, beneath, along, across và facing phải khớp quan hệ giữa các vật.\n\nCách làm: Xác định vật nổi bật và số lượng. → Phân biệt trạng thái đứng yên với hành động đang diễn ra. → Kiểm tra vị trí và vật nhỏ trong câu mô tả.\n\nTránh lỗi: Being installed không đúng chỉ vì thiết bị đã có ở đó. Facing the screen khác behind the screen.\n\nSeveral chairs have been placed beneath the awning.\n\nCâu mô tả vị trí và kết quả sắp xếp; không yêu cầu nhìn thấy người đang đặt ghế."
+        }
+      ],
+      "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
+      "question_count": 10
+    },
+    {
+      "id": "lab-p2",
+      "stage": 1,
+      "title": "Chuyên đề Part 2 · Phản hồi trong giao tiếp",
+      "part": 2,
+      "minutes": 45,
+      "objectives": [
+        "Nhận diện các dạng câu hỏi và chọn cách xử lý phù hợp.",
+        "Giải thích đáp án bằng ngữ pháp hoặc bằng chứng cụ thể.",
+        "Dùng mục Ôn theo dạng để luyện từng kỹ năng rồi mở đề tổng hợp."
+      ],
+      "sections": [
+        {
+          "title": "Who / Where / When / What / How / Why",
+          "body": "Từ hỏi báo trước loại thông tin cần nghe, nhưng câu trả lời có thể gián tiếp.\n\nWho hỏi người; where hỏi nơi; when hỏi thời điểm. How long hỏi thời lượng, how often hỏi tần suất.\n\nWhy có thể được đáp bằng mục đích to + V hoặc nguyên nhân, không bắt buộc because.\n\nWhat time và which floor phải được nghe như cả cụm; đừng chỉ bắt từ đầu.\n\nCách làm: Giữ lại từ hỏi và động từ chính. → Dự đoán loại thông tin. → Chọn câu đáp hợp tình huống, kể cả lời chỉ dẫn nơi tìm thông tin.\n\nTránh lỗi: Âm giống không phải nghĩa giống: floor/four. Câu đáp đúng ngữ pháp nhưng trả lời một câu hỏi khác vẫn sai.\n\nWhen will the revised roster be available? — Check the noticeboard after lunch.\n\nLời đáp chỉ thời điểm xem được lịch; không cần lặp will hoặc available."
+        },
+        {
+          "title": "Yes/No, câu phủ định và câu hỏi đuôi",
+          "body": "Do/Does/Did, Have/Has, Is/Are, Won't… hoặc một mệnh đề kèm isn't it / didn't you.\n\nTrả lời theo sự việc thực tế; không chọn máy móc Yes cho câu khẳng định hay No cho câu phủ định.\n\nCâu hỏi đuôi thường xin xác nhận; lời đáp có thể sửa thông tin thay vì nói yes/no.\n\nHave you finished? hỏi kết quả đến hiện tại; Did you finish yesterday? gắn mốc quá khứ.\n\nCách làm: Xác định việc đang được xác nhận. → Nghe động từ, chủ thể và mốc thời gian. → Kiểm tra lời đáp xác nhận, bác bỏ hay giải thích việc chưa làm.\n\nTránh lỗi: Yes, it does không phù hợp câu hỏi người đã làm việc gì. Đáp lại bằng một chi tiết hợp lý có thể đúng hơn yes/no máy móc.\n\nYou haven't sent the invoice yet, have you? — I'm waiting for the purchase number.\n\nNgười đáp giải thích vì sao chưa gửi; đây là câu đáp gián tiếp phù hợp."
+        },
+        {
+          "title": "Câu hỏi lựa chọn A or B",
+          "body": "Người nói đưa ra hai phương án về thời gian, địa điểm hoặc hành động.\n\nCó thể chọn A, chọn B, cả hai, không cái nào hoặc nêu phương án khác nếu phù hợp.\n\nEither works nghĩa là phương án nào cũng được; neither phủ định cả hai.\n\nOr ở giữa hai danh từ không tự biến mọi câu thành câu hỏi lựa chọn; cần hiểu toàn câu.\n\nCách làm: Nhớ hai lựa chọn. → Nghe người đáp đang chọn, từ chối hay chuyển quyền quyết định. → Kiểm tra câu đáp có giải quyết lựa chọn đang đặt ra không.\n\nTránh lỗi: Yes không thường đủ để trả lời A hay B. Lựa chọn lặp lại một từ nghe được nhưng đổi đối tượng là bẫy.\n\nShould we print the agenda or send a link? — Let's save paper this time.\n\nSave paper hàm ý gửi đường dẫn; phải suy ra từ hai lựa chọn có sẵn."
+        },
+        {
+          "title": "Yêu cầu, đề nghị và lời mời",
+          "body": "Could you…, Would you mind…, Why don't we…, Let's… hoặc Would you like…\n\nCould you thường là nhờ làm việc, không chỉ hỏi khả năng.\n\nWould you mind + V-ing là lời nhờ lịch sự; Not at all thường thể hiện đồng ý.\n\nWhy don't we đề xuất một hành động; lời đáp nên chấp nhận, từ chối hoặc đưa phương án khác.\n\nCách làm: Nhận diện chức năng giao tiếp. → Xác định ai cần làm việc gì. → Chọn lời đáp lịch sự và phù hợp điều kiện của người nói.\n\nTránh lỗi: Why don't we không luôn yêu cầu nêu nguyên nhân. No có thể đồng ý với Would you mind, tùy phần giải thích sau đó.\n\nCould you cover the reception desk at noon? — I can, once my call ends.\n\nNgười đáp nhận hỗ trợ nhưng có điều kiện về thời gian; không phải từ chối hoàn toàn."
+        },
+        {
+          "title": "Phản hồi gián tiếp và câu phát biểu",
+          "body": "Lời đầu là thông báo, phàn nàn hoặc câu hỏi mà người đáp không trả lời thẳng.\n\nMột thông báo có thể được đáp bằng hành động khắc phục, lời cảm ơn hoặc câu hỏi tiếp.\n\nI thought… có thể sửa một giả định; you'll have to ask… chuyển đến người biết thông tin.\n\nChỉ suy luận một bước từ ngữ cảnh; không tự dựng một câu chuyện ngoài lời nói.\n\nCách làm: Xác định nhu cầu ẩn sau câu đầu. → Tìm phản hồi giúp tiếp tục cuộc trao đổi. → Loại đáp án chỉ liên quan từ vựng nhưng không có quan hệ giao tiếp.\n\nTránh lỗi: Lặp từ trong câu hỏi là bẫy phổ biến. Không loại câu hỏi ngược chỉ vì nó không phải câu trần thuật.\n\nThe projector won't start. — Is the power cable connected?\n\nCâu hỏi ngược đề xuất kiểm tra nguyên nhân, nên đáp lại vấn đề hợp lý."
+        }
+      ],
+      "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
+      "question_count": 78
+    },
+    {
+      "id": "lab-p3",
+      "stage": 2,
+      "title": "Chuyên đề Part 3 · Hiểu hội thoại công việc",
+      "part": 3,
+      "minutes": 45,
+      "objectives": [
+        "Nhận diện các dạng câu hỏi và chọn cách xử lý phù hợp.",
+        "Giải thích đáp án bằng ngữ pháp hoặc bằng chứng cụ thể.",
+        "Dùng mục Ôn theo dạng để luyện từng kỹ năng rồi mở đề tổng hợp."
+      ],
+      "sections": [
+        {
+          "title": "Hội thoại: chủ đề, địa điểm và vai trò",
+          "body": "What are the speakers discussing? Where are they? Who most likely is the woman?\n\nChủ đề thường được xác lập sớm rồi triển khai thành vấn đề và giải pháp.\n\nVai trò phải dựa vào việc người đó làm hoặc cung cấp, không chỉ một danh từ nghề nghiệp.\n\nKết hợp hai dấu hiệu địa điểm nếu có: prescription + pharmacist mạnh hơn từ counter đơn lẻ.\n\nCách làm: Đọc nhanh ba câu hỏi trước khi nghe. → Ghi mối quan hệ người nói và vấn đề chính. → Đối chiếu câu trả lời ở mức khái quát vừa đủ.\n\nTránh lỗi: Chi tiết phụ ở cuối không nhất thiết là chủ đề. Một người nhắc đến nhà hàng chưa có nghĩa đang ở nhà hàng.\n\nThe replacement lenses arrived. Could you come in for a fitting tomorrow?\n\nReplacement lenses và fitting gợi dịch vụ kính; người gọi đang sắp lịch thử kính."
+        },
+        {
+          "title": "Hội thoại: chi tiết, nguyên nhân và thay đổi",
+          "body": "Hỏi giờ, giá, tên, vật dụng, lý do hoặc điều gì đã thay đổi.\n\nĐáp án thường diễn đạt lại thông tin: out of stock → unavailable.\n\nThông tin sửa sau but, actually, instead có thể thay thế kế hoạch ban đầu.\n\nLưu mối liên hệ giữa con số và đối tượng: giá cũ, giá mới, ngày đặt và ngày nhận.\n\nCách làm: Xác định loại chi tiết cần nghe. → Ghi từ khóa thay cho cả câu. → Kiểm tra lần nhắc cuối cùng áp dụng cho đối tượng nào.\n\nTránh lỗi: Con số nghe rõ nhất chưa chắc được hỏi. Đừng áp dụng một thay đổi cho cả những điều người nói không sửa.\n\nWe originally booked Tuesday, but the engineer can only come on Thursday.\n\nLịch thực hiện đã chuyển sang Thursday; Tuesday là phương án ban đầu."
+        },
+        {
+          "title": "Hội thoại: hành động tiếp theo",
+          "body": "What will the man do next? What is the woman asked to do?\n\nPhân biệt việc đã làm, đang làm, dự định và được nhờ làm.\n\nI'll, let me, please và could you thường đánh dấu việc tiếp theo; kiểm tra đúng người.\n\nNếu hành động có điều kiện, giữ điều kiện đó trong cách diễn đạt của đáp án.\n\nCách làm: Xác định người được hỏi. → Theo dõi lời chốt nhiệm vụ. → Loại hoạt động đã hoàn tất trước cuộc gọi.\n\nTránh lỗi: Đáp án mô tả việc của người còn lại. Cần làm sau khi được duyệt không đồng nghĩa sẽ làm ngay.\n\nI'll reserve the room once you confirm the guest count.\n\nNgười nói sẽ đặt phòng sau khi người kia xác nhận số khách, không phải tự đếm khách."
+        },
+        {
+          "title": "Hội thoại: hàm ý và mục đích câu nói",
+          "body": "What does the speaker mean when saying…? Why does the speaker say…?\n\nÝ định cần được giải thích bằng câu trước và câu sau đoạn trích.\n\nMột lời nhận xét có thể là yêu cầu gián tiếp hoặc thể hiện sự do dự.\n\nMức độ chắc chắn phải giữ nguyên: might không đồng nghĩa definitely.\n\nCách làm: Xác định vấn đề ngay trước lời nói. → Nghe phản hồi và hành động sau đó. → Chọn chức năng giao tiếp, không chỉ nghĩa từ điển.\n\nTránh lỗi: Diễn giải quá mạnh một lời gợi ý. Chọn câu đúng nghĩa đen nhưng không giải thích vì sao nói lúc đó.\n\nThe shipment can arrive Friday. — That gives us some breathing room.\n\nLời đáp thể hiện có thêm thời gian chuẩn bị, không nói về không khí hay phòng ốc."
+        },
+        {
+          "title": "Hội thoại kết hợp bảng hoặc lịch",
+          "body": "Look at the graphic: cần nối dữ kiện nghe với một hàng trong bảng.\n\nBảng cung cấp dữ kiện tĩnh; audio thường cho điều kiện để xác định hàng đúng.\n\nĐọc tên cột, đơn vị và chú thích trước; chỉ nhìn số mà quên đơn vị dễ chọn sai.\n\nNếu audio thông báo điều chỉnh, áp dụng đúng mục bị thay đổi rồi tìm kết quả trong bảng.\n\nCách làm: Đọc câu hỏi và tên cột. → Nghe điều kiện lọc: sức chứa, giờ, giá hoặc loại vé. → Đối chiếu từng điều kiện rồi chọn đúng ô.\n\nTránh lỗi: Chọn hàng có một điều kiện đúng nhưng điều kiện khác sai. Tính tổng trước khi xác định giá là theo người hay theo nhóm.\n\nRoom Cedar: 20 seats; Room Elm: 35 seats. Audio: We need space for 28 guests.\n\nCedar không đủ chỗ; Elm phù hợp nếu không có điều kiện khác trong audio."
+        }
+      ],
+      "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
+      "question_count": 54
+    },
+    {
+      "id": "lab-p4",
+      "stage": 2,
+      "title": "Chuyên đề Part 4 · Nghe thông báo và hướng dẫn",
+      "part": 4,
+      "minutes": 45,
+      "objectives": [
+        "Nhận diện các dạng câu hỏi và chọn cách xử lý phù hợp.",
+        "Giải thích đáp án bằng ngữ pháp hoặc bằng chứng cụ thể.",
+        "Dùng mục Ôn theo dạng để luyện từng kỹ năng rồi mở đề tổng hợp."
+      ],
+      "sections": [
+        {
+          "title": "Bài nói: mục đích, người nghe và bối cảnh",
+          "body": "Thông báo, voicemail, quảng cáo, giới thiệu hoặc hướng dẫn công việc.\n\nPhần mở đầu thường cho biết người nói và mục đích; phần cuối nêu hành động cần làm.\n\nPhân biệt quảng cáo một dịch vụ với thông báo thay đổi dịch vụ đã đặt.\n\nĐối tượng nghe được xác định bằng nghĩa vụ/quyền lợi của họ trong bài.\n\nCách làm: Nhận dạng loại bài nói. → Tóm tắt bằng một động từ: announce, explain, invite, apologize. → Kiểm tra đáp án có bao quát toàn bài không.\n\nTránh lỗi: Một sản phẩm được nhắc đến không tự biến bài thành quảng cáo. Chọn một chi tiết kỹ thuật làm mục đích chung.\n\nThis message concerns the new entrance procedure for contractors.\n\nMục đích là giải thích quy trình vào tòa nhà cho nhà thầu, không phải tuyển nhà thầu."
+        },
+        {
+          "title": "Bài nói: điều kiện và thông tin cụ thể",
+          "body": "Hỏi thời hạn, vị trí, ưu đãi, nguyên nhân hay ngoại lệ.\n\nOnly, except, unless và at least giới hạn phạm vi của thông tin.\n\nĐáp án đúng giữ cả thông tin chính lẫn điều kiện áp dụng.\n\nMột danh sách có thể chứa các nhóm khác nhau; ghép đúng đối tượng với quyền lợi.\n\nCách làm: Khoanh loại dữ kiện được hỏi. → Nghe cụm hạn chế ngay trước hoặc sau số liệu. → So lại đáp án xem có bỏ mất điều kiện không.\n\nTránh lỗi: Miễn phí cho thành viên không phải miễn phí cho mọi người. By Friday và on Friday khác nhau.\n\nExpress delivery is free for orders above eighty dollars, excluding furniture.\n\nĐơn vượt 80 đô la vẫn không được ưu đãi này nếu là đồ nội thất."
+        },
+        {
+          "title": "Bài nói: yêu cầu và bước tiếp theo",
+          "body": "What should listeners do? What will happen next?\n\nHướng dẫn thường có thứ tự: đăng ký, nhận xác nhận, rồi đến địa điểm.\n\nPlease, remember to, be sure to và contact… nêu hành động cụ thể.\n\nPhân biệt việc người nghe phải làm với việc ban tổ chức sẽ làm.\n\nCách làm: Tìm chủ thể của hành động. → Ghi bước bắt buộc và hạn chót. → Ưu tiên lời hướng dẫn trực tiếp ở cuối bài.\n\nTránh lỗi: Đến nơi trước khi xác nhận dù audio yêu cầu xác nhận trước. Đọc một hành động tùy chọn thành bắt buộc.\n\nTo change your delivery slot, reply to this message before four.\n\nNgười muốn đổi lịch phải trả lời tin nhắn trước 4 giờ; không áp dụng cho người giữ lịch cũ."
+        },
+        {
+          "title": "Bài nói kết hợp bảng giá và lịch trình",
+          "body": "Một bài nói cung cấp điều kiện cần nối với thông tin trực quan.\n\nBảng có thể chứa giá cơ bản, phụ phí hoặc khung giờ, cần đọc đúng tiêu đề.\n\nKhi audio nói dịch vụ được thay thế, xác định dòng mới thay vì dùng lịch cũ.\n\nTính toán chỉ ở mức cần thiết; TOEIC chủ yếu kiểm tra hiểu thông tin tiếng Anh.\n\nCách làm: Quét bảng và câu hỏi trước. → Ghi điều kiện từ audio. → Dùng đúng hàng/cột và kiểm tra đơn vị.\n\nTránh lỗi: Nhầm giờ đến với giờ khởi hành. Cộng phí đã bao gồm trong giá.\n\nShuttle: 08:00 North / 08:20 West. Audio: West passengers should use the later bus.\n\nTìm giờ 08:20 tương ứng tuyến West; không chọn chuyến đầu chỉ vì được đọc trước."
+        }
+      ],
+      "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
+      "question_count": 51
+    },
+    {
+      "id": "lab-p5",
+      "stage": 2,
+      "title": "Chuyên đề Part 5 · Ngữ pháp và từ vựng trong câu",
+      "part": 5,
+      "minutes": 45,
+      "objectives": [
+        "Nhận diện các dạng câu hỏi và chọn cách xử lý phù hợp.",
+        "Giải thích đáp án bằng ngữ pháp hoặc bằng chứng cụ thể.",
+        "Dùng mục Ôn theo dạng để luyện từng kỹ năng rồi mở đề tổng hợp."
+      ],
+      "sections": [
+        {
+          "title": "Từ loại và vị trí trong câu",
+          "body": "Các lựa chọn chung gốc: efficient / efficiently / efficiency / efficiencies.\n\nXác định ô trống cần danh từ, động từ, tính từ hay trạng từ từ cấu trúc xung quanh.\n\nA/an/the + (tính từ) + danh từ; trạng từ có thể đứng giữa trợ động từ và phân từ.\n\nSau động từ nối như seem/remain/become thường là tính từ, không tự động chọn trạng từ sau mọi động từ.\n\nCách làm: Đọc cả cụm chứa chỗ trống. → Tìm từ mà chỗ trống bổ nghĩa. → Chọn từ loại rồi kiểm tra nghĩa và số ít/số nhiều.\n\nTránh lỗi: Đuôi -ly không phải lúc nào cũng là trạng từ: friendly là tính từ. Từ đứng sát danh từ chưa chắc là tính từ nếu giữa chúng có giới từ.\n\nThe technician checked the connection carefully.\n\nCarefully bổ nghĩa hành động checked; careful cần bổ nghĩa một danh từ hoặc đứng sau động từ nối."
+        },
+        {
+          "title": "Thì và mốc thời gian",
+          "body": "Các lựa chọn là những dạng chia khác nhau của cùng động từ.\n\nPast simple thường gắn mốc quá khứ kết thúc; present perfect nối quá khứ với hiện tại.\n\nPast perfect nêu hành động xảy ra trước một mốc quá khứ khác, không dùng chỉ vì thấy before.\n\nBy the time + mốc tương lai có thể đi với future perfect nếu hành động đã hoàn tất trước mốc đó.\n\nCách làm: Tìm mốc và trình tự sự kiện. → Xác định hành động còn liên quan hiện tại không. → Kiểm tra hòa hợp chủ ngữ sau khi chọn thì.\n\nTránh lỗi: Since có thể là liên từ chỉ lý do trong ngữ cảnh khác. Tomorrow không bắt buộc will: lịch trình có thể dùng hiện tại đơn.\n\nBy the time the courier arrived, we had sealed the boxes.\n\nViệc niêm phong đã xong trước khi người giao hàng đến: had sealed."
+        },
+        {
+          "title": "Hòa hợp chủ ngữ – động từ",
+          "body": "Bẫy danh từ số nhiều trong cụm giới từ hoặc chủ ngữ nối either/neither.\n\nĐộng từ hòa hợp với danh từ trung tâm của chủ ngữ, không phải danh từ gần nhất bất kỳ.\n\nEach/every + danh từ số ít thường dùng động từ số ít; a number of + số nhiều dùng số nhiều.\n\nVới either…or / neither…nor, kiểm tra danh từ gần động từ và quy tắc ngữ cảnh sử dụng.\n\nCách làm: Gạch bỏ cụm bổ nghĩa xen giữa. → Xác định chủ ngữ trung tâm. → Đối chiếu số và thì của từng phương án.\n\nTránh lỗi: The number of khác a number of. Together with không có vai trò như and trong việc tạo chủ ngữ ghép.\n\nThe list of replacement parts is on the desk.\n\nList là chủ ngữ số ít; of replacement parts chỉ bổ nghĩa nên dùng is."
+        },
+        {
+          "title": "Chủ động và bị động",
+          "body": "Chủ ngữ nhận hành động: invoices, applications, equipment, requests.\n\nBị động thường là be + past participle; modal + be + V3; have/has been + V3.\n\nGiữ thì ở trợ động từ, không đổi phân từ sang động từ nguyên mẫu.\n\nKhông phải động từ nào cũng có tân ngữ để chuyển bị động: arrive/happen thường không dùng bị động.\n\nCách làm: Hỏi chủ ngữ làm hay nhận hành động. → Tìm dấu hiệu thì hoặc modal. → Kiểm tra động từ có thể mang nghĩa bị động không.\n\nTránh lỗi: By Friday là thời hạn, không phải tác nhân. Be interested là mô tả trạng thái, cần hiểu nghĩa thay vì gán mọi V3 là hành động bị động.\n\nAll applications must be reviewed before Friday.\n\nApplications nhận hành động xét duyệt; modal must cần be reviewed."
+        },
+        {
+          "title": "Đại từ và sở hữu",
+          "body": "I/me/my/mine, they/them/their/theirs, hoặc đại từ phản thân.\n\nĐại từ chủ ngữ đứng làm chủ thể; đại từ tân ngữ sau động từ/giới từ.\n\nTính từ sở hữu cần danh từ theo sau; đại từ sở hữu có thể thay cả cụm danh từ.\n\nĐại từ phản thân dùng khi tân ngữ cùng người với chủ ngữ hoặc để nhấn mạnh, không thay thế mọi tân ngữ.\n\nCách làm: Xác định chức năng chỗ trống. → Tìm danh từ đi kèm nếu có. → Kiểm tra đại từ tham chiếu đúng người và số.\n\nTránh lỗi: Its là sở hữu, it's = it is/has. Their và theirs không dùng cùng vị trí.\n\nPlease send the revised estimate to her, not to me.\n\nSau giới từ to cần đại từ tân ngữ her/me; không dùng she/I."
+        },
+        {
+          "title": "Giới từ và cụm cố định",
+          "body": "Giới từ chỉ thời gian, vị trí hoặc theo sau một tính từ/động từ.\n\nBy nêu hạn cuối, until nêu trạng thái kéo dài đến một mốc, within nêu khoảng giới hạn.\n\nGiới từ đi với danh từ hoặc V-ing; to có thể là giới từ trong look forward to.\n\nHọc cả cụm: responsible for, interested in, comply with, on behalf of.\n\nCách làm: Phân biệt giới từ nghĩa tự do và cụm cố định. → Đọc thành phần ngay sau chỗ trống. → Kiểm tra quan hệ thời gian hoặc nghĩa của cả cụm.\n\nTránh lỗi: During + danh từ; while + mệnh đề trong cách dùng thông thường. Không chọn to chỉ vì thấy dạng nguyên mẫu trong các cụm giới từ.\n\nPlease keep the receipt until the warranty expires.\n\nKeep diễn tả duy trì việc giữ; until xác định thời điểm kết thúc."
+        },
+        {
+          "title": "Liên từ và quan hệ logic",
+          "body": "Because/because of; although/despite; unless/if; however/therefore.\n\nBecause/although + mệnh đề; because of/despite + cụm danh từ hoặc V-ing.\n\nUnless diễn tả ngoại lệ/điều kiện phủ định, không thay if trong mọi câu.\n\nHowever và therefore là trạng từ liên kết; xem dấu câu để tránh nối hai mệnh đề độc lập bằng dấu phẩy sai.\n\nCách làm: Xác định sau chỗ trống là cụm hay mệnh đề. → Tìm quan hệ nguyên nhân, tương phản, điều kiện hoặc mục đích. → Đọc lại câu với nghĩa đã chọn.\n\nTránh lỗi: Although và despite giống quan hệ nghĩa nhưng khác cấu trúc. Even if là điều kiện giả định, even though là nhượng bộ về điều được nêu là thực.\n\nAlthough the delivery was late, the client accepted the shipment.\n\nSau Although là mệnh đề có chủ ngữ và động từ; despite không đứng trực tiếp trước cấu trúc này."
+        },
+        {
+          "title": "Mệnh đề quan hệ và rút gọn",
+          "body": "Who/whom/whose/which/that, hoặc V-ing/V3 ngay sau danh từ.\n\nWho thường chỉ người, which chỉ vật; whose thể hiện sở hữu và đi với danh từ.\n\nXem đại từ đóng vai chủ ngữ hay tân ngữ trong mệnh đề phụ trước khi chọn.\n\nRút gọn chủ động thường dùng V-ing; bị động dùng V3, nhưng chỉ khi cấu trúc và nghĩa cho phép.\n\nCách làm: Tìm danh từ được bổ nghĩa. → Xác định mệnh đề đang thiếu thành phần gì. → Kiểm tra chủ động/bị động và dấu phẩy.\n\nTránh lỗi: Không dùng that sau giới từ đặt ngay trước đại từ quan hệ. V3 sau danh từ không tự là thì quá khứ của mệnh đề chính.\n\nThe documents attached to the message contain the revised prices.\n\nAttached rút gọn which are attached; contain mới là động từ chính."
+        },
+        {
+          "title": "Từ chỉ lượng và danh từ đếm được",
+          "body": "Much/many, fewer/less, few/little, each/every và lượng thông tin.\n\nMany/few/fewer đi với danh từ đếm được số nhiều; much/little/less thường đi với không đếm được.\n\nA few/a little thường mang ý có một lượng; few/little thường nhấn mạnh không nhiều hoặc chưa đủ.\n\nInformation, equipment, advice thường không đếm được; dùng piece/item để diễn tả đơn vị.\n\nCách làm: Xác định danh từ đếm được không. → Kiểm tra số ít/số nhiều. → Đọc sắc thái đủ/thiếu và so sánh.\n\nTránh lỗi: Không thêm -s vào equipment trong cách dùng thông thường. Each dùng với danh từ số ít nhưng each of đi với cụm số nhiều, động từ chính thường số ít.\n\nWe need a little more information before approving the request.\n\nInformation không đếm được nên dùng a little; many không phù hợp."
+        },
+        {
+          "title": "To V, V-ing và dạng nguyên mẫu",
+          "body": "Sau động từ, giới từ, tính từ hoặc động từ khuyết thiếu.\n\nModal + V nguyên mẫu; agree/plan/decide + to V; avoid/consider + V-ing.\n\nSau giới từ thường dùng V-ing; phân biệt to giới từ với to của nguyên mẫu.\n\nMột số động từ thay đổi nghĩa theo dạng theo sau: stop doing và stop to do.\n\nCách làm: Xác định từ chi phối chỗ trống. → Đối chiếu mẫu bổ ngữ của từ đó. → Kiểm tra nghĩa của hai hành động.\n\nTránh lỗi: Can to submit sai: modal không cần to. Be used to doing khác used to do.\n\nThe team postponed installing the update until Friday.\n\nPostpone nhận V-ing; installing là hoạt động bị hoãn."
+        },
+        {
+          "title": "So sánh, mức độ và song song",
+          "body": "Than, as…as, the most…, hoặc hai cấu trúc cần tương ứng.\n\nSo sánh hơn thường có -er/more và than; không dùng more với một dạng đã có -er.\n\nAs + tính từ/trạng từ gốc + as; chọn tính từ hay trạng từ theo chức năng.\n\nMuch/far/considerably có thể bổ nghĩa so sánh hơn; very thường không dùng trực tiếp trước better.\n\nCách làm: Tìm đối tượng được so sánh. → Xác định khung cấu trúc. → Kiểm tra từ loại và sự song song.\n\nTránh lỗi: Most efficient và more efficient có phạm vi so sánh khác nhau. So sánh phải cùng loại đối tượng: costs với costs, không costs với company.\n\nThe new process runs considerably faster than the old one.\n\nConsiderably bổ nghĩa faster; faster bổ nghĩa runs."
+        },
+        {
+          "title": "Từ vựng ngữ cảnh và collocation",
+          "body": "Các lựa chọn cùng từ loại, đều đúng ngữ pháp nhưng khác nghĩa.\n\nKhi cấu trúc không loại được đáp án, đọc cả câu để xác định mục đích và đối tượng.\n\nHọc kết hợp từ: meet a deadline, place an order, raise a concern, issue a refund.\n\nMột từ nhiều nghĩa phải được hiểu theo ngành và tình huống, không theo nghĩa học đầu tiên.\n\nCách làm: Xác nhận các lựa chọn cùng loại từ. → Xác định quan hệ nghĩa với danh từ/động từ bên cạnh. → Thử diễn đạt lại cả câu.\n\nTránh lỗi: Nghĩa gần nhau không đồng nghĩa mọi kết hợp đều tự nhiên. Không dựa riêng vào một bản dịch tiếng Việt chung.\n\nThe manager raised a concern about the revised schedule.\n\nRaise a concern là nêu quan ngại; rise là nội động từ nên không dùng với tân ngữ a concern."
+        },
+        {
+          "title": "Điều kiện, đảo ngữ và giả định",
+          "body": "Had/Were/Should đứng đầu, not only, hoặc recommend that…\n\nHad + S + V3 có thể thay if + past perfect trong điều kiện không thực ở quá khứ.\n\nSau recommend/require/insist that, dạng giả định thường dùng động từ nguyên mẫu theo nghĩa yêu cầu.\n\nCụm mở đầu phủ định như Not until/Only after có thể yêu cầu đảo trợ động từ ở mệnh đề chính.\n\nCách làm: Xác định mẫu cấu trúc thay vì dịch từng từ. → Tách mệnh đề điều kiện khỏi kết quả. → Kiểm tra cả nghĩa thời gian và dạng động từ.\n\nTránh lỗi: Không đảo mệnh đề nằm trong cụm Only after; đảo mệnh đề chính. Không dùng một công thức giả định cho mọi nghĩa của insist.\n\nThe supervisor requested that each file be checked twice.\n\nRequest mang nghĩa yêu cầu; be là dạng nguyên mẫu trong mệnh đề giả định, không đổi theo each file."
+        }
+      ],
+      "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
+      "question_count": 142
+    },
+    {
+      "id": "lab-p6",
+      "stage": 3,
+      "title": "Chuyên đề Part 6 · Mạch văn bản và câu nối",
+      "part": 6,
+      "minutes": 45,
+      "objectives": [
+        "Nhận diện các dạng câu hỏi và chọn cách xử lý phù hợp.",
+        "Giải thích đáp án bằng ngữ pháp hoặc bằng chứng cụ thể.",
+        "Dùng mục Ôn theo dạng để luyện từng kỹ năng rồi mở đề tổng hợp."
+      ],
+      "sections": [
+        {
+          "title": "Part 6: ngữ pháp trong đoạn văn",
+          "body": "Chỗ trống từ loại, thì, chủ động/bị động hoặc từ vựng trong email/thông báo.\n\nDùng ngữ pháp câu gần chỗ trống nhưng kiểm tra thì và đối tượng trong cả đoạn.\n\nMột câu trước có thể xác định sự việc đã diễn ra hay mới dự kiến.\n\nCác chỗ trống cùng thuộc một văn bản; đáp án không được làm mâu thuẫn trình tự chung.\n\nCách làm: Đọc người gửi, người nhận và mục đích. → Giải các khoảng trống đủ bằng chứng cục bộ. → Đọc lại cả đoạn sau khi điền.\n\nTránh lỗi: Không chọn thì chỉ từ một trạng từ khi đoạn đã xác lập mốc khác. Đừng bỏ qua chủ thể của câu bị động.\n\nWe inspected the units yesterday. Three items have been ____ for replacement. (selected/selecting)\n\nHave been selected là bị động: ba món đã được chọn, phù hợp hành động kiểm tra trước đó."
+        },
+        {
+          "title": "Part 6: từ nối và tham chiếu",
+          "body": "However/therefore/otherwise, this change, these items hoặc đại từ.\n\nTừ nối biểu thị quan hệ giữa hai ý, không chỉ giữa hai từ đứng sát nhau.\n\nThis/these/such cần một nội dung phù hợp đã được giới thiệu; kiểm tra số lượng và nghĩa.\n\nOtherwise thường nêu hệ quả nếu điều kiện trước không được thực hiện.\n\nCách làm: Tóm tắt hai câu bằng tiếng Việt ngắn. → Xác định quan hệ logic. → Thay từ nối vào và đọc mạch hoàn chỉnh.\n\nTránh lỗi: Một câu nối ngữ pháp đúng có thể đảo sai quan hệ nguyên nhân. These không thể chỉ một danh từ số ít nếu không có ý tập hợp phù hợp.\n\nReturn the badge before leaving. Otherwise, a replacement fee will be charged.\n\nOtherwise nối yêu cầu với hậu quả nếu không trả thẻ; không phải một ví dụ minh họa."
+        },
+        {
+          "title": "Part 6: điền cả câu",
+          "body": "Các phương án là câu hoàn chỉnh cho một khoảng trống trong văn bản.\n\nCâu đúng cần nối được cả phía trước lẫn phía sau, cùng chủ đề chưa đủ.\n\nTìm chuỗi yêu cầu → điều kiện → hệ quả và đại từ chỉ ngược.\n\nKhông thêm một cam kết, khoản phí hoặc ngoại lệ mà phần còn lại phủ nhận.\n\nCách làm: Đọc ít nhất một câu trước và sau. → Xác định khoảng trống đang thiếu chức năng gì. → Thử từng phương án và loại mâu thuẫn.\n\nTránh lỗi: Câu có cùng từ khóa nhưng làm đứt mạch. Chọn chi tiết hợp lý ngoài đời dù đoạn không nói đến.\n\nThe workshop is full. [____] These applicants will be contacted if a seat becomes available.\n\nCâu chèn cần giới thiệu người trong danh sách chờ để These applicants có đối tượng tham chiếu."
+        }
+      ],
+      "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
+      "question_count": 20
+    },
+    {
+      "id": "lab-p7",
+      "stage": 3,
+      "title": "Chuyên đề Part 7 · Đọc bằng chứng và đối chiếu nguồn",
+      "part": 7,
+      "minutes": 45,
+      "objectives": [
+        "Nhận diện các dạng câu hỏi và chọn cách xử lý phù hợp.",
+        "Giải thích đáp án bằng ngữ pháp hoặc bằng chứng cụ thể.",
+        "Dùng mục Ôn theo dạng để luyện từng kỹ năng rồi mở đề tổng hợp."
+      ],
+      "sections": [
+        {
+          "title": "Part 7: mục đích và ý chính",
+          "body": "Why was the email sent? What is the main purpose of the notice?\n\nXác định hành động giao tiếp: thông báo, yêu cầu, xác nhận, quảng bá hay xin lỗi.\n\nTiêu đề là dấu hiệu nhưng thân bài và lời chốt quyết định mục đích.\n\nCâu trả lời quá rộng hoặc chỉ nói một chi tiết phụ đều có thể sai.\n\nCách làm: Đọc loại văn bản, người gửi và chủ đề. → Tóm tắt chức năng trong một câu. → Đối chiếu tất cả phương án.\n\nTránh lỗi: Một hóa đơn đính kèm không có nghĩa email chỉ yêu cầu trả tiền. Không chọn một mục đích hợp ngành nhưng không xuất hiện trong bài.\n\nYour reservation is confirmed. Please review the attached arrival instructions.\n\nMục đích chính là xác nhận đặt chỗ và cung cấp hướng dẫn, không phải quảng cáo giảm giá."
+        },
+        {
+          "title": "Part 7: chi tiết, NOT/EXCEPT và tham chiếu",
+          "body": "Hỏi ai, khi nào, ở đâu, điều kiện nào; hoặc thông tin không được nêu.\n\nTìm bằng từ khóa nhưng so nghĩa toàn cụm, vì đáp án thường paraphrase.\n\nNOT/EXCEPT yêu cầu đối chiếu cả bốn phương án; ba phương án được hỗ trợ không có nghĩa phương án cuối là điều trái ngược.\n\nTheo dõi đại từ, đơn vị, hạn chót và phạm vi của only/all/some.\n\nCách làm: Đọc kỹ từ phủ định trong câu hỏi. → Khoanh dòng bằng chứng. → Kiểm tra đối tượng và điều kiện của thông tin.\n\nTránh lỗi: Thông tin không được nêu khác với thông tin bị bài phủ định. Tên hoặc ngày trùng chưa đủ nếu gắn với người/sự kiện khác.\n\nMembers may borrow up to four devices for seven days.\n\nGiới hạn đồng thời có hai điều kiện: tối đa bốn thiết bị và thời hạn bảy ngày."
+        },
+        {
+          "title": "Part 7: suy luận và hành động dự kiến",
+          "body": "What is implied/suggested? What will most likely happen?\n\nSuy luận đúng là kết luận được bằng chứng hỗ trợ, không phải một khả năng tưởng tượng.\n\nPhân biệt kế hoạch, yêu cầu và xác nhận đã thực hiện.\n\nMức độ chắc chắn của đáp án phải phù hợp với từ may, likely, confirmed trong văn bản.\n\nCách làm: Chỉ ra ít nhất một bằng chứng cụ thể. → Nối dữ kiện bằng suy luận ngắn. → Loại phương án cần thêm giả định chưa được nói.\n\nTránh lỗi: Requested a refund không có nghĩa received a refund. Most likely không cho phép chọn bất kỳ câu hợp lý ngoài đời.\n\nPlease retain the original packaging until your inspection appointment.\n\nNgười nhận sẽ cần bao bì ít nhất đến buổi kiểm tra; chưa có bằng chứng sản phẩm chắc chắn được hoàn tiền."
+        },
+        {
+          "title": "Part 7: nghĩa từ và dụng ý trong ngữ cảnh",
+          "body": "Closest in meaning, hoặc tác giả muốn nói gì qua một câu trích.\n\nChọn nghĩa giữ được ý của câu và mạch đoạn, không chỉ nghĩa phổ biến nhất.\n\nTừ thay thế phải phù hợp chức năng ngữ pháp và collocation.\n\nVới tin nhắn, đọc lượt trước/sau để hiểu lời đồng ý, từ chối hoặc sửa thông tin.\n\nCách làm: Đọc toàn câu chứa từ. → Diễn đạt lại nghĩa theo ngữ cảnh. → Thử thay bằng từng phương án.\n\nTránh lỗi: Issue có thể là phát hành, vấn đề hoặc số tạp chí. Một từ đồng nghĩa từ điển vẫn có thể sai sắc thái trong câu.\n\nWe can accommodate the revised delivery window.\n\nAccommodate ở đây là đáp ứng/điều chỉnh cho phù hợp, không phải cung cấp phòng ở."
+        },
+        {
+          "title": "Part 7: hai và ba văn bản",
+          "body": "Email + lịch, quảng cáo + đơn hàng, chính sách + hóa đơn + cập nhật.\n\nGắn mỗi văn bản với chức năng và thời điểm: quy định, giao dịch, thay đổi cuối.\n\nMột câu có thể cần hai nguồn bằng chứng; ghi rõ nguồn nào cung cấp điều kiện, nguồn nào cung cấp dữ kiện.\n\nThông tin mới chỉ thay thế phần nó sửa; các điều kiện cũ còn lại có thể vẫn áp dụng.\n\nCách làm: Lập bản đồ văn bản trước khi đọc sâu. → Theo dõi cùng người/đơn hàng giữa các nguồn. → Đối chiếu điều kiện và mốc cập nhật trước khi tính hoặc suy luận.\n\nTránh lỗi: Cộng một khoản thay thế như thể là khoản bổ sung. Áp ưu đãi trước hạn cho một đơn đặt sau hạn.\n\nPolicy: orders placed by 12 May get free delivery. Email: order placed on 14 May.\n\nĐơn không đáp ứng thời hạn ưu đãi; việc giao sau hay trước ngày 12 không phải điều kiện được nêu."
+        },
+        {
+          "title": "Part 7: chọn vị trí chèn câu",
+          "body": "Văn bản có vị trí [1]–[4]; chọn nơi một câu mới phù hợp nhất.\n\nĐại từ và từ chỉ ngược trong câu mới cần tiền đề rõ ràng.\n\nCâu mới có thể giới thiệu một ý được giải thích ở câu sau, nên phải kiểm tra hai phía.\n\nMạch thường đi từ thông báo chung sang chi tiết, điều kiện và hành động.\n\nCách làm: Đọc câu cần chèn và gạch từ tham chiếu. → Tìm vị trí có tiền đề phù hợp. → Đọc ba câu liên tiếp sau khi chèn.\n\nTránh lỗi: Chủ đề giống nhau chưa đủ nếu thời gian hoặc logic đứt đoạn. Không đặt This alternative trước khi phương án thay thế được giới thiệu.\n\nThe west entrance is closed. Guests should use the garden gate. [2] A temporary ramp has been installed there.\n\nCâu mô tả lợi ích của lối đi thay thế phù hợp sau garden gate và trước chi tiết ramp nếu tham chiếu nhất quán."
+        }
+      ],
+      "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
+      "question_count": 104
     }
   ],
   "vocabulary": [
@@ -2133,7 +2406,7 @@
     "title": "Từ nền tảng đến mục tiêu 900",
     "reviewed_on": "2026-10-27",
     "description": "24 buổi Level 1 xây nền và 12 buổi Level 2 luyện đủ 7 Part, nối tiếp bằng 20 buổi nâng cao. Học theo năng lực và điều chỉnh nhịp sau mỗi mốc đánh giá.",
-    "notice": "Các mốc điểm là mục tiêu định hướng, không phải quy đổi CEFR hay cam kết đầu ra. 56 buổi là kế hoạch học; bộ luyện chấm điểm hiện có gồm 20 bài, 268 câu và 200 thẻ từ. Bài tự kiểm tra trong từng buổi dùng để hiểu bài, không dùng dự đoán điểm thi.",
+    "notice": "Các mốc điểm là mục tiêu định hướng, không phải quy đổi CEFR hay cam kết đầu ra. 56 buổi là kế hoạch học; dùng thêm thư viện chuyên đề, đề luyện và sổ câu sai để củng cố. Bài tự kiểm tra trong từng buổi dùng để hiểu bài, không dùng dự đoán điểm thi.",
     "entry": [
       "Người mới bắt đầu học Level 1 từ buổi 1; trước mỗi buổi dành 10 phút nghe âm, trọng âm, số và giờ.",
       "Đã học tiếng Anh: làm khảo sát 25 câu trong DHV, xem lỗi theo Part, rồi đọc thử mục tiêu và bài tự kiểm tra của level dự định học. Khảo sát ngắn chỉ giúp định hướng.",
@@ -7850,6 +8123,1396 @@
       }
     ]
   },
-  "question_count": 268,
+  "topics": [
+    {
+      "id": "p1-actions",
+      "part": 1,
+      "title": "Người và hành động đang diễn ra",
+      "recognition": "Hình có một hoặc nhiều người: nghe chủ thể, động tác và vật chịu tác động.",
+      "rules": [
+        "S + be + V-ing mô tả hành động đang diễn ra; chú ý bàn tay, tư thế và hướng nhìn.",
+        "Phân biệt wearing (đang mặc sẵn) và putting on (đang đưa đồ lên người), holding và handing.",
+        "Câu đúng chỉ cần mô tả một chi tiết nhìn thấy; không cần kể toàn bộ hình."
+      ],
+      "steps": [
+        "Quan sát người và đồ vật trong vài giây.",
+        "Dự đoán 2–3 động từ có thể mô tả.",
+        "Nghe đủ từng câu rồi đối chiếu cả chủ thể lẫn động tác."
+      ],
+      "traps": [
+        "Một danh từ trùng hình không cứu được động từ sai.",
+        "Không suy ra nghề nghiệp, mục đích hoặc cuộc hẹn từ trang phục."
+      ],
+      "example": {
+        "text": "A worker is fastening a strap around a carton.",
+        "explanation": "Cần thấy người đang siết dây quanh thùng; a worker is opening a carton sai nếu không có thao tác mở."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 13
+    },
+    {
+      "id": "p1-scene",
+      "part": 1,
+      "title": "Đồ vật, trạng thái và vị trí",
+      "recognition": "Hình ít người hoặc không có người: đồ đạc, đường phố, khu vực làm việc.",
+      "rules": [
+        "Be + V3 có thể mô tả trạng thái kết quả: chairs are arranged; be being + V3 nhấn mạnh hành động đang được thực hiện.",
+        "There is/are xác nhận sự hiện diện; không tự thêm người đang thao tác.",
+        "Beside, beneath, along, across và facing phải khớp quan hệ giữa các vật."
+      ],
+      "steps": [
+        "Xác định vật nổi bật và số lượng.",
+        "Phân biệt trạng thái đứng yên với hành động đang diễn ra.",
+        "Kiểm tra vị trí và vật nhỏ trong câu mô tả."
+      ],
+      "traps": [
+        "Being installed không đúng chỉ vì thiết bị đã có ở đó.",
+        "Facing the screen khác behind the screen."
+      ],
+      "example": {
+        "text": "Several chairs have been placed beneath the awning.",
+        "explanation": "Câu mô tả vị trí và kết quả sắp xếp; không yêu cầu nhìn thấy người đang đặt ghế."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 5
+    },
+    {
+      "id": "p2-wh",
+      "part": 2,
+      "title": "Who / Where / When / What / How / Why",
+      "recognition": "Từ hỏi báo trước loại thông tin cần nghe, nhưng câu trả lời có thể gián tiếp.",
+      "rules": [
+        "Who hỏi người; where hỏi nơi; when hỏi thời điểm. How long hỏi thời lượng, how often hỏi tần suất.",
+        "Why có thể được đáp bằng mục đích to + V hoặc nguyên nhân, không bắt buộc because.",
+        "What time và which floor phải được nghe như cả cụm; đừng chỉ bắt từ đầu."
+      ],
+      "steps": [
+        "Giữ lại từ hỏi và động từ chính.",
+        "Dự đoán loại thông tin.",
+        "Chọn câu đáp hợp tình huống, kể cả lời chỉ dẫn nơi tìm thông tin."
+      ],
+      "traps": [
+        "Âm giống không phải nghĩa giống: floor/four.",
+        "Câu đáp đúng ngữ pháp nhưng trả lời một câu hỏi khác vẫn sai."
+      ],
+      "example": {
+        "text": "When will the revised roster be available? — Check the noticeboard after lunch.",
+        "explanation": "Lời đáp chỉ thời điểm xem được lịch; không cần lặp will hoặc available."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 52
+    },
+    {
+      "id": "p2-yesno",
+      "part": 2,
+      "title": "Yes/No, câu phủ định và câu hỏi đuôi",
+      "recognition": "Do/Does/Did, Have/Has, Is/Are, Won't… hoặc một mệnh đề kèm isn't it / didn't you.",
+      "rules": [
+        "Trả lời theo sự việc thực tế; không chọn máy móc Yes cho câu khẳng định hay No cho câu phủ định.",
+        "Câu hỏi đuôi thường xin xác nhận; lời đáp có thể sửa thông tin thay vì nói yes/no.",
+        "Have you finished? hỏi kết quả đến hiện tại; Did you finish yesterday? gắn mốc quá khứ."
+      ],
+      "steps": [
+        "Xác định việc đang được xác nhận.",
+        "Nghe động từ, chủ thể và mốc thời gian.",
+        "Kiểm tra lời đáp xác nhận, bác bỏ hay giải thích việc chưa làm."
+      ],
+      "traps": [
+        "Yes, it does không phù hợp câu hỏi người đã làm việc gì.",
+        "Đáp lại bằng một chi tiết hợp lý có thể đúng hơn yes/no máy móc."
+      ],
+      "example": {
+        "text": "You haven't sent the invoice yet, have you? — I'm waiting for the purchase number.",
+        "explanation": "Người đáp giải thích vì sao chưa gửi; đây là câu đáp gián tiếp phù hợp."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 23
+    },
+    {
+      "id": "p2-choice",
+      "part": 2,
+      "title": "Câu hỏi lựa chọn A or B",
+      "recognition": "Người nói đưa ra hai phương án về thời gian, địa điểm hoặc hành động.",
+      "rules": [
+        "Có thể chọn A, chọn B, cả hai, không cái nào hoặc nêu phương án khác nếu phù hợp.",
+        "Either works nghĩa là phương án nào cũng được; neither phủ định cả hai.",
+        "Or ở giữa hai danh từ không tự biến mọi câu thành câu hỏi lựa chọn; cần hiểu toàn câu."
+      ],
+      "steps": [
+        "Nhớ hai lựa chọn.",
+        "Nghe người đáp đang chọn, từ chối hay chuyển quyền quyết định.",
+        "Kiểm tra câu đáp có giải quyết lựa chọn đang đặt ra không."
+      ],
+      "traps": [
+        "Yes không thường đủ để trả lời A hay B.",
+        "Lựa chọn lặp lại một từ nghe được nhưng đổi đối tượng là bẫy."
+      ],
+      "example": {
+        "text": "Should we print the agenda or send a link? — Let's save paper this time.",
+        "explanation": "Save paper hàm ý gửi đường dẫn; phải suy ra từ hai lựa chọn có sẵn."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 6
+    },
+    {
+      "id": "p2-request",
+      "part": 2,
+      "title": "Yêu cầu, đề nghị và lời mời",
+      "recognition": "Could you…, Would you mind…, Why don't we…, Let's… hoặc Would you like…",
+      "rules": [
+        "Could you thường là nhờ làm việc, không chỉ hỏi khả năng.",
+        "Would you mind + V-ing là lời nhờ lịch sự; Not at all thường thể hiện đồng ý.",
+        "Why don't we đề xuất một hành động; lời đáp nên chấp nhận, từ chối hoặc đưa phương án khác."
+      ],
+      "steps": [
+        "Nhận diện chức năng giao tiếp.",
+        "Xác định ai cần làm việc gì.",
+        "Chọn lời đáp lịch sự và phù hợp điều kiện của người nói."
+      ],
+      "traps": [
+        "Why don't we không luôn yêu cầu nêu nguyên nhân.",
+        "No có thể đồng ý với Would you mind, tùy phần giải thích sau đó."
+      ],
+      "example": {
+        "text": "Could you cover the reception desk at noon? — I can, once my call ends.",
+        "explanation": "Người đáp nhận hỗ trợ nhưng có điều kiện về thời gian; không phải từ chối hoàn toàn."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 19
+    },
+    {
+      "id": "p2-indirect",
+      "part": 2,
+      "title": "Phản hồi gián tiếp và câu phát biểu",
+      "recognition": "Lời đầu là thông báo, phàn nàn hoặc câu hỏi mà người đáp không trả lời thẳng.",
+      "rules": [
+        "Một thông báo có thể được đáp bằng hành động khắc phục, lời cảm ơn hoặc câu hỏi tiếp.",
+        "I thought… có thể sửa một giả định; you'll have to ask… chuyển đến người biết thông tin.",
+        "Chỉ suy luận một bước từ ngữ cảnh; không tự dựng một câu chuyện ngoài lời nói."
+      ],
+      "steps": [
+        "Xác định nhu cầu ẩn sau câu đầu.",
+        "Tìm phản hồi giúp tiếp tục cuộc trao đổi.",
+        "Loại đáp án chỉ liên quan từ vựng nhưng không có quan hệ giao tiếp."
+      ],
+      "traps": [
+        "Lặp từ trong câu hỏi là bẫy phổ biến.",
+        "Không loại câu hỏi ngược chỉ vì nó không phải câu trần thuật."
+      ],
+      "example": {
+        "text": "The projector won't start. — Is the power cable connected?",
+        "explanation": "Câu hỏi ngược đề xuất kiểm tra nguyên nhân, nên đáp lại vấn đề hợp lý."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 14
+    },
+    {
+      "id": "p3-overview",
+      "part": 3,
+      "title": "Hội thoại: chủ đề, địa điểm và vai trò",
+      "recognition": "What are the speakers discussing? Where are they? Who most likely is the woman?",
+      "rules": [
+        "Chủ đề thường được xác lập sớm rồi triển khai thành vấn đề và giải pháp.",
+        "Vai trò phải dựa vào việc người đó làm hoặc cung cấp, không chỉ một danh từ nghề nghiệp.",
+        "Kết hợp hai dấu hiệu địa điểm nếu có: prescription + pharmacist mạnh hơn từ counter đơn lẻ."
+      ],
+      "steps": [
+        "Đọc nhanh ba câu hỏi trước khi nghe.",
+        "Ghi mối quan hệ người nói và vấn đề chính.",
+        "Đối chiếu câu trả lời ở mức khái quát vừa đủ."
+      ],
+      "traps": [
+        "Chi tiết phụ ở cuối không nhất thiết là chủ đề.",
+        "Một người nhắc đến nhà hàng chưa có nghĩa đang ở nhà hàng."
+      ],
+      "example": {
+        "text": "The replacement lenses arrived. Could you come in for a fitting tomorrow?",
+        "explanation": "Replacement lenses và fitting gợi dịch vụ kính; người gọi đang sắp lịch thử kính."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 10
+    },
+    {
+      "id": "p3-detail",
+      "part": 3,
+      "title": "Hội thoại: chi tiết, nguyên nhân và thay đổi",
+      "recognition": "Hỏi giờ, giá, tên, vật dụng, lý do hoặc điều gì đã thay đổi.",
+      "rules": [
+        "Đáp án thường diễn đạt lại thông tin: out of stock → unavailable.",
+        "Thông tin sửa sau but, actually, instead có thể thay thế kế hoạch ban đầu.",
+        "Lưu mối liên hệ giữa con số và đối tượng: giá cũ, giá mới, ngày đặt và ngày nhận."
+      ],
+      "steps": [
+        "Xác định loại chi tiết cần nghe.",
+        "Ghi từ khóa thay cho cả câu.",
+        "Kiểm tra lần nhắc cuối cùng áp dụng cho đối tượng nào."
+      ],
+      "traps": [
+        "Con số nghe rõ nhất chưa chắc được hỏi.",
+        "Đừng áp dụng một thay đổi cho cả những điều người nói không sửa."
+      ],
+      "example": {
+        "text": "We originally booked Tuesday, but the engineer can only come on Thursday.",
+        "explanation": "Lịch thực hiện đã chuyển sang Thursday; Tuesday là phương án ban đầu."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 56
+    },
+    {
+      "id": "p3-next",
+      "part": 3,
+      "title": "Hội thoại: hành động tiếp theo",
+      "recognition": "What will the man do next? What is the woman asked to do?",
+      "rules": [
+        "Phân biệt việc đã làm, đang làm, dự định và được nhờ làm.",
+        "I'll, let me, please và could you thường đánh dấu việc tiếp theo; kiểm tra đúng người.",
+        "Nếu hành động có điều kiện, giữ điều kiện đó trong cách diễn đạt của đáp án."
+      ],
+      "steps": [
+        "Xác định người được hỏi.",
+        "Theo dõi lời chốt nhiệm vụ.",
+        "Loại hoạt động đã hoàn tất trước cuộc gọi."
+      ],
+      "traps": [
+        "Đáp án mô tả việc của người còn lại.",
+        "Cần làm sau khi được duyệt không đồng nghĩa sẽ làm ngay."
+      ],
+      "example": {
+        "text": "I'll reserve the room once you confirm the guest count.",
+        "explanation": "Người nói sẽ đặt phòng sau khi người kia xác nhận số khách, không phải tự đếm khách."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 25
+    },
+    {
+      "id": "p3-intent",
+      "part": 3,
+      "title": "Hội thoại: hàm ý và mục đích câu nói",
+      "recognition": "What does the speaker mean when saying…? Why does the speaker say…?",
+      "rules": [
+        "Ý định cần được giải thích bằng câu trước và câu sau đoạn trích.",
+        "Một lời nhận xét có thể là yêu cầu gián tiếp hoặc thể hiện sự do dự.",
+        "Mức độ chắc chắn phải giữ nguyên: might không đồng nghĩa definitely."
+      ],
+      "steps": [
+        "Xác định vấn đề ngay trước lời nói.",
+        "Nghe phản hồi và hành động sau đó.",
+        "Chọn chức năng giao tiếp, không chỉ nghĩa từ điển."
+      ],
+      "traps": [
+        "Diễn giải quá mạnh một lời gợi ý.",
+        "Chọn câu đúng nghĩa đen nhưng không giải thích vì sao nói lúc đó."
+      ],
+      "example": {
+        "text": "The shipment can arrive Friday. — That gives us some breathing room.",
+        "explanation": "Lời đáp thể hiện có thêm thời gian chuẩn bị, không nói về không khí hay phòng ốc."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 3
+    },
+    {
+      "id": "p3-graphic",
+      "part": 3,
+      "title": "Hội thoại kết hợp bảng hoặc lịch",
+      "recognition": "Look at the graphic: cần nối dữ kiện nghe với một hàng trong bảng.",
+      "rules": [
+        "Bảng cung cấp dữ kiện tĩnh; audio thường cho điều kiện để xác định hàng đúng.",
+        "Đọc tên cột, đơn vị và chú thích trước; chỉ nhìn số mà quên đơn vị dễ chọn sai.",
+        "Nếu audio thông báo điều chỉnh, áp dụng đúng mục bị thay đổi rồi tìm kết quả trong bảng."
+      ],
+      "steps": [
+        "Đọc câu hỏi và tên cột.",
+        "Nghe điều kiện lọc: sức chứa, giờ, giá hoặc loại vé.",
+        "Đối chiếu từng điều kiện rồi chọn đúng ô."
+      ],
+      "traps": [
+        "Chọn hàng có một điều kiện đúng nhưng điều kiện khác sai.",
+        "Tính tổng trước khi xác định giá là theo người hay theo nhóm."
+      ],
+      "example": {
+        "text": "Room Cedar: 20 seats; Room Elm: 35 seats. Audio: We need space for 28 guests.",
+        "explanation": "Cedar không đủ chỗ; Elm phù hợp nếu không có điều kiện khác trong audio."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 2
+    },
+    {
+      "id": "p4-purpose",
+      "part": 4,
+      "title": "Bài nói: mục đích, người nghe và bối cảnh",
+      "recognition": "Thông báo, voicemail, quảng cáo, giới thiệu hoặc hướng dẫn công việc.",
+      "rules": [
+        "Phần mở đầu thường cho biết người nói và mục đích; phần cuối nêu hành động cần làm.",
+        "Phân biệt quảng cáo một dịch vụ với thông báo thay đổi dịch vụ đã đặt.",
+        "Đối tượng nghe được xác định bằng nghĩa vụ/quyền lợi của họ trong bài."
+      ],
+      "steps": [
+        "Nhận dạng loại bài nói.",
+        "Tóm tắt bằng một động từ: announce, explain, invite, apologize.",
+        "Kiểm tra đáp án có bao quát toàn bài không."
+      ],
+      "traps": [
+        "Một sản phẩm được nhắc đến không tự biến bài thành quảng cáo.",
+        "Chọn một chi tiết kỹ thuật làm mục đích chung."
+      ],
+      "example": {
+        "text": "This message concerns the new entrance procedure for contractors.",
+        "explanation": "Mục đích là giải thích quy trình vào tòa nhà cho nhà thầu, không phải tuyển nhà thầu."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 6
+    },
+    {
+      "id": "p4-detail",
+      "part": 4,
+      "title": "Bài nói: điều kiện và thông tin cụ thể",
+      "recognition": "Hỏi thời hạn, vị trí, ưu đãi, nguyên nhân hay ngoại lệ.",
+      "rules": [
+        "Only, except, unless và at least giới hạn phạm vi của thông tin.",
+        "Đáp án đúng giữ cả thông tin chính lẫn điều kiện áp dụng.",
+        "Một danh sách có thể chứa các nhóm khác nhau; ghép đúng đối tượng với quyền lợi."
+      ],
+      "steps": [
+        "Khoanh loại dữ kiện được hỏi.",
+        "Nghe cụm hạn chế ngay trước hoặc sau số liệu.",
+        "So lại đáp án xem có bỏ mất điều kiện không."
+      ],
+      "traps": [
+        "Miễn phí cho thành viên không phải miễn phí cho mọi người.",
+        "By Friday và on Friday khác nhau."
+      ],
+      "example": {
+        "text": "Express delivery is free for orders above eighty dollars, excluding furniture.",
+        "explanation": "Đơn vượt 80 đô la vẫn không được ưu đãi này nếu là đồ nội thất."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 55
+    },
+    {
+      "id": "p4-action",
+      "part": 4,
+      "title": "Bài nói: yêu cầu và bước tiếp theo",
+      "recognition": "What should listeners do? What will happen next?",
+      "rules": [
+        "Hướng dẫn thường có thứ tự: đăng ký, nhận xác nhận, rồi đến địa điểm.",
+        "Please, remember to, be sure to và contact… nêu hành động cụ thể.",
+        "Phân biệt việc người nghe phải làm với việc ban tổ chức sẽ làm."
+      ],
+      "steps": [
+        "Tìm chủ thể của hành động.",
+        "Ghi bước bắt buộc và hạn chót.",
+        "Ưu tiên lời hướng dẫn trực tiếp ở cuối bài."
+      ],
+      "traps": [
+        "Đến nơi trước khi xác nhận dù audio yêu cầu xác nhận trước.",
+        "Đọc một hành động tùy chọn thành bắt buộc."
+      ],
+      "example": {
+        "text": "To change your delivery slot, reply to this message before four.",
+        "explanation": "Người muốn đổi lịch phải trả lời tin nhắn trước 4 giờ; không áp dụng cho người giữ lịch cũ."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 21
+    },
+    {
+      "id": "p4-graphic",
+      "part": 4,
+      "title": "Bài nói kết hợp bảng giá và lịch trình",
+      "recognition": "Một bài nói cung cấp điều kiện cần nối với thông tin trực quan.",
+      "rules": [
+        "Bảng có thể chứa giá cơ bản, phụ phí hoặc khung giờ, cần đọc đúng tiêu đề.",
+        "Khi audio nói dịch vụ được thay thế, xác định dòng mới thay vì dùng lịch cũ.",
+        "Tính toán chỉ ở mức cần thiết; TOEIC chủ yếu kiểm tra hiểu thông tin tiếng Anh."
+      ],
+      "steps": [
+        "Quét bảng và câu hỏi trước.",
+        "Ghi điều kiện từ audio.",
+        "Dùng đúng hàng/cột và kiểm tra đơn vị."
+      ],
+      "traps": [
+        "Nhầm giờ đến với giờ khởi hành.",
+        "Cộng phí đã bao gồm trong giá."
+      ],
+      "example": {
+        "text": "Shuttle: 08:00 North / 08:20 West. Audio: West passengers should use the later bus.",
+        "explanation": "Tìm giờ 08:20 tương ứng tuyến West; không chọn chuyến đầu chỉ vì được đọc trước."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 2
+    },
+    {
+      "id": "p5-word-form",
+      "part": 5,
+      "title": "Từ loại và vị trí trong câu",
+      "recognition": "Các lựa chọn chung gốc: efficient / efficiently / efficiency / efficiencies.",
+      "rules": [
+        "Xác định ô trống cần danh từ, động từ, tính từ hay trạng từ từ cấu trúc xung quanh.",
+        "A/an/the + (tính từ) + danh từ; trạng từ có thể đứng giữa trợ động từ và phân từ.",
+        "Sau động từ nối như seem/remain/become thường là tính từ, không tự động chọn trạng từ sau mọi động từ."
+      ],
+      "steps": [
+        "Đọc cả cụm chứa chỗ trống.",
+        "Tìm từ mà chỗ trống bổ nghĩa.",
+        "Chọn từ loại rồi kiểm tra nghĩa và số ít/số nhiều."
+      ],
+      "traps": [
+        "Đuôi -ly không phải lúc nào cũng là trạng từ: friendly là tính từ.",
+        "Từ đứng sát danh từ chưa chắc là tính từ nếu giữa chúng có giới từ."
+      ],
+      "example": {
+        "text": "The technician checked the connection carefully.",
+        "explanation": "Carefully bổ nghĩa hành động checked; careful cần bổ nghĩa một danh từ hoặc đứng sau động từ nối."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 19
+    },
+    {
+      "id": "p5-tense",
+      "part": 5,
+      "title": "Thì và mốc thời gian",
+      "recognition": "Các lựa chọn là những dạng chia khác nhau của cùng động từ.",
+      "rules": [
+        "Past simple thường gắn mốc quá khứ kết thúc; present perfect nối quá khứ với hiện tại.",
+        "Past perfect nêu hành động xảy ra trước một mốc quá khứ khác, không dùng chỉ vì thấy before.",
+        "By the time + mốc tương lai có thể đi với future perfect nếu hành động đã hoàn tất trước mốc đó."
+      ],
+      "steps": [
+        "Tìm mốc và trình tự sự kiện.",
+        "Xác định hành động còn liên quan hiện tại không.",
+        "Kiểm tra hòa hợp chủ ngữ sau khi chọn thì."
+      ],
+      "traps": [
+        "Since có thể là liên từ chỉ lý do trong ngữ cảnh khác.",
+        "Tomorrow không bắt buộc will: lịch trình có thể dùng hiện tại đơn."
+      ],
+      "example": {
+        "text": "By the time the courier arrived, we had sealed the boxes.",
+        "explanation": "Việc niêm phong đã xong trước khi người giao hàng đến: had sealed."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 11
+    },
+    {
+      "id": "p5-agreement",
+      "part": 5,
+      "title": "Hòa hợp chủ ngữ – động từ",
+      "recognition": "Bẫy danh từ số nhiều trong cụm giới từ hoặc chủ ngữ nối either/neither.",
+      "rules": [
+        "Động từ hòa hợp với danh từ trung tâm của chủ ngữ, không phải danh từ gần nhất bất kỳ.",
+        "Each/every + danh từ số ít thường dùng động từ số ít; a number of + số nhiều dùng số nhiều.",
+        "Với either…or / neither…nor, kiểm tra danh từ gần động từ và quy tắc ngữ cảnh sử dụng."
+      ],
+      "steps": [
+        "Gạch bỏ cụm bổ nghĩa xen giữa.",
+        "Xác định chủ ngữ trung tâm.",
+        "Đối chiếu số và thì của từng phương án."
+      ],
+      "traps": [
+        "The number of khác a number of.",
+        "Together with không có vai trò như and trong việc tạo chủ ngữ ghép."
+      ],
+      "example": {
+        "text": "The list of replacement parts is on the desk.",
+        "explanation": "List là chủ ngữ số ít; of replacement parts chỉ bổ nghĩa nên dùng is."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 13
+    },
+    {
+      "id": "p5-passive",
+      "part": 5,
+      "title": "Chủ động và bị động",
+      "recognition": "Chủ ngữ nhận hành động: invoices, applications, equipment, requests.",
+      "rules": [
+        "Bị động thường là be + past participle; modal + be + V3; have/has been + V3.",
+        "Giữ thì ở trợ động từ, không đổi phân từ sang động từ nguyên mẫu.",
+        "Không phải động từ nào cũng có tân ngữ để chuyển bị động: arrive/happen thường không dùng bị động."
+      ],
+      "steps": [
+        "Hỏi chủ ngữ làm hay nhận hành động.",
+        "Tìm dấu hiệu thì hoặc modal.",
+        "Kiểm tra động từ có thể mang nghĩa bị động không."
+      ],
+      "traps": [
+        "By Friday là thời hạn, không phải tác nhân.",
+        "Be interested là mô tả trạng thái, cần hiểu nghĩa thay vì gán mọi V3 là hành động bị động."
+      ],
+      "example": {
+        "text": "All applications must be reviewed before Friday.",
+        "explanation": "Applications nhận hành động xét duyệt; modal must cần be reviewed."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 13
+    },
+    {
+      "id": "p5-pronouns",
+      "part": 5,
+      "title": "Đại từ và sở hữu",
+      "recognition": "I/me/my/mine, they/them/their/theirs, hoặc đại từ phản thân.",
+      "rules": [
+        "Đại từ chủ ngữ đứng làm chủ thể; đại từ tân ngữ sau động từ/giới từ.",
+        "Tính từ sở hữu cần danh từ theo sau; đại từ sở hữu có thể thay cả cụm danh từ.",
+        "Đại từ phản thân dùng khi tân ngữ cùng người với chủ ngữ hoặc để nhấn mạnh, không thay thế mọi tân ngữ."
+      ],
+      "steps": [
+        "Xác định chức năng chỗ trống.",
+        "Tìm danh từ đi kèm nếu có.",
+        "Kiểm tra đại từ tham chiếu đúng người và số."
+      ],
+      "traps": [
+        "Its là sở hữu, it's = it is/has.",
+        "Their và theirs không dùng cùng vị trí."
+      ],
+      "example": {
+        "text": "Please send the revised estimate to her, not to me.",
+        "explanation": "Sau giới từ to cần đại từ tân ngữ her/me; không dùng she/I."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 10
+    },
+    {
+      "id": "p5-preposition",
+      "part": 5,
+      "title": "Giới từ và cụm cố định",
+      "recognition": "Giới từ chỉ thời gian, vị trí hoặc theo sau một tính từ/động từ.",
+      "rules": [
+        "By nêu hạn cuối, until nêu trạng thái kéo dài đến một mốc, within nêu khoảng giới hạn.",
+        "Giới từ đi với danh từ hoặc V-ing; to có thể là giới từ trong look forward to.",
+        "Học cả cụm: responsible for, interested in, comply with, on behalf of."
+      ],
+      "steps": [
+        "Phân biệt giới từ nghĩa tự do và cụm cố định.",
+        "Đọc thành phần ngay sau chỗ trống.",
+        "Kiểm tra quan hệ thời gian hoặc nghĩa của cả cụm."
+      ],
+      "traps": [
+        "During + danh từ; while + mệnh đề trong cách dùng thông thường.",
+        "Không chọn to chỉ vì thấy dạng nguyên mẫu trong các cụm giới từ."
+      ],
+      "example": {
+        "text": "Please keep the receipt until the warranty expires.",
+        "explanation": "Keep diễn tả duy trì việc giữ; until xác định thời điểm kết thúc."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 33
+    },
+    {
+      "id": "p5-conjunction",
+      "part": 5,
+      "title": "Liên từ và quan hệ logic",
+      "recognition": "Because/because of; although/despite; unless/if; however/therefore.",
+      "rules": [
+        "Because/although + mệnh đề; because of/despite + cụm danh từ hoặc V-ing.",
+        "Unless diễn tả ngoại lệ/điều kiện phủ định, không thay if trong mọi câu.",
+        "However và therefore là trạng từ liên kết; xem dấu câu để tránh nối hai mệnh đề độc lập bằng dấu phẩy sai."
+      ],
+      "steps": [
+        "Xác định sau chỗ trống là cụm hay mệnh đề.",
+        "Tìm quan hệ nguyên nhân, tương phản, điều kiện hoặc mục đích.",
+        "Đọc lại câu với nghĩa đã chọn."
+      ],
+      "traps": [
+        "Although và despite giống quan hệ nghĩa nhưng khác cấu trúc.",
+        "Even if là điều kiện giả định, even though là nhượng bộ về điều được nêu là thực."
+      ],
+      "example": {
+        "text": "Although the delivery was late, the client accepted the shipment.",
+        "explanation": "Sau Although là mệnh đề có chủ ngữ và động từ; despite không đứng trực tiếp trước cấu trúc này."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 17
+    },
+    {
+      "id": "p5-relative",
+      "part": 5,
+      "title": "Mệnh đề quan hệ và rút gọn",
+      "recognition": "Who/whom/whose/which/that, hoặc V-ing/V3 ngay sau danh từ.",
+      "rules": [
+        "Who thường chỉ người, which chỉ vật; whose thể hiện sở hữu và đi với danh từ.",
+        "Xem đại từ đóng vai chủ ngữ hay tân ngữ trong mệnh đề phụ trước khi chọn.",
+        "Rút gọn chủ động thường dùng V-ing; bị động dùng V3, nhưng chỉ khi cấu trúc và nghĩa cho phép."
+      ],
+      "steps": [
+        "Tìm danh từ được bổ nghĩa.",
+        "Xác định mệnh đề đang thiếu thành phần gì.",
+        "Kiểm tra chủ động/bị động và dấu phẩy."
+      ],
+      "traps": [
+        "Không dùng that sau giới từ đặt ngay trước đại từ quan hệ.",
+        "V3 sau danh từ không tự là thì quá khứ của mệnh đề chính."
+      ],
+      "example": {
+        "text": "The documents attached to the message contain the revised prices.",
+        "explanation": "Attached rút gọn which are attached; contain mới là động từ chính."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 18
+    },
+    {
+      "id": "p5-quantity",
+      "part": 5,
+      "title": "Từ chỉ lượng và danh từ đếm được",
+      "recognition": "Much/many, fewer/less, few/little, each/every và lượng thông tin.",
+      "rules": [
+        "Many/few/fewer đi với danh từ đếm được số nhiều; much/little/less thường đi với không đếm được.",
+        "A few/a little thường mang ý có một lượng; few/little thường nhấn mạnh không nhiều hoặc chưa đủ.",
+        "Information, equipment, advice thường không đếm được; dùng piece/item để diễn tả đơn vị."
+      ],
+      "steps": [
+        "Xác định danh từ đếm được không.",
+        "Kiểm tra số ít/số nhiều.",
+        "Đọc sắc thái đủ/thiếu và so sánh."
+      ],
+      "traps": [
+        "Không thêm -s vào equipment trong cách dùng thông thường.",
+        "Each dùng với danh từ số ít nhưng each of đi với cụm số nhiều, động từ chính thường số ít."
+      ],
+      "example": {
+        "text": "We need a little more information before approving the request.",
+        "explanation": "Information không đếm được nên dùng a little; many không phù hợp."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 11
+    },
+    {
+      "id": "p5-infinitive",
+      "part": 5,
+      "title": "To V, V-ing và dạng nguyên mẫu",
+      "recognition": "Sau động từ, giới từ, tính từ hoặc động từ khuyết thiếu.",
+      "rules": [
+        "Modal + V nguyên mẫu; agree/plan/decide + to V; avoid/consider + V-ing.",
+        "Sau giới từ thường dùng V-ing; phân biệt to giới từ với to của nguyên mẫu.",
+        "Một số động từ thay đổi nghĩa theo dạng theo sau: stop doing và stop to do."
+      ],
+      "steps": [
+        "Xác định từ chi phối chỗ trống.",
+        "Đối chiếu mẫu bổ ngữ của từ đó.",
+        "Kiểm tra nghĩa của hai hành động."
+      ],
+      "traps": [
+        "Can to submit sai: modal không cần to.",
+        "Be used to doing khác used to do."
+      ],
+      "example": {
+        "text": "The team postponed installing the update until Friday.",
+        "explanation": "Postpone nhận V-ing; installing là hoạt động bị hoãn."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 11
+    },
+    {
+      "id": "p5-comparison",
+      "part": 5,
+      "title": "So sánh, mức độ và song song",
+      "recognition": "Than, as…as, the most…, hoặc hai cấu trúc cần tương ứng.",
+      "rules": [
+        "So sánh hơn thường có -er/more và than; không dùng more với một dạng đã có -er.",
+        "As + tính từ/trạng từ gốc + as; chọn tính từ hay trạng từ theo chức năng.",
+        "Much/far/considerably có thể bổ nghĩa so sánh hơn; very thường không dùng trực tiếp trước better."
+      ],
+      "steps": [
+        "Tìm đối tượng được so sánh.",
+        "Xác định khung cấu trúc.",
+        "Kiểm tra từ loại và sự song song."
+      ],
+      "traps": [
+        "Most efficient và more efficient có phạm vi so sánh khác nhau.",
+        "So sánh phải cùng loại đối tượng: costs với costs, không costs với company."
+      ],
+      "example": {
+        "text": "The new process runs considerably faster than the old one.",
+        "explanation": "Considerably bổ nghĩa faster; faster bổ nghĩa runs."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 4
+    },
+    {
+      "id": "p5-vocabulary",
+      "part": 5,
+      "title": "Từ vựng ngữ cảnh và collocation",
+      "recognition": "Các lựa chọn cùng từ loại, đều đúng ngữ pháp nhưng khác nghĩa.",
+      "rules": [
+        "Khi cấu trúc không loại được đáp án, đọc cả câu để xác định mục đích và đối tượng.",
+        "Học kết hợp từ: meet a deadline, place an order, raise a concern, issue a refund.",
+        "Một từ nhiều nghĩa phải được hiểu theo ngành và tình huống, không theo nghĩa học đầu tiên."
+      ],
+      "steps": [
+        "Xác nhận các lựa chọn cùng loại từ.",
+        "Xác định quan hệ nghĩa với danh từ/động từ bên cạnh.",
+        "Thử diễn đạt lại cả câu."
+      ],
+      "traps": [
+        "Nghĩa gần nhau không đồng nghĩa mọi kết hợp đều tự nhiên.",
+        "Không dựa riêng vào một bản dịch tiếng Việt chung."
+      ],
+      "example": {
+        "text": "The manager raised a concern about the revised schedule.",
+        "explanation": "Raise a concern là nêu quan ngại; rise là nội động từ nên không dùng với tân ngữ a concern."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 29
+    },
+    {
+      "id": "p5-advanced",
+      "part": 5,
+      "title": "Điều kiện, đảo ngữ và giả định",
+      "recognition": "Had/Were/Should đứng đầu, not only, hoặc recommend that…",
+      "rules": [
+        "Had + S + V3 có thể thay if + past perfect trong điều kiện không thực ở quá khứ.",
+        "Sau recommend/require/insist that, dạng giả định thường dùng động từ nguyên mẫu theo nghĩa yêu cầu.",
+        "Cụm mở đầu phủ định như Not until/Only after có thể yêu cầu đảo trợ động từ ở mệnh đề chính."
+      ],
+      "steps": [
+        "Xác định mẫu cấu trúc thay vì dịch từng từ.",
+        "Tách mệnh đề điều kiện khỏi kết quả.",
+        "Kiểm tra cả nghĩa thời gian và dạng động từ."
+      ],
+      "traps": [
+        "Không đảo mệnh đề nằm trong cụm Only after; đảo mệnh đề chính.",
+        "Không dùng một công thức giả định cho mọi nghĩa của insist."
+      ],
+      "example": {
+        "text": "The supervisor requested that each file be checked twice.",
+        "explanation": "Request mang nghĩa yêu cầu; be là dạng nguyên mẫu trong mệnh đề giả định, không đổi theo each file."
+      },
+      "source_ids": [
+        "bc-reference",
+        "bc-b1"
+      ],
+      "question_count": 10
+    },
+    {
+      "id": "p6-grammar",
+      "part": 6,
+      "title": "Part 6: ngữ pháp trong đoạn văn",
+      "recognition": "Chỗ trống từ loại, thì, chủ động/bị động hoặc từ vựng trong email/thông báo.",
+      "rules": [
+        "Dùng ngữ pháp câu gần chỗ trống nhưng kiểm tra thì và đối tượng trong cả đoạn.",
+        "Một câu trước có thể xác định sự việc đã diễn ra hay mới dự kiến.",
+        "Các chỗ trống cùng thuộc một văn bản; đáp án không được làm mâu thuẫn trình tự chung."
+      ],
+      "steps": [
+        "Đọc người gửi, người nhận và mục đích.",
+        "Giải các khoảng trống đủ bằng chứng cục bộ.",
+        "Đọc lại cả đoạn sau khi điền."
+      ],
+      "traps": [
+        "Không chọn thì chỉ từ một trạng từ khi đoạn đã xác lập mốc khác.",
+        "Đừng bỏ qua chủ thể của câu bị động."
+      ],
+      "example": {
+        "text": "We inspected the units yesterday. Three items have been ____ for replacement. (selected/selecting)",
+        "explanation": "Have been selected là bị động: ba món đã được chọn, phù hợp hành động kiểm tra trước đó."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 25
+    },
+    {
+      "id": "p6-linking",
+      "part": 6,
+      "title": "Part 6: từ nối và tham chiếu",
+      "recognition": "However/therefore/otherwise, this change, these items hoặc đại từ.",
+      "rules": [
+        "Từ nối biểu thị quan hệ giữa hai ý, không chỉ giữa hai từ đứng sát nhau.",
+        "This/these/such cần một nội dung phù hợp đã được giới thiệu; kiểm tra số lượng và nghĩa.",
+        "Otherwise thường nêu hệ quả nếu điều kiện trước không được thực hiện."
+      ],
+      "steps": [
+        "Tóm tắt hai câu bằng tiếng Việt ngắn.",
+        "Xác định quan hệ logic.",
+        "Thay từ nối vào và đọc mạch hoàn chỉnh."
+      ],
+      "traps": [
+        "Một câu nối ngữ pháp đúng có thể đảo sai quan hệ nguyên nhân.",
+        "These không thể chỉ một danh từ số ít nếu không có ý tập hợp phù hợp."
+      ],
+      "example": {
+        "text": "Return the badge before leaving. Otherwise, a replacement fee will be charged.",
+        "explanation": "Otherwise nối yêu cầu với hậu quả nếu không trả thẻ; không phải một ví dụ minh họa."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 6
+    },
+    {
+      "id": "p6-insertion",
+      "part": 6,
+      "title": "Part 6: điền cả câu",
+      "recognition": "Các phương án là câu hoàn chỉnh cho một khoảng trống trong văn bản.",
+      "rules": [
+        "Câu đúng cần nối được cả phía trước lẫn phía sau, cùng chủ đề chưa đủ.",
+        "Tìm chuỗi yêu cầu → điều kiện → hệ quả và đại từ chỉ ngược.",
+        "Không thêm một cam kết, khoản phí hoặc ngoại lệ mà phần còn lại phủ nhận."
+      ],
+      "steps": [
+        "Đọc ít nhất một câu trước và sau.",
+        "Xác định khoảng trống đang thiếu chức năng gì.",
+        "Thử từng phương án và loại mâu thuẫn."
+      ],
+      "traps": [
+        "Câu có cùng từ khóa nhưng làm đứt mạch.",
+        "Chọn chi tiết hợp lý ngoài đời dù đoạn không nói đến."
+      ],
+      "example": {
+        "text": "The workshop is full. [____] These applicants will be contacted if a seat becomes available.",
+        "explanation": "Câu chèn cần giới thiệu người trong danh sách chờ để These applicants có đối tượng tham chiếu."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 9
+    },
+    {
+      "id": "p7-purpose",
+      "part": 7,
+      "title": "Part 7: mục đích và ý chính",
+      "recognition": "Why was the email sent? What is the main purpose of the notice?",
+      "rules": [
+        "Xác định hành động giao tiếp: thông báo, yêu cầu, xác nhận, quảng bá hay xin lỗi.",
+        "Tiêu đề là dấu hiệu nhưng thân bài và lời chốt quyết định mục đích.",
+        "Câu trả lời quá rộng hoặc chỉ nói một chi tiết phụ đều có thể sai."
+      ],
+      "steps": [
+        "Đọc loại văn bản, người gửi và chủ đề.",
+        "Tóm tắt chức năng trong một câu.",
+        "Đối chiếu tất cả phương án."
+      ],
+      "traps": [
+        "Một hóa đơn đính kèm không có nghĩa email chỉ yêu cầu trả tiền.",
+        "Không chọn một mục đích hợp ngành nhưng không xuất hiện trong bài."
+      ],
+      "example": {
+        "text": "Your reservation is confirmed. Please review the attached arrival instructions.",
+        "explanation": "Mục đích chính là xác nhận đặt chỗ và cung cấp hướng dẫn, không phải quảng cáo giảm giá."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 8
+    },
+    {
+      "id": "p7-detail",
+      "part": 7,
+      "title": "Part 7: chi tiết, NOT/EXCEPT và tham chiếu",
+      "recognition": "Hỏi ai, khi nào, ở đâu, điều kiện nào; hoặc thông tin không được nêu.",
+      "rules": [
+        "Tìm bằng từ khóa nhưng so nghĩa toàn cụm, vì đáp án thường paraphrase.",
+        "NOT/EXCEPT yêu cầu đối chiếu cả bốn phương án; ba phương án được hỗ trợ không có nghĩa phương án cuối là điều trái ngược.",
+        "Theo dõi đại từ, đơn vị, hạn chót và phạm vi của only/all/some."
+      ],
+      "steps": [
+        "Đọc kỹ từ phủ định trong câu hỏi.",
+        "Khoanh dòng bằng chứng.",
+        "Kiểm tra đối tượng và điều kiện của thông tin."
+      ],
+      "traps": [
+        "Thông tin không được nêu khác với thông tin bị bài phủ định.",
+        "Tên hoặc ngày trùng chưa đủ nếu gắn với người/sự kiện khác."
+      ],
+      "example": {
+        "text": "Members may borrow up to four devices for seven days.",
+        "explanation": "Giới hạn đồng thời có hai điều kiện: tối đa bốn thiết bị và thời hạn bảy ngày."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 147
+    },
+    {
+      "id": "p7-inference",
+      "part": 7,
+      "title": "Part 7: suy luận và hành động dự kiến",
+      "recognition": "What is implied/suggested? What will most likely happen?",
+      "rules": [
+        "Suy luận đúng là kết luận được bằng chứng hỗ trợ, không phải một khả năng tưởng tượng.",
+        "Phân biệt kế hoạch, yêu cầu và xác nhận đã thực hiện.",
+        "Mức độ chắc chắn của đáp án phải phù hợp với từ may, likely, confirmed trong văn bản."
+      ],
+      "steps": [
+        "Chỉ ra ít nhất một bằng chứng cụ thể.",
+        "Nối dữ kiện bằng suy luận ngắn.",
+        "Loại phương án cần thêm giả định chưa được nói."
+      ],
+      "traps": [
+        "Requested a refund không có nghĩa received a refund.",
+        "Most likely không cho phép chọn bất kỳ câu hợp lý ngoài đời."
+      ],
+      "example": {
+        "text": "Please retain the original packaging until your inspection appointment.",
+        "explanation": "Người nhận sẽ cần bao bì ít nhất đến buổi kiểm tra; chưa có bằng chứng sản phẩm chắc chắn được hoàn tiền."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 6
+    },
+    {
+      "id": "p7-vocabulary",
+      "part": 7,
+      "title": "Part 7: nghĩa từ và dụng ý trong ngữ cảnh",
+      "recognition": "Closest in meaning, hoặc tác giả muốn nói gì qua một câu trích.",
+      "rules": [
+        "Chọn nghĩa giữ được ý của câu và mạch đoạn, không chỉ nghĩa phổ biến nhất.",
+        "Từ thay thế phải phù hợp chức năng ngữ pháp và collocation.",
+        "Với tin nhắn, đọc lượt trước/sau để hiểu lời đồng ý, từ chối hoặc sửa thông tin."
+      ],
+      "steps": [
+        "Đọc toàn câu chứa từ.",
+        "Diễn đạt lại nghĩa theo ngữ cảnh.",
+        "Thử thay bằng từng phương án."
+      ],
+      "traps": [
+        "Issue có thể là phát hành, vấn đề hoặc số tạp chí.",
+        "Một từ đồng nghĩa từ điển vẫn có thể sai sắc thái trong câu."
+      ],
+      "example": {
+        "text": "We can accommodate the revised delivery window.",
+        "explanation": "Accommodate ở đây là đáp ứng/điều chỉnh cho phù hợp, không phải cung cấp phòng ở."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 4
+    },
+    {
+      "id": "p7-cross-reference",
+      "part": 7,
+      "title": "Part 7: hai và ba văn bản",
+      "recognition": "Email + lịch, quảng cáo + đơn hàng, chính sách + hóa đơn + cập nhật.",
+      "rules": [
+        "Gắn mỗi văn bản với chức năng và thời điểm: quy định, giao dịch, thay đổi cuối.",
+        "Một câu có thể cần hai nguồn bằng chứng; ghi rõ nguồn nào cung cấp điều kiện, nguồn nào cung cấp dữ kiện.",
+        "Thông tin mới chỉ thay thế phần nó sửa; các điều kiện cũ còn lại có thể vẫn áp dụng."
+      ],
+      "steps": [
+        "Lập bản đồ văn bản trước khi đọc sâu.",
+        "Theo dõi cùng người/đơn hàng giữa các nguồn.",
+        "Đối chiếu điều kiện và mốc cập nhật trước khi tính hoặc suy luận."
+      ],
+      "traps": [
+        "Cộng một khoản thay thế như thể là khoản bổ sung.",
+        "Áp ưu đãi trước hạn cho một đơn đặt sau hạn."
+      ],
+      "example": {
+        "text": "Policy: orders placed by 12 May get free delivery. Email: order placed on 14 May.",
+        "explanation": "Đơn không đáp ứng thời hạn ưu đãi; việc giao sau hay trước ngày 12 không phải điều kiện được nêu."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 14
+    },
+    {
+      "id": "p7-insertion",
+      "part": 7,
+      "title": "Part 7: chọn vị trí chèn câu",
+      "recognition": "Văn bản có vị trí [1]–[4]; chọn nơi một câu mới phù hợp nhất.",
+      "rules": [
+        "Đại từ và từ chỉ ngược trong câu mới cần tiền đề rõ ràng.",
+        "Câu mới có thể giới thiệu một ý được giải thích ở câu sau, nên phải kiểm tra hai phía.",
+        "Mạch thường đi từ thông báo chung sang chi tiết, điều kiện và hành động."
+      ],
+      "steps": [
+        "Đọc câu cần chèn và gạch từ tham chiếu.",
+        "Tìm vị trí có tiền đề phù hợp.",
+        "Đọc ba câu liên tiếp sau khi chèn."
+      ],
+      "traps": [
+        "Chủ đề giống nhau chưa đủ nếu thời gian hoặc logic đứt đoạn.",
+        "Không đặt This alternative trước khi phương án thay thế được giới thiệu."
+      ],
+      "example": {
+        "text": "The west entrance is closed. Guests should use the garden gate. [2] A temporary ramp has been installed there.",
+        "explanation": "Câu mô tả lợi ích của lối đi thay thế phù hợp sau garden gate và trước chi tiết ramp nếu tham chiếu nhất quán."
+      },
+      "source_ids": [
+        "format",
+        "ets"
+      ],
+      "question_count": 4
+    }
+  ],
+  "exams": [
+    {
+      "id": "dhv-full-01-v1",
+      "title": "DHV 01 · Đề toàn phần",
+      "type": "full",
+      "minutes": 120,
+      "description": "200 câu: 100 nghe + 100 đọc, đúng số lượng Parts 1–7. Hai mã đề toàn phần không trùng ID câu hỏi trong phiên bản này; không phải đề chính thức.",
+      "parts": [
+        {
+          "part": 1,
+          "count": 6
+        },
+        {
+          "part": 2,
+          "count": 25
+        },
+        {
+          "part": 3,
+          "count": 39
+        },
+        {
+          "part": 4,
+          "count": 30
+        },
+        {
+          "part": 5,
+          "count": 30
+        },
+        {
+          "part": 6,
+          "count": 16
+        },
+        {
+          "part": 7,
+          "count": 54
+        }
+      ],
+      "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
+      "question_count": 200
+    },
+    {
+      "id": "dhv-listening-01-v1",
+      "title": "Listening 01 · Sức bền nghe",
+      "type": "listening",
+      "minutes": 45,
+      "description": "100 câu Parts 1–4, 45 phút. Trích phần nghe của DHV 01.",
+      "parts": [
+        {
+          "part": 1,
+          "count": 6
+        },
+        {
+          "part": 2,
+          "count": 25
+        },
+        {
+          "part": 3,
+          "count": 39
+        },
+        {
+          "part": 4,
+          "count": 30
+        }
+      ],
+      "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
+      "question_count": 100
+    },
+    {
+      "id": "dhv-reading-01-v1",
+      "title": "Reading 01 · Quản lý 75 phút",
+      "type": "reading",
+      "minutes": 75,
+      "description": "100 câu Parts 5–7, 75 phút. Trích phần đọc của DHV 01.",
+      "parts": [
+        {
+          "part": 5,
+          "count": 30
+        },
+        {
+          "part": 6,
+          "count": 16
+        },
+        {
+          "part": 7,
+          "count": 54
+        }
+      ],
+      "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
+      "question_count": 100
+    },
+    {
+      "id": "dhv-full-02-v1",
+      "title": "DHV 02 · Đề toàn phần",
+      "type": "full",
+      "minutes": 120,
+      "description": "200 câu: 100 nghe + 100 đọc, đúng số lượng Parts 1–7. Hai mã đề toàn phần không trùng ID câu hỏi trong phiên bản này; không phải đề chính thức.",
+      "parts": [
+        {
+          "part": 1,
+          "count": 6
+        },
+        {
+          "part": 2,
+          "count": 25
+        },
+        {
+          "part": 3,
+          "count": 39
+        },
+        {
+          "part": 4,
+          "count": 30
+        },
+        {
+          "part": 5,
+          "count": 30
+        },
+        {
+          "part": 6,
+          "count": 16
+        },
+        {
+          "part": 7,
+          "count": 54
+        }
+      ],
+      "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
+      "question_count": 200
+    },
+    {
+      "id": "dhv-mini-01-v1",
+      "title": "Mini test 01 · 7 Part",
+      "type": "mini",
+      "minutes": 35,
+      "description": "50 câu để luyện một lượt ngắn, giữ nguyên nhóm hội thoại và văn bản. Không phải đề rút gọn do ETS ban hành.",
+      "parts": [
+        {
+          "part": 1,
+          "count": 2
+        },
+        {
+          "part": 2,
+          "count": 6
+        },
+        {
+          "part": 3,
+          "count": 9
+        },
+        {
+          "part": 4,
+          "count": 9
+        },
+        {
+          "part": 5,
+          "count": 10
+        },
+        {
+          "part": 6,
+          "count": 4
+        },
+        {
+          "part": 7,
+          "count": 10
+        }
+      ],
+      "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
+      "question_count": 50
+    },
+    {
+      "id": "dhv-mini-02-v1",
+      "title": "Mini test 02 · 7 Part",
+      "type": "mini",
+      "minutes": 35,
+      "description": "50 câu để luyện một lượt ngắn, giữ nguyên nhóm hội thoại và văn bản. Không phải đề rút gọn do ETS ban hành.",
+      "parts": [
+        {
+          "part": 1,
+          "count": 2
+        },
+        {
+          "part": 2,
+          "count": 6
+        },
+        {
+          "part": 3,
+          "count": 9
+        },
+        {
+          "part": 4,
+          "count": 9
+        },
+        {
+          "part": 5,
+          "count": 10
+        },
+        {
+          "part": 6,
+          "count": 4
+        },
+        {
+          "part": 7,
+          "count": 10
+        }
+      ],
+      "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
+      "question_count": 50
+    },
+    {
+      "id": "dhv-mini-03-v1",
+      "title": "Mini test 03 · 7 Part",
+      "type": "mini",
+      "minutes": 35,
+      "description": "50 câu để luyện một lượt ngắn, giữ nguyên nhóm hội thoại và văn bản. Không phải đề rút gọn do ETS ban hành.",
+      "parts": [
+        {
+          "part": 1,
+          "count": 2
+        },
+        {
+          "part": 2,
+          "count": 6
+        },
+        {
+          "part": 3,
+          "count": 9
+        },
+        {
+          "part": 4,
+          "count": 9
+        },
+        {
+          "part": 5,
+          "count": 10
+        },
+        {
+          "part": 6,
+          "count": 4
+        },
+        {
+          "part": 7,
+          "count": 10
+        }
+      ],
+      "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
+      "question_count": 50
+    },
+    {
+      "id": "dhv-mini-04-v1",
+      "title": "Mini test 04 · 7 Part",
+      "type": "mini",
+      "minutes": 35,
+      "description": "50 câu để luyện một lượt ngắn, giữ nguyên nhóm hội thoại và văn bản. Không phải đề rút gọn do ETS ban hành.",
+      "parts": [
+        {
+          "part": 1,
+          "count": 2
+        },
+        {
+          "part": 2,
+          "count": 6
+        },
+        {
+          "part": 3,
+          "count": 9
+        },
+        {
+          "part": 4,
+          "count": 9
+        },
+        {
+          "part": 5,
+          "count": 10
+        },
+        {
+          "part": 6,
+          "count": 4
+        },
+        {
+          "part": 7,
+          "count": 10
+        }
+      ],
+      "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
+      "question_count": 50
+    }
+  ],
+  "question_count": 727,
   "vocabulary_count": 200
 }
