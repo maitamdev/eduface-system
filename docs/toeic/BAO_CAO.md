@@ -1,6 +1,6 @@
 # Bàn giao tính năng “TOEIC cùng DHV”
 
-Ngày 27/10/2026. Phạm vi: bổ sung góc học tiếng Anh vào EduFace hiện có. Toàn bộ công việc được thực hiện trực tiếp, không dùng sub-agent. Chưa push, publish hoặc deploy.
+Ngày 27/10/2026. Phạm vi: bổ sung góc học tiếng Anh vào EduFace hiện có. Toàn bộ công việc được thực hiện trực tiếp, không dùng sub-agent. Đã push và deploy theo yêu cầu tiếp theo của chủ dự án; xem [kết quả production](../reports/2026-10-27/DEPLOYMENT.md). Chưa phát hành package lên registry.
 
 ## Kết quả có thể sử dụng
 

@@ -1,6 +1,6 @@
 # Lỗi CORS khi sinh viên tự đăng ký — 27/10/2026
 
-Đã sửa và kiểm thử mã nguồn local. Chưa push, deploy, thay đổi cấu hình Render hoặc dữ liệu production.
+Trạng thái lúc lập báo cáo: đã sửa và kiểm thử mã nguồn local, chưa push/deploy. **Cập nhật sau khi được chủ dự án cho phép:** đã triển khai và kiểm tra CORS trên production ngày 27/10/2026; xem [báo cáo triển khai](DEPLOYMENT.md). Các mô tả điều tra bên dưới ghi lại trạng thái trước triển khai.
 
 ## Kết quả kiểm tra hệ thống đang chạy
 

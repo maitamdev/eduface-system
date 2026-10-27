@@ -1,5 +1,7 @@
 # Hướng dẫn nâng cấp dữ liệu và vận hành — 27/10/2026
 
+> Cập nhật sau khi chủ dự án yêu cầu push/deploy: đã triển khai, xác minh production và bỏ index tên cũ sau sao lưu/kiểm tra khôi phục. Xem [báo cáo triển khai](reports/2026-10-27/DEPLOYMENT.md). Phạm vi bàn giao ban đầu bên dưới ghi lại trạng thái trước khi được cho phép triển khai.
+
 ## Phạm vi bàn giao
 
 Chỉ thay đổi mã nguồn và chạy dữ liệu thử trên máy này. Không thay đổi DB cấu hình thật, không publish package, không deploy và không push. Bản sao các sửa đổi đã tồn tại trước khi sửa lỗi: `D:\project\AI-Attendance-System-before-fixes-20261027-002122`.

@@ -2,7 +2,7 @@
 
 EduFace hỗ trợ hồ sơ sinh viên, đăng ký khuôn mặt, phiên điểm danh, sổ điểm theo học phần, đơn nghỉ phép và báo cáo chuyên cần. Tác giả dự án: [maitamdev](https://github.com/maitamdev).
 
-Bản cập nhật cục bộ ngày 27/10/2026: xem [báo cáo khắc phục](docs/reports/2026-10-27/BAO_CAO_KHAC_PHUC.md) và [hướng dẫn nâng cấp](docs/UPGRADE_2026_10.md). Những thay đổi trong workspace này **chưa được deploy/push/publish**. Các địa chỉ website trước đây không chứng minh rằng bản đang chạy đã nhận các thay đổi này.
+Bản cập nhật ngày 27/10/2026 đã được push lên `main` và triển khai trên Vercel/Render theo yêu cầu chủ dự án. Đã kiểm tra health, CORS, cấu hình Google và API TOEIC trên production; xem [báo cáo triển khai](docs/reports/2026-10-27/DEPLOYMENT.md), [báo cáo khắc phục](docs/reports/2026-10-27/BAO_CAO_KHAC_PHUC.md) và [hướng dẫn nâng cấp](docs/UPGRADE_2026_10.md). Các package chưa phát hành lên registry.
 
 ## TOEIC cùng DHV
 
@@ -26,7 +26,7 @@ Xem [hướng dẫn chạy và mở rộng](docs/toeic/README.md), [nguồn tham
 | Operator | Nhân viên vận hành toàn hệ thống; chưa phải vai trò giảng viên bị giới hạn theo lớp được phân công |
 | Student | Chỉ truy cập hồ sơ/học vụ được liên kết bằng `users.person_id`; không suy ra quyền từ email liên hệ |
 
-Google chỉ bật khi đặt `GOOGLE_CLIENT_ID`. Tài khoản mới có vai trò student; quyền trên tài khoản đã tồn tại chỉ được nhận qua liên kết Google do admin thiết lập. Mật khẩu tài khoản tạo mới tối thiểu 12 ký tự. CSV nhập sinh viên cấp mật khẩu ngẫu nhiên riêng cho từng người; người vận hành tải thông tin cấp tài khoản một lần.
+Google dùng `GOOGLE_CLIENT_ID`; riêng dịch vụ DHV trên Render giữ cấu hình OAuth công khai hiện có trong `backend/data/deployment-public.json`, chỉ áp dụng khi hostname do Render cấp khớp chính xác. Biến môi trường được ưu tiên, giá trị rỗng tắt Google. Tài khoản mới có vai trò student; quyền trên tài khoản đã tồn tại chỉ được nhận qua liên kết Google do admin thiết lập. Mật khẩu tài khoản tạo mới tối thiểu 12 ký tự. CSV nhập sinh viên cấp mật khẩu ngẫu nhiên riêng cho từng người; người vận hành tải thông tin cấp tài khoản một lần.
 
 ## Chạy cục bộ
 
