@@ -1,0 +1,76 @@
+.toeic-roadmap-mode{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:25px}
+.toeic-roadmap-mode button{padding:10px 16px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-muted);font-size:13px}
+.toeic-roadmap-mode button[aria-pressed=true]{background:var(--toeic-pale);color:var(--toeic-green);border-color:var(--toeic-green);font-weight:650}
+.toeic-curriculum{scroll-margin-top:20px;min-width:0}
+.toeic-curriculum .toeic-section-heading{align-items:flex-start}
+.toeic-curriculum .toeic-section-heading>a{flex-shrink:0}
+.toeic-schedule{display:grid;grid-template-columns:190px repeat(3,minmax(0,1fr));gap:24px;padding:22px 24px;background:var(--ui-surface);border:1px solid var(--ui-border);border-radius:12px;align-items:center}
+.toeic-schedule label{display:grid;gap:7px;font-size:12px;color:var(--ui-muted)}
+.toeic-schedule>div{display:flex;flex-direction:column;gap:3px}
+.toeic-schedule strong{font-size:24px;letter-spacing:-.6px;font-weight:650}
+.toeic-schedule span{font-size:11px;color:var(--ui-muted)}
+.toeic-page p.toeic-curriculum-caption{font-size:11px;color:var(--ui-muted);margin:12px 0;line-height:1.75}
+.toeic-study-guide{padding:15px 0 22px;border-bottom:1px solid var(--ui-border);margin-bottom:26px;font-size:13px}
+.toeic-curriculum summary{cursor:pointer;font-weight:600;line-height:1.6}
+.toeic-curriculum li{margin:7px 0}
+.toeic-curriculum ul,.toeic-curriculum ol{padding-left:21px;margin:12px 0}
+.toeic-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:26px 0}
+.toeic-levels button{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;padding:20px 18px;color:var(--ui-text);border:1px solid var(--ui-border);border-radius:11px;background:var(--ui-surface);min-width:0}
+.toeic-levels button:hover{background:var(--ui-soft)}
+.toeic-levels button.active{border-color:var(--toeic-green);background:var(--toeic-pale);box-shadow:inset 0 3px var(--toeic-green)}
+.toeic-levels .toeic-eyebrow{margin-bottom:2px;font-size:9px;letter-spacing:1.1px}
+.toeic-levels strong{font-size:15px;line-height:1.5;min-height:45px}
+.toeic-levels button>span:not(.toeic-eyebrow){font-size:11px;color:var(--ui-muted)}
+.toeic-levels small{font-size:10px;color:var(--ui-muted);margin-top:auto;padding-top:7px}
+.toeic-levels progress{width:100%;height:5px;accent-color:var(--toeic-green)}
+.toeic-level-intro{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;padding:23px 0;border-top:1px solid var(--ui-border);font-size:13px}
+.toeic-level-intro .toeic-eyebrow{margin-bottom:5px}
+.toeic-level-intro p{margin-top:8px;font-size:12px;color:var(--ui-muted)}
+.toeic-level-intro details{border-left:1px solid var(--ui-border);padding-left:24px;align-self:center}
+.toeic-session-layout{display:grid;grid-template-columns:285px minmax(0,1fr);gap:24px;align-items:start}
+.toeic-session-list{display:grid;max-height:620px;overflow-y:auto;overscroll-behavior:contain;border:1px solid var(--ui-border);border-radius:11px;background:var(--ui-surface);position:sticky;top:20px;padding:5px}
+.toeic-session-list button{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:15px 10px;border:1px solid transparent;border-bottom-color:var(--ui-border);background:transparent;color:var(--ui-text);border-radius:7px;width:100%;min-width:0}
+.toeic-session-list button:last-child{border-bottom-color:transparent}
+.toeic-session-list button:hover{background:var(--ui-soft)}
+.toeic-session-list button.active{background:var(--toeic-pale);border-color:var(--toeic-green)}
+.toeic-session-number{font-size:16px;min-width:23px;color:var(--toeic-green);padding-top:2px;display:flex;justify-content:center}
+.toeic-session-list small{display:block;font-size:10px;color:var(--ui-muted);margin-bottom:4px}
+.toeic-session-list strong{display:block;font-size:12px;line-height:1.65;font-weight:600;overflow-wrap:anywhere}
+.toeic-session-list em{font-size:9px;font-style:normal;color:var(--toeic-green);display:block;margin-top:4px}
+.toeic-session-detail{background:var(--ui-surface);border:1px solid var(--ui-border);border-radius:13px;padding:30px;scroll-margin-top:20px;min-width:0;font-size:14px}
+.toeic-session-detail>header{border-bottom:1px solid var(--ui-border);padding-bottom:25px}
+.toeic-session-detail>header h2{font-size:26px;line-height:1.45}
+.toeic-session-meta{display:flex;flex-wrap:wrap;align-items:center;gap:16px;font-size:11px;color:var(--ui-muted);margin-top:15px}
+.toeic-session-meta span{display:flex;align-items:center;gap:6px}
+.toeic-session-detail>section{margin-top:28px}
+.toeic-session-detail h3{margin-bottom:12px}
+.toeic-session-detail section>p{margin:12px 0;line-height:1.9}
+.toeic-session-examples{background:var(--ui-soft);padding:22px;border-radius:10px}
+.toeic-session-examples>div+div{border-top:1px solid var(--ui-border);margin-top:17px;padding-top:17px}
+.toeic-session-examples>div>p:first-child{font-weight:550;line-height:1.8}
+.toeic-session-examples>div>p+p{font-size:12px;color:var(--ui-muted);margin-top:7px}
+.toeic-agenda{padding:16px 0;border-bottom:1px solid var(--ui-border);font-size:12px}
+.toeic-supporting-lessons{display:flex;flex-direction:column;gap:9px;margin:16px 0}
+.toeic-supporting-lessons button{justify-content:flex-start;text-align:left;font-size:12px!important;line-height:1.7}
+.toeic-supporting-lessons svg{flex-shrink:0}
+.toeic-supporting-lessons svg:last-child{margin-left:auto}
+.toeic-session-check{border-top:1px solid var(--ui-border);padding-top:25px}
+.toeic-session-check>p{font-size:12px;color:var(--ui-muted)}
+.toeic-session-check fieldset{min-width:0;margin:20px 0;padding:0;border:0}
+.toeic-session-check legend{font-size:13px;font-weight:600;margin-bottom:12px;line-height:1.8}
+.toeic-session-check label{display:flex;align-items:flex-start;gap:10px;padding:12px;margin:7px 0;border:1px solid var(--ui-border);border-radius:7px;cursor:pointer;font-size:13px}
+.toeic-session-check input{margin-top:5px;accent-color:var(--toeic-green);flex-shrink:0}
+.toeic-session-check label:has(input:checked){border-color:var(--toeic-green);background:var(--ui-soft)}
+.toeic-session-check label.correct{background:var(--toeic-pale);border-color:var(--toeic-green)}
+.toeic-page p.toeic-check-explanation{font-size:12px;line-height:1.8;margin:12px 0;color:var(--ui-muted)}
+.toeic-session-check [role=status]{margin-bottom:16px;color:var(--ui-text);font-size:13px}
+.toeic-session-sources{display:grid;gap:9px}
+.toeic-session-sources a{display:flex;justify-content:space-between;gap:14px;color:var(--toeic-green);text-decoration:none;font-size:12px;padding:11px 0;border-bottom:1px solid var(--ui-border)}
+.toeic-session-sources a:hover span{text-decoration:underline}
+.toeic-session-sources small{display:block;color:var(--ui-muted);font-size:10px;margin-top:3px}
+.toeic-session-sources svg{flex-shrink:0;margin-top:3px}
+.toeic-session-completion{padding-top:25px;margin-top:28px;border-top:1px solid var(--ui-border)}
+.toeic-session-completion p{font-size:11px;color:var(--ui-muted);margin-top:12px;line-height:1.8}
+@media(max-width:1100px){.toeic-session-layout{grid-template-columns:240px minmax(0,1fr);gap:17px}.toeic-session-detail{padding:25px}.toeic-schedule{grid-template-columns:160px repeat(3,minmax(0,1fr));gap:18px}.toeic-levels{gap:8px}.toeic-levels button{padding:16px 13px}}
+@media(max-width:900px){.toeic-session-layout{grid-template-columns:1fr}.toeic-session-list{position:static;max-height:270px}.toeic-session-list strong{font-size:13px}.toeic-session-list button{padding:12px}.toeic-levels{grid-template-columns:repeat(2,minmax(0,1fr))}.toeic-levels strong{min-height:0}.toeic-schedule{grid-template-columns:1fr 1fr;gap:20px}.toeic-curriculum .toeic-section-heading{flex-direction:column;gap:14px}}
+@media(max-width:540px){.toeic-level-intro{grid-template-columns:1fr;gap:18px}.toeic-level-intro details{border-left:0;padding-left:0}.toeic-session-detail{padding:20px 17px}.toeic-session-detail>header h2{font-size:23px}.toeic-session-examples{padding:17px}.toeic-schedule{padding:18px;gap:18px}.toeic-schedule strong{font-size:22px}.toeic-schedule span{font-size:10px}.toeic-levels strong{font-size:14px}.toeic-session-detail .toeic-button{max-width:100%}.toeic-curriculum h2{font-size:23px}.toeic-roadmap-mode button{font-size:12px;padding:10px 12px}}

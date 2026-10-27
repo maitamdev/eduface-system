@@ -1,5 +1,30 @@
 # Nguồn nghiên cứu cho TOEIC cùng DHV
 
+## Bổ sung nghiên cứu cho lộ trình 56 buổi
+
+Đối chiếu lại ngày 27/10/2026 bằng trang nhà cung cấp, README và file cấp phép trên GitHub. Đây là khảo sát **có chọn lọc**, không phải tuyên bố đã đọc hết mọi repository/nền tảng. [Bản thiết kế](THIET_KE_CHUONG_TRINH.md) giải thích cách giữ 24/12 buổi gốc và bổ sung 12/8 buổi nâng cao; [bản chi tiết](LO_TRINH_CHI_TIET.md) chứa toàn bộ buổi, ví dụ và tự kiểm tra.
+
+| Repository được kiểm tra | Giấy phép/ghi nhận tại thời điểm đọc | Áp dụng vào DHV |
+|---|---|---|
+| [py-fsrs](https://github.com/open-spaced-repetition/py-fsrs) | [MIT](https://github.com/open-spaced-repetition/py-fsrs/blob/main/LICENSE). | Giữ thư viện lên lịch ôn đã tích hợp; không thay thuật toán hoặc nâng dependency trong lần này. |
+| [Moodle](https://github.com/moodle/moodle) | [GPL-3.0](https://github.com/moodle/moodle/blob/main/COPYING.txt). | Tham khảo cách tổ chức khóa/hoạt động và tách tiến độ học; không đưa thêm LMS hay chép code. |
+| [H5P Interactive Book](https://github.com/h5p/h5p-interactive-book) | [MIT](https://github.com/h5p/h5p-interactive-book/blob/master/LICENSE); component dùng H5P framework. | Tham khảo bố cục nội dung kết hợp tự kiểm tra; tự triển khai component React theo hệ thống sẵn có. |
+| [LibreLingo](https://github.com/kantord/LibreLingo) | [AGPL-3.0](https://github.com/kantord/LibreLingo/blob/main/LICENSE); README báo chưa được duy trì và nội dung khóa có thể dùng giấy phép riêng. | Tham khảo nội dung tách khỏi giao diện; không dùng làm dependency vận hành, không nhập học liệu. |
+| [Anki](https://github.com/ankitects/anki) | [LICENSE](https://github.com/ankitects/anki/blob/main/LICENSE) ghi AGPL v3 hoặc mới hơn, có các phần dùng giấy phép khác; không chỉ dựa vào giá trị `NOASSERTION` của API. | Tham khảo học bằng truy hồi và lịch ôn; không nhập shared decks không rõ nguồn. |
+| [HungTabe/TOEIC_VLearningApp](https://github.com/HungTabe/TOEIC_VLearningApp) | README ghi MIT nhưng API vẫn không tìm được file license riêng. | Giữ mức tham khảo ý tưởng từ vựng theo chủ đề; không sao chép code/database. |
+| [toeic-question-ocean](https://github.com/kdeppaei/toeic-question-ocean) | [MIT](https://github.com/kdeppaei/toeic-question-ocean/blob/main/LICENSE); dự án có thông tin attribution cho tài nguyên riêng. | Tham khảo cách công bố nguồn; không coi license code là quyền nhập toàn bộ học liệu. Không nhập đề hoặc media. |
+| [seikaikyo/toeic-practice](https://github.com/seikaikyo/toeic-practice) | [LICENSE](https://github.com/seikaikyo/toeic-practice/blob/main/LICENSE) ghi proprietary, không cấp quyền dùng code. Repo công khai không đồng nghĩa mã nguồn mở. | Loại khỏi phương án tái sử dụng code; không clone hay tích hợp. |
+
+Vì EduFace đã có React, FastAPI, JWT và FSRS, lựa chọn triển khai là thêm lớp **buổi học → bài hỗ trợ → nguồn học → mốc đánh giá** vào ứng dụng hiện có. Lần này không nhập thêm dependency từ các repo trên; nội dung và code mới được viết trực tiếp cho dự án.
+
+Nguồn kiến thức được mở/đối chiếu gồm [ETS](https://www.ets.org/toeic/test-takers/prepare.html), [IIBC format](https://www.iibc-global.org/english/toeic/test/lr/about/format.html), [British Council grammar reference](https://learnenglish.britishcouncil.org/free-resources/grammar/english-grammar-reference), [A1–A2](https://learnenglish.britishcouncil.org/free-resources/grammar/a1-a2), [B1–B2](https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2), [relative clauses](https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2/relative-clauses-defining-relative-clauses), [participle clauses](https://learnenglish.britishcouncil.org/free-resources/grammar/c1/participle-clauses), [A2 listening](https://learnenglish.britishcouncil.org/free-resources/listening/a2), [B1 listening](https://learnenglish.britishcouncil.org/free-resources/listening/b1), [Cambridge activities](https://www.cambridgeenglish.org/learning-english/activities-for-learners/) và [IIG ôn luyện](https://toeic.iigvietnam.com/on-luyen/). Nội dung bài và ví dụ trong DHV là biên soạn mới dựa trên kiến thức ngôn ngữ, không chép các bài tập ở những trang này.
+
+[Tatoeba](https://en.wiki.tatoeba.org/articles/show/using-the-tatoeba-corpus) có thể hữu ích cho ví dụ câu ở lần mở rộng sau, nhưng quyền văn bản và audio không giống nhau; cần lưu attribution và giấy phép từng tài nguyên nếu nhập. Lần này không nhập dữ liệu Tatoeba. Công cụ đọc web gặp timeout với trang B2 listening và HTTP 403 tại Cambridge Dictionary; các liên kết vẫn là nguồn chính thức để người học mở trực tiếp, không tuyên bố đã kiểm tra mọi bài tập bên trong.
+
+Các tiêu chí 70/75/80%, mốc 350–900, nhịp 2/3/4 buổi và lịch ôn 1/3/7 ngày là thiết kế nội bộ của DHV. Chúng không được trình bày như quy định ETS hay cam kết đầu ra của British Council/Cambridge/IIG.
+
+## Nghiên cứu nền của ngân hàng bài luyện
+
 Đối chiếu ngày 27/10/2026 (giờ Việt Nam). Phân biệt **mã nguồn phần mềm**, **học liệu được xem miễn phí**, và **quyền sao chép/phân phối học liệu**. Một kho code công khai hoặc một trang bài tập miễn phí không tự động cho phép đưa toàn bộ đề/audio vào ứng dụng khác.
 
 ## Mã nguồn đã xem xét

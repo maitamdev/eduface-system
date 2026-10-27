@@ -16,6 +16,46 @@ async def student(db, name="learner"):
     return uid, {"Authorization":"Bearer " + create_access_token(uid,name,"student")[0]}
 
 
+async def test_curriculum_completion_is_private_idempotent_and_separate_from_scores(live):
+    db, http = live
+    uid, headers = await student(db)
+    _, other = await student(db, "other-learner")
+    path = "/api/toeic/curriculum/sessions/l1-s01"
+    assert (await http.put(path, json={"completed": True})).status_code == 403
+    assert (await http.put(path, headers=headers, json={"completed": "true"})).status_code == 422
+    assert (await http.put(path, headers=headers, json={"completed": True, "user_id": "other"})).status_code == 422
+    assert (await http.put("/api/toeic/curriculum/sessions/unknown", headers=headers, json={"completed": True})).status_code == 404
+    for _ in range(2):
+        response = await http.put(path, headers=headers, json={"completed": True})
+        assert response.status_code == 200, response.text
+    profile = await db.toeic_profiles.find_one({"_id": uid})
+    assert profile["curriculum_completed"] == ["l1-s01"]
+    progress = (await http.get("/api/toeic/progress", headers=headers)).json()
+    assert progress["curriculum_completed"] == ["l1-s01"]
+    assert progress["lessons"] == {} and progress["streak"] == 0
+    assert (await http.get("/api/toeic/progress", headers=other)).json()["curriculum_completed"] == []
+    await http.put(path, headers=headers, json={"completed": False})
+    assert (await http.get("/api/toeic/progress", headers=headers)).json()["curriculum_completed"] == []
+
+
+async def test_curriculum_concurrent_first_completions_preserve_both_sessions(live):
+    import asyncio
+    db, http = live
+    uid, headers = await student(db)
+    results = await asyncio.gather(*[
+        http.put(f"/api/toeic/curriculum/sessions/{sid}", headers=headers, json={"completed": True})
+        for sid in ("l1-s01", "l1-s02")
+    ])
+    assert all(r.status_code == 200 for r in results), [r.text for r in results]
+    await http.put("/api/toeic/preferences", headers=headers, json={"target": 900, "daily_minutes": 45})
+    profile = await db.toeic_profiles.find_one({"_id": uid})
+    assert set(profile["curriculum_completed"]) == {"l1-s01", "l1-s02"}
+    assert profile["target"] == 900
+    catalog = (await http.get("/api/toeic/catalog", headers=headers)).json()
+    assert len(catalog["curriculum"]["sessions"]) == 56
+    assert "questions" not in catalog
+
+
 async def start(http, headers, kind="lesson", **extra):
     payload={"kind":kind,"request_id":str(uuid4()), **extra}
     if kind=="lesson": payload.setdefault("lesson_id","f01")

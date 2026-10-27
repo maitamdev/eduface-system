@@ -2,6 +2,8 @@
 
 ## Code và nội dung mới
 
+Lộ trình 56 buổi và 112 câu tự kiểm tra mới được biên soạn tại `backend/scripts/toeic_curriculum.py`; bản Markdown, metadata và nội dung trong ứng dụng được tạo từ cùng nguồn. Không nhập câu hỏi, transcript hay bộ khóa học từ các repo nghiên cứu. Các câu tự kiểm tra khác với 268 câu ngân hàng có chấm điểm và không được trình bày như đề ETS.
+
 Code frontend/backend và script biên soạn TOEIC được viết trực tiếp cho repository này. Điều khoản của dự án tại `LICENSE` vẫn được giữ nguyên; lần nâng cấp không thay giấy phép toàn repository hay xác lập quyền đối với tài liệu của bên thứ ba.
 
 `backend/data/toeic/course.json` và bản metadata xem thử được tạo từ các script `backend/scripts/*toeic*.py`. Nội dung được biên soạn bằng hỗ trợ AI cho dự án, không trích ngân hàng câu hỏi thương mại. Bộ nội dung chưa được kiểm định tương đương đề thi chuẩn hóa; không dùng nhãn “ETS official questions” hoặc “cam kết 900”.

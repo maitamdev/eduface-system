@@ -43,7 +43,14 @@ for seed in range(30):
 preview = json.loads((ROOT / "frontend/src/features/toeic/previewCatalog.json").read_text(encoding="utf-8"))
 assert "questions" not in preview
 assert preview["version"] == data["version"]
+assert preview["curriculum"] == data["curriculum"], "Preview curriculum is stale"
+guide = (ROOT / "docs/toeic/LO_TRINH_CHI_TIET.md").read_text(encoding="utf-8")
+public_guide = (ROOT / "frontend/public/toeic/lo-trinh-dhv.md").read_text(encoding="utf-8")
+assert guide.count("### Buổi ") == len(data["curriculum"]["sessions"])
+assert public_guide.count("### Buổi ") == len(data["curriculum"]["sessions"])
 report = {"lessons": len(data["lessons"]), "questions": len(data["questions"]), "vocabulary": len(data["vocabulary"]),
+          "curriculum_levels": len(data["curriculum"]["levels"]), "curriculum_sessions": len(data["curriculum"]["sessions"]),
+          "self_checks": sum(len(s["checks"]) for s in data["curriculum"]["sessions"]),
           "by_part": dict(Counter(q["part"] for q in data["questions"])), "audio_files": len(audio),
           "audio_minutes": round(sum(durations)/60, 2), "audio_MB": round(size/1e6, 2),
           "shortest_audio_seconds": round(min(durations), 2), "longest_audio_seconds": round(max(durations), 2)}

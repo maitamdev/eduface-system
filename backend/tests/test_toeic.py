@@ -3,8 +3,8 @@ from pathlib import Path
 import json
 import pytest
 from pydantic import ValidationError
-from core.toeic_content import content, select_questions, public_question, grade, PART_COUNTS
-from routers.toeic import Answers, Review, Start, validated_answers
+from core.toeic_content import content, select_questions, public_question, grade, PART_COUNTS, validate_curriculum
+from routers.toeic import Answers, Review, Start, validated_answers, SessionCompletion
 from fastapi import HTTPException
 from uuid import uuid4
 
@@ -64,3 +64,37 @@ def test_listening_option_letters_match_authored_audio_transcripts():
     for q in content()["questions"]:
         if q["part"] <= 2:
             for i, option in enumerate(q["options"]): assert f"{chr(65+i)}. {option}" in q["transcript"]
+
+
+def test_curriculum_covers_requested_levels_and_has_reusable_learning_resources():
+    data = content()
+    syllabus = validate_curriculum(data)
+    assert [l["session_count"] for l in syllabus["levels"]] == [24, 12, 12, 8]
+    assert len(syllabus["sessions"]) == 56
+    assert sum(len(s["checks"]) for s in syllabus["sessions"]) == 112
+    assert sum(s["minutes"] for s in syllabus["sessions"]) == 5130
+    assert sum(s["minutes"] == 120 for s in syllabus["sessions"]) == 3
+    assert {s["id"] for s in syllabus["sessions"] if s["level_id"] == "level-1"} == {f"l1-s{n:02}" for n in range(1,25)}
+    assert "Final test" in next(s["title"] for s in syllabus["sessions"] if s["id"] == "l1-s24")
+    assert "Announcement" in next(s["title"] for s in syllabus["sessions"] if s["id"] == "l2-s12")
+    # The self-check keys are intentionally visible study material, independent of
+    # the scored bank; adding a syllabus must not expose bank question answers.
+    assert not ({q["id"] for q in data["questions"]} & {s["id"] for s in syllabus["sessions"]})
+
+
+@pytest.mark.parametrize("field,value", [
+    ("source_ids", ["not-a-source"]), ("lesson_ids", ["not-a-lesson"]),
+    ("minutes", 999), ("number", 99), ("knowledge", []),
+])
+def test_curriculum_validation_rejects_broken_learning_paths(field, value):
+    from copy import deepcopy
+    data = deepcopy(content())
+    data["curriculum"]["sessions"][0][field] = value
+    with pytest.raises(AssertionError):
+        validate_curriculum(data)
+
+
+@pytest.mark.parametrize("value", ["true", 1, None])
+def test_session_completion_requires_an_explicit_boolean(value):
+    with pytest.raises(ValidationError):
+        SessionCompletion(completed=value)

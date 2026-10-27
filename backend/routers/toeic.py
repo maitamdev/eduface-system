@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel, ConfigDict, Field, StrictInt
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictBool
 from pymongo.errors import DuplicateKeyError
 from fsrs import Card, Rating, Scheduler
 
@@ -33,6 +33,10 @@ class StrictBody(BaseModel):
 class Preferences(StrictBody):
     target: Literal[350, 550, 650, 750, 900] = 650
     daily_minutes: Literal[15, 30, 45, 60] = 30
+
+
+class SessionCompletion(StrictBody):
+    completed: StrictBool
 
 
 class Start(StrictBody):
@@ -92,6 +96,7 @@ async def activity(db, uid, field, amount, timestamp):
 async def catalog():
     data = content()
     return {"version": data["version"], "stages": data["stages"], "sources": data["sources"],
+            "curriculum": data["curriculum"],
             "notice": data["notice"], "question_count": len(data["questions"]),
             "vocabulary_count": len(data["vocabulary"]),
             "lessons": [{k: v for k, v in lesson.items() if k != "sections"} |
@@ -136,8 +141,25 @@ async def progress(request: Request, db=Depends(get_db)):
     learned = await db.toeic_cards.count_documents({"user_id": uid})
     due = await db.toeic_cards.count_documents({"user_id": uid, "due": {"$lte": now()}})
     return {"target": profile.get("target", 650), "daily_minutes": profile.get("daily_minutes", 30),
+            "curriculum_completed": profile.get("curriculum_completed", []),
             "lessons": profile.get("lessons", {}), "recent": recent, "active": active,
             "days": days[:90], "streak": streak, "cards_learned": learned, "cards_due": due}
+
+
+@router.put("/curriculum/sessions/{session_id}")
+@limiter.limit("60/minute")
+async def complete_session(session_id: str, body: SessionCompletion, request: Request, db=Depends(get_db)):
+    """Learner-reported study completion; never awards quiz scores or a certificate."""
+    uid = learner(request)
+    if session_id not in {row["id"] for row in content()["curriculum"]["sessions"]}:
+        raise HTTPException(404, "Không tìm thấy buổi học.")
+    update = {"$addToSet" if body.completed else "$pull": {"curriculum_completed": session_id}}
+    try:
+        await db.toeic_profiles.update_one({"_id": uid}, update, upsert=True)
+    except DuplicateKeyError:
+        # Concurrent first writes may both try to create the same learner profile.
+        await db.toeic_profiles.update_one({"_id": uid}, update)
+    return {"session_id": session_id, "completed": body.completed}
 
 
 @router.post("/attempts")

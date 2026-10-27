@@ -6,6 +6,7 @@ to survive rebuilds. Review factual/pedagogical changes before increasing versio
 import json
 import hashlib
 from pathlib import Path
+from toeic_curriculum import curriculum, guide_markdown
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = {"version": "dhv-toeic-2026.10-v1", "notice": "Học liệu tự biên soạn, không phải đề ETS. Mục tiêu 900 là định hướng học, không bảo đảm kết quả. ‘Từ 0’ nghĩa là bắt đầu từ nền tảng; điểm TOEIC L&R chính thức là 10–990. Âm thanh là giọng tổng hợp; Part 1 dùng hình minh họa.", "stages": [
@@ -159,6 +160,19 @@ lesson("a04", 4, "Part 7 · Ba văn bản và chiến lược 900", 7,
 for name in ("toeic_vocabulary.py", "toeic_questions_basic.py", "toeic_questions_context.py"):
     exec(compile((Path(__file__).parent / name).read_text(encoding="utf-8"), name, "exec"))
 
+DATA["version"] = "dhv-toeic-2026.10-v2"
+DATA["sources"].extend([
+    {"id": "bc-reference", "title": "British Council · English grammar reference", "url": "https://learnenglish.britishcouncil.org/free-resources/grammar/english-grammar-reference", "provider": "British Council", "access": "Bài học công khai", "stage": "Level 1–2", "usage": "Tra cấu trúc câu, từ loại, đại từ, thì và giới từ trên trang gốc."},
+    {"id": "bc-b1", "title": "British Council · B1–B2 grammar", "url": "https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2", "provider": "British Council", "access": "Bài học công khai", "stage": "Level 2–4", "usage": "Bổ trợ bị động, điều kiện và liên kết ý; chọn bài theo nhu cầu, không quy đổi CEFR thành điểm TOEIC."},
+    {"id": "bc-relative", "title": "British Council · Defining relative clauses", "url": "https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2/relative-clauses-defining-relative-clauses", "provider": "British Council", "access": "Bài học công khai", "stage": "Level 2 · buổi 1, 5", "usage": "Đối chiếu chức năng đại từ quan hệ trước khi học rút gọn."},
+    {"id": "bc-participles", "title": "British Council · Participle clauses", "url": "https://learnenglish.britishcouncil.org/free-resources/grammar/c1/participle-clauses", "provider": "British Council", "access": "Bài học công khai", "stage": "Bổ trợ rút gọn mệnh đề", "usage": "Tham khảo điều kiện chủ thể phù hợp của cụm phân từ; không yêu cầu học hết C1 để bắt đầu TOEIC."},
+    {"id": "bc-a2-listening", "title": "British Council · A2 listening", "url": "https://learnenglish.britishcouncil.org/free-resources/listening/a2", "provider": "British Council", "access": "Audio và bài tập tại nguồn", "stage": "Nền tảng / Level 2", "usage": "Bổ sung nghe tình huống quen thuộc bằng giọng người thật."},
+    {"id": "bc-b1-listening", "title": "British Council · B1 listening", "url": "https://learnenglish.britishcouncil.org/free-resources/listening/b1", "provider": "British Council", "access": "Audio và bài tập tại nguồn", "stage": "Level 2–3", "usage": "Nghe tình huống công việc và đời sống; không nhập audio vào DHV."},
+    {"id": "bc-b2-listening", "title": "British Council · B2 listening", "url": "https://learnenglish.britishcouncil.org/free-resources/listening/b2", "provider": "British Council", "access": "Audio và bài tập tại nguồn", "stage": "Level 3–4", "usage": "Luyện bài nói dài, ý định và nhiều cách diễn đạt; chọn độ khó phù hợp."},
+    {"id": "cambridge-dictionary", "title": "Cambridge Dictionary · Tra nghĩa và cách dùng", "url": "https://dictionary.cambridge.org/", "provider": "Cambridge", "access": "Tra cứu tại nguồn", "stage": "Mọi level", "usage": "Kiểm tra nghĩa, phát âm và cụm từ; tự viết ví dụ để kiểm tra hiểu."},
+])
+DATA["curriculum"] = curriculum()
+
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, str(ROOT / "backend"))
@@ -172,4 +186,10 @@ if __name__ == "__main__":
     for row in preview["lessons"]:
         row["question_count"] = sum(q["lesson_id"] == row["id"] for q in DATA["questions"])
     (ROOT / "frontend/src/features/toeic/previewCatalog.json").write_text(json.dumps(preview, ensure_ascii=False, indent=2), encoding="utf-8")
+    guide = guide_markdown(DATA["sources"])
+    (ROOT / "docs/toeic/LO_TRINH_CHI_TIET.md").write_text(guide, encoding="utf-8")
+    public_guide = guide
+    for filename in ("SOURCES.md", "THIET_KE_CHUONG_TRINH.md", "README.md"):
+        public_guide = public_guide.replace(f"]({filename})", f"](https://github.com/maitamdev/eduface-system/blob/main/docs/toeic/{filename})")
+    (ROOT / "frontend/public/toeic/lo-trinh-dhv.md").write_text(public_guide, encoding="utf-8")
     print(f"Built {len(DATA['lessons'])} lessons, {len(DATA['questions'])} questions, {len(DATA['vocabulary'])} vocabulary cards")

@@ -14,7 +14,9 @@ Tính năng nằm trong ứng dụng EduFace hiện có, tại `/toeic`. Tài kh
 
 ## Các luồng chính
 
-- **Lộ trình:** chọn một trong 5 chặng; đọc mục tiêu, kiến thức, ví dụ và cách luyện. Làm bài đạt ít nhất 70% để đánh dấu hoàn thành. Hệ thống giữ tỷ lệ đúng tốt nhất của từng bài.
+- **Lộ trình theo buổi:** 4 level, 24 + 12 + 12 + 8 = 56 buổi, giữ khung Level 1–2 của người dùng và nối tới mục tiêu 900. Mỗi buổi có kiến thức, ví dụ, 2 câu tự kiểm tra, nhiệm vụ luyện, bài tập về nhà và nguồn học. Chọn nhịp 2/3/4 buổi mỗi tuần để xem lịch dự kiến; dùng **Tải lộ trình (.md)** để tải bản đầy đủ.
+- **Buổi đã học:** học viên tự đánh dấu, lưu theo tài khoản và có thể bỏ đánh dấu. Đây không phải điểm kiểm tra, không tự tăng streak hay cấp chứng chỉ. Bài tự kiểm tra 2 câu không lưu kết quả lên server; đổi buổi sẽ bắt đầu lại.
+- **Thư viện 20 bài luyện:** vẫn có 5 chặng kỹ năng và các bài hỗ trợ cũ. Làm bài đạt ít nhất 70% để đánh dấu bài luyện hoàn thành; hệ thống giữ tỷ lệ đúng tốt nhất. Nhiều buổi có thể dùng chung một bài hỗ trợ.
 - **Luyện tập:** khảo sát 25 câu/25 phút, bài theo từng Part hoặc 200 câu/120 phút. Part 1–2 chỉ hiện nhãn A/B/C/D trước khi nộp để luyện nghe; Part 3–4 dùng audio chung theo nhóm. Đáp án, giải thích và transcript được mở sau khi nộp.
 - **Tiếp tục bài:** dùng “Lưu & về góc học tập”, vào **Tiến độ → Bài đang làm → Tiếp tục**. Thời gian vẫn chạy khi rời trang. Bài hết hạn được chấm từ đáp án đã lưu trên máy chủ; không chấp nhận thay đáp án sau hạn (có 3 giây đệm cho yêu cầu nộp).
 - **Lưu lỗi:** đáp án trên màn hình vẫn giữ để thử lại. Không đóng tab khi đang báo “Chưa lưu được”. Nếu hai cửa sổ cùng sửa một bài, server chặn bản ghi cũ; nút lấy bản đã lưu sẽ thay bản chưa lưu hiện tại bằng bản trên server.
@@ -26,6 +28,10 @@ Tính năng nằm trong ứng dụng EduFace hiện có, tại `/toeic`. Tài kh
 
 | Thành phần | Số lượng |
 |---|---:|
+| Level / kế hoạch buổi | 4 / 56 |
+| Câu tự kiểm tra kiến thức (khác ngân hàng chấm điểm) | 112 |
+| Ví dụ và phân tích trong lộ trình | 112 |
+| Thời lượng trong buổi (chưa tính tự học) | 85,5 giờ |
 | Chặng / bài học ngắn | 5 / 20 |
 | Câu hỏi có lời giải | 268 |
 | Part 1 / 2 / 3 / 4 / 5 / 6 / 7 | 8 / 32 / 42 / 33 / 54 / 20 / 79 |
@@ -38,6 +44,8 @@ Tính năng nằm trong ứng dụng EduFace hiện có, tại `/toeic`. Tài kh
 “Từ 0” nghĩa là người mới học; điểm thi TOEIC L&R chính thức không bắt đầu từ 0. Mốc chặng, thời lượng gợi ý và bài khảo sát nội bộ không chứng nhận trình độ hay bảo đảm đạt 900. Hai mươi bài ngắn và 200 từ là bộ khởi đầu; cần bổ sung luyện nghe tự nhiên, vốn từ rộng và đề chính thức cho mục tiêu cao.
 
 ## Tạo lại / thêm học liệu
+
+Lộ trình được biên soạn tại `backend/scripts/toeic_curriculum.py`. Builder tạo dữ liệu chung, [bản 56 buổi](LO_TRINH_CHI_TIET.md) và file tải tại `frontend/public/toeic/lo-trinh-dhv.md`. Không sửa riêng các bản sinh ra. Xem [thiết kế và phạm vi](THIET_KE_CHUONG_TRINH.md) để phân biệt kế hoạch buổi, bài hỗ trợ, tự kiểm tra và đánh giá chính thức.
 
 Các script dùng đường dẫn dự án, không cần database:
 
@@ -70,6 +78,8 @@ npm run build
 Các integration test tự tạo database tên ngẫu nhiên `eduface_integration_*`, kiểm tra chỉ kết nối localhost và chỉ dọn database do chính test tạo. Khi không đặt `MONGODB_INTEGRATION_URI`, integration test sẽ skip; cần chạy có replica set trước khi bàn giao thay đổi server. CI đã bổ sung kiểm tra học liệu/audio và các transaction TOEIC.
 
 ## Lưu trữ và API
+
+Trạng thái buổi nằm tại `toeic_profiles.curriculum_completed`. `PUT /api/toeic/curriculum/sessions/{id}` nhận `{ "completed": true/false }`, chỉ ghi theo JWT của người gọi; GET progress trả danh sách ID đã học. Không cần seed hay migration dữ liệu. Catalog bổ sung `curriculum`; frontend có nhánh dự phòng nếu nhận catalog cũ trong lúc triển khai.
 
 Nội dung versioned ở JSON; tiến độ MongoDB nằm trong `toeic_profiles`, `toeic_attempts`, `toeic_cards`, `toeic_activity`. Attempt lưu snapshot câu hỏi để kết quả cũ không bị thay bởi cập nhật nội dung. Mọi truy vấn tiến độ lọc theo JWT user ID; API key dùng chung không được ghi tiến độ cá nhân. Nộp bài và ghi lịch FSRS dùng transaction để tránh ghi dở dang.
 

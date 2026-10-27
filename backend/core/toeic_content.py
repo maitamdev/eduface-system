@@ -10,7 +10,36 @@ DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "toeic" / "course.jso
 PART_COUNTS = {1: 6, 2: 25, 3: 39, 4: 30, 5: 30, 6: 16, 7: 54}
 
 
+def validate_curriculum(data):
+    syllabus = data["curriculum"]
+    lessons = {row["id"] for row in data["lessons"]}
+    sources = {row["id"] for row in data["sources"]}
+    levels = {row["id"] for row in syllabus["levels"]}
+    sessions = syllabus["sessions"]
+    assert len({row["id"] for row in sessions}) == len(sessions), "Duplicate curriculum session"
+    assert len(levels) == len(syllabus["levels"]), "Duplicate curriculum level"
+    for level in syllabus["levels"]:
+        rows = [row for row in sessions if row["level_id"] == level["id"]]
+        assert [row["number"] for row in rows] == list(range(1, level["session_count"] + 1)), "Invalid session sequence"
+        assert set(level["checkpoints"]) <= {row["number"] for row in rows}, "Unknown checkpoint"
+    for row in sessions:
+        assert row["level_id"] in levels
+        assert row["objectives"] and row["knowledge"] and row["examples"]
+        assert row["practice"] and row["homework"] and row["vocabulary_focus"]
+        assert row["lesson_ids"] and set(row["lesson_ids"]) <= lessons, "Unknown supporting lesson"
+        assert row["source_ids"] and set(row["source_ids"]) <= sources, "Unknown curriculum source"
+        assert sum(step["minutes"] for step in row["agenda"]) == row["minutes"], "Agenda duration mismatch"
+        assert all(step["minutes"] > 0 and step["task"] for step in row["agenda"])
+        assert len(row["checks"]) >= 2
+        for check in row["checks"]:
+            assert check["prompt"] and check["explanation"]
+            assert len(set(check["options"])) == len(check["options"]) >= 3
+            assert type(check["correct"]) is int and 0 <= check["correct"] < len(check["options"])
+    return syllabus
+
+
 def validate_content(data):
+    validate_curriculum(data)
     lessons = {x["id"] for x in data["lessons"]}
     ids = set()
     for q in data["questions"]:
