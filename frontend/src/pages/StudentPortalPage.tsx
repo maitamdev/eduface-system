@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { Camera, CheckCircle2, SwitchCamera, Trash2, Upload, FileCheck2, Megaphone, BookOpen, Award, Send } from "lucide-react";
 import {
   authApi,
@@ -15,7 +16,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useToast } from "@/context/ToastContext";
 import { useCamera, captureVideoFrame } from "@/hooks/useCamera";
 import { useResource } from "@/hooks/useResource";
-import { dateTime, errorMessage, isDesignPreview, matchesSearch } from "@/lib/format";
+import { appPath, dateTime, errorMessage, isDesignPreview, matchesSearch } from "@/lib/format";
 import {
   PageHeader,
   Section,
@@ -28,6 +29,11 @@ import {
 } from "@/components/ProductUI";
 
 type Photo = { blob: Blob; url: string };
+
+function readSetupDeferred(key: string | null): boolean {
+  try { return key !== null && window.localStorage.getItem(key) === "1"; }
+  catch { return false; }
+}
 
 export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | "student" }> = ({ previewRole }) => {
   const { user, role: authRole, refreshProfile } = useAuth();
@@ -53,6 +59,12 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
   const [submitting, setSubmitting] = useState(false);
   const [enrollError, setEnrollError] = useState<string | null>(null);
   const [showReenroll, setShowReenroll] = useState(false);
+  const setupPreferenceKey = user?.id ? `eduface:student-setup-later:${user.id}` : null;
+  const [setupDeferred, setSetupDeferred] = useState(() => readSetupDeferred(setupPreferenceKey));
+
+  useEffect(() => {
+    setSetupDeferred(readSetupDeferred(setupPreferenceKey));
+  }, [setupPreferenceKey]);
 
   useEffect(() => {
     if (user) {
@@ -243,6 +255,25 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
   const { person, total_sessions, present_count, absent_count, attendance_rate, is_defaulter, sessions } =
     portal.data;
 
+  useEffect(() => {
+    if (role !== "student" || !person) return;
+    setSetupDeferred(false);
+    try { if (setupPreferenceKey) window.localStorage.removeItem(setupPreferenceKey); }
+    catch { /* The completed server profile remains the source of truth. */ }
+  }, [role, person?.id, setupPreferenceKey]);
+
+  const deferSetup = () => {
+    if (submitting || capturing || analyzing) return;
+    camera.stop();
+    changePhotos([]);
+    setConsent(false);
+    setEnrollError(null);
+    setShowReenroll(false);
+    setSetupDeferred(true);
+    try { if (setupPreferenceKey) window.localStorage.setItem(setupPreferenceKey, "1"); }
+    catch { /* Browsers that block storage can still defer for this visit. */ }
+  };
+
   const filteredSessions = sessions.filter((item) => {
     if (statusFilter !== "all" && item.status !== statusFilter) return false;
     return matchesSearch(search, item.label, item.department);
@@ -326,23 +357,47 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         </Section>
       )}
 
-      {role === "student" && !portal.loading && (!person || showReenroll) && (
+      {role === "student" && !portal.loading && !portal.error && !person && setupDeferred && !showReenroll && (
+        <Section
+          title={t("Hoàn tất hồ sơ khi bạn sẵn sàng", "Finish your profile when you are ready")}
+          description={t(
+            "Bạn có thể học TOEIC và xem thông báo ngay. Hoàn tất hồ sơ sinh viên và đăng ký khuôn mặt trước khi sử dụng điểm danh AI.",
+            "You can study TOEIC and read announcements now. Complete your student profile and face registration before using AI attendance."
+          )}
+        >
+          <div className="page-actions">
+            <Link className="primary-button" to={appPath("/toeic")}><BookOpen size={15} />{t("Học TOEIC ngay", "Start learning TOEIC")}</Link>
+            <button type="button" className="secondary-button" onClick={() => setShowReenroll(true)}>
+              {t("Hoàn tất thiết lập", "Complete setup")}
+            </button>
+          </div>
+        </Section>
+      )}
+
+      {role === "student" && !portal.loading && !portal.error && ((!person && !setupDeferred) || showReenroll) && (
         <Section
           title={
             person
               ? t("Chụp lại khuôn mặt AI (giữ hồ sơ học vụ)", "Re-capture face (academic profile preserved)")
               : t("Khai báo thông tin sinh viên & Đăng ký khuôn mặt lần đầu", "First-time student profile & face registration")
           }
-          description={t(
+          description={person ? t(
             "Vui lòng điền Họ tên, Mã số sinh viên (MSSV), Lớp học phần và chụp 1–5 góc mặt (lộ rõ 2 mắt, mũi, miệng) để AI nhận diện chính xác nhất.",
             "Please provide your Full name, Student ID, Class/Course, and 1–5 clear face photos so the classroom AI camera can recognize you."
+          ) : t(
+            "Hoàn tất hồ sơ và đăng ký khuôn mặt để điểm danh AI. Bạn có thể chọn Để sau và bắt đầu học TOEIC ngay.",
+            "Complete your profile and face registration for AI attendance. You can choose Set up later and start learning TOEIC now."
           )}
           action={
             person ? (
               <button type="button" className="secondary-button" onClick={openReenrollForm}>
                 {t("Đóng", "Close")}
               </button>
-            ) : undefined
+            ) : (
+              <button type="button" className="secondary-button" onClick={deferSetup} disabled={submitting || capturing || analyzing}>
+                {t("Để sau", "Set up later")}
+              </button>
+            )
           }
         >
           <ErrorNotice message={enrollError || camera.error} />
@@ -589,7 +644,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         </Section>
       )}
 
-      <dl className="metric-strip">
+      {(person || role !== "student") && <dl className="metric-strip">
         <div>
           <dt>{t("Tổng số buổi học", "Total sessions")}</dt>
           <dd>{portal.loading ? "…" : total_sessions}</dd>
@@ -620,7 +675,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
                   : t("Đủ điều kiện chuyên cần (≥ 75%)", "Meets requirement (≥ 75%)")}
           </p>
         </div>
-      </dl>
+      </dl>}
 
       {person && <Section title={t("Điểm theo học phần", "Course grades")}><p className="field-hint">{t("GPA theo tín chỉ đã có điểm", "Credit-weighted GPA")}: <strong>{transcript.loading ? "…" : transcript.data.weighted_gpa?.toFixed(2) ?? "–"}</strong> · {transcript.data.credits_graded} {t("tín chỉ", "credits")}</p><Field id="student-grade-course" label={t("Chọn học phần / Học kỳ", "Select course / semester")}><select id="student-grade-course" value={courseId} onChange={(e) => setCourseId(e.target.value)}><option value="">{t("Dữ liệu cũ chưa gắn học phần", "Legacy unassigned grades")}</option>{courses.data.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.name} · {c.semester}</option>)}</select></Field></Section>}
       {person && myGrade.data && (
@@ -843,7 +898,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
         </Section>
       )}
 
-      <Section
+      {(person || role !== "student") && <Section
         title={t("Chi tiết điểm danh theo từng buổi học", "Session-by-session attendance log")}
         description={t(
           "Lịch sử các buổi học thuộc hồ sơ. Tỷ lệ chuyên cần tính trên các buổi đã đánh giá, theo ngày bắt đầu buổi học.",
@@ -940,7 +995,7 @@ export const StudentPortalPage: React.FC<{ previewRole?: "admin" | "operator" | 
             {t("Chưa có buổi học nào phù hợp.", "No matching sessions found.")}
           </EmptyState>
         )}
-      </Section>
+      </Section>}
     </div>
   );
 };

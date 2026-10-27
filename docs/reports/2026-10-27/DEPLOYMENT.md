@@ -50,3 +50,13 @@ Việc trao đổi token Google hợp lệ bằng tài khoản cá nhân và tha
 - Backend đã tạo index mới, gồm index định danh và TOEIC. Đã bỏ `name_unique_active` sau đối chiếu định nghĩa với backup để cho phép các sinh viên khác nhau trùng họ tên. Hồ sơ trước/sau thao tác giống nhau; giữ index MSSV duy nhất.
 - Không xóa hồ sơ, không tự gộp tài khoản, không dựng danh sách lớp lịch sử từ lớp hiện tại. Năm phiên cũ thiếu snapshot roster vẫn được giữ nguyên.
 - Backup không được commit/upload. Không publish package npm/PyPI.
+
+## Thiết lập sinh viên có thể hoàn tất sau
+
+Bổ sung theo yêu cầu tiếp theo: sinh viên mới có thể chọn **Để sau** mà không nhập hồ sơ, chụp ảnh hoặc đồng ý xử lý sinh trắc. Lựa chọn được ghi nhớ trên trình duyệt theo từng tài khoản. Cổng sinh viên hiển thị **Học TOEIC ngay** và **Hoàn tất thiết lập** để quay lại bất cứ lúc nào. Dữ liệu học vụ và chức năng cần hồ sơ vẫn dựa vào hồ sơ thật trên server.
+
+Khi bỏ qua, camera dừng và các ảnh chưa lưu được giải phóng; không gửi yêu cầu tạo hồ sơ. Trình duyệt chặn localStorage vẫn bỏ qua được trong lượt truy cập hiện tại. Khi server có hồ sơ, cờ bỏ qua được xóa.
+
+Đã kiểm tra 48 frontend tests, production build và thao tác thật trên trang preview: bỏ qua với biểu mẫu trống, mở lại thiết lập và chuyển sang TOEIC. Ảnh dưới đây dùng dữ liệu mẫu trong preview.
+
+![Cổng sinh viên sau khi chọn Để sau](student-setup-later.png)
