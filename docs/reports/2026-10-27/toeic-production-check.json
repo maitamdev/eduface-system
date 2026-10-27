@@ -1,0 +1,109 @@
+{
+  "application_commit": "0e026d92f64f0113b8d9c3a9c3dfc1be324d4a23",
+  "checked_at_utc": "2026-10-27T05:58:06.938031+00:00",
+  "github": {
+    "sha": "0e026d92f64f0113b8d9c3a9c3dfc1be324d4a23",
+    "state": "success",
+    "statuses": [
+      {
+        "name": "Vercel",
+        "state": "success"
+      }
+    ],
+    "checks": [
+      {
+        "name": "Dependency vulnerability scan (pip-audit)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Syntax + import check",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Unit tests and real MongoDB transactions",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Dependency vulnerability scan (npm audit)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "validate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "TypeScript, unit tests, and build",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "backend": {
+    "health_status": 200,
+    "health": {
+      "status": "healthy",
+      "database": true,
+      "model": true
+    },
+    "login_status": 200,
+    "catalog": {
+      "version": "dhv-toeic-2026.10-v3",
+      "questions": 727,
+      "lessons": 27,
+      "topics": 38,
+      "exams": 8,
+      "vocab": 200,
+      "exam_question_ids_exposed": false
+    },
+    "curriculum_matches_local": true,
+    "catalog_cors": "https://www.dhv-edu.tech",
+    "review_status": 200,
+    "review_response_keys": [
+      "count",
+      "items",
+      "parts",
+      "window"
+    ],
+    "cors_preflight": {
+      "status": 200,
+      "origin": "https://www.dhv-edu.tech",
+      "headers": "authorization"
+    }
+  },
+  "frontend": {
+    "local_main": "/assets/main-CZBXL3su.js",
+    "production_main": "/assets/main-CZBXL3su.js",
+    "main_bytes_match": true,
+    "assets": [
+      {
+        "path": "toeic/so-tay-dang-bai.md",
+        "status": 200,
+        "type": "text/markdown; charset=utf-8",
+        "bytes_match": true
+      },
+      {
+        "path": "toeic/licenses/OCEAN-MIT-LICENSE.txt",
+        "status": 200,
+        "type": "text/plain; charset=utf-8",
+        "bytes_match": true
+      },
+      {
+        "path": "toeic/audio/dhv-x-graphic-conversation-1.wav",
+        "status": 200,
+        "type": "audio/wave",
+        "bytes_match": true
+      },
+      {
+        "path": "toeic/images/ocean-barcode-ai-v3.jpg",
+        "status": 200,
+        "type": "image/jpeg",
+        "bytes_match": true
+      }
+    ]
+  }
+}

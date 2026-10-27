@@ -50,6 +50,17 @@ Thử bằng trình duyệt thật với **tài khoản QA và MongoDB cục b�
 
 Ảnh là môi trường QA: model nhận diện khuôn mặt được bỏ qua trong fixture nên badge health toàn ứng dụng báo mất kết nối; API học tập vẫn chạy với auth/Mongo thật tại localhost. Đây không phải ảnh trạng thái production.
 
+## Xác nhận triển khai thực tế
+
+Mã ứng dụng `0e026d92f64f0113b8d9c3a9c3dfc1be324d4a23` đã được push lên `main` và triển khai tại [dhv-edu.tech](https://www.dhv-edu.tech/toeic). Bản ghi kiểm tra đầy đủ nằm trong [toeic-production-check.json](toeic-production-check.json).
+
+- Cả 6 kiểm tra GitHub CI và trạng thái triển khai Vercel đều thành công.
+- Backend production trả `healthy`, database và model đều sẵn sàng.
+- Catalog production xác nhận phiên bản `dhv-toeic-2026.10-v3`: 727 câu, 27 bài, 38 chuyên đề, 8 mã đề, 200 từ; toàn bộ lộ trình khớp dữ liệu cục bộ.
+- API sổ câu sai trả HTTP 200; request có xác thực và CORS preflight chấp nhận đúng origin `https://www.dhv-edu.tech`.
+- Bundle JavaScript production khớp SHA-256 với bản build cục bộ. Sổ tay, giấy phép và mẫu WAV/JPG mới đều trả HTTP 200, đúng loại nội dung và hash.
+- Kiểm tra production chỉ đọc học liệu và trạng thái; không tạo bài làm hoặc ghi điểm lên tài khoản thật.
+
 ## Giới hạn được công bố trong sản phẩm
 
 Audio tổng hợp có thể nghe lại và điều khiển thủ công; chưa khóa hai giai đoạn như thi thật. Các mã mini/phần kỹ năng dùng lại câu cùng ngân hàng, không phải 8 bộ câu hoàn toàn độc lập. Chưa chuẩn hóa độ khó hoặc quy đổi ra điểm TOEIC; học liệu chưa có thẩm định giáo viên độc lập. Việc giữ số câu theo 7 Part không được mô tả là tái tạo đầy đủ mọi quy tắc dạng con của đề ETS.
