@@ -1,7 +1,10 @@
 .toeic-lexicon-filters{grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1.3fr) minmax(0,.75fr)}
+.toeic-lexicon-header-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .toeic-lexicon-mode{margin:0}
 .toeic-lexicon .toeic-flashcard,.toeic-lexicon .toeic-word-list{min-width:0}
 .toeic-lexicon .toeic-flashcard h3{overflow-wrap:anywhere;margin-bottom:6px}
+.toeic-vi-headword-sub{margin:0 0 8px;font-size:15px;color:var(--toeic-green)}
+.toeic-inflections,.toeic-dict-inflections{margin:0 0 12px;color:var(--ui-muted);font-style:italic}
 .toeic-phonetic-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0 18px}
 .toeic-ipa{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:15px;color:var(--toeic-green);background:rgba(16,185,129,.1);padding:4px 10px;border-radius:999px;font-weight:600}
 .toeic-pos-list{display:inline-flex;flex-wrap:wrap;gap:6px}
@@ -21,6 +24,10 @@
 .toeic-alphabet-bar .toeic-reset-filter{margin-left:auto;display:inline-flex;align-items:center;gap:5px;color:var(--toeic-green);border-color:rgba(16,185,129,.35)}
 .toeic-word-item-main{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;text-align:left}
 .toeic-word-ipa{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:var(--ui-muted)}
+.toeic-word-vi{font-size:13px;color:var(--ui-text);opacity:.9}
+.toeic-word-vi-lead{color:var(--toeic-green)}
+.toeic-word-en-sub{font-size:13px;color:var(--ui-muted);font-weight:600}
+.toeic-dict-en-term{font-size:16px;color:var(--toeic-green)}
 .toeic-word-item-meta{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .toeic-word-pos{font-size:11px;color:var(--ui-muted)}
 .toeic-status-pill{font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(148,163,184,.14)}

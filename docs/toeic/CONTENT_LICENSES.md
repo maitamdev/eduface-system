@@ -22,13 +22,19 @@ Code frontend/backend và script biên soạn TOEIC được viết trực tiế
 
 Xem [phạm vi, kiểm tra và cách tái tạo](MO_RONG_ON_TAP.md). MIT của phần được nhập không thay thế giấy phép của toàn bộ EduFace hoặc quyền đối với các tài liệu bên ngoài được dẫn link.
 
-## NGSL 1.2, TOEIC Service List 1.2, Vietnamese Wiktionary & ipa-dict · CC BY-SA 4.0 & MIT
+## Đại Từ Điển Song Ngữ Anh–Việt 147.245 Mục Từ (NGSL 1.2, TSL 1.2, thichhoc-dict v0.9.0, Vietnamese Wiktionary & ipa-dict) · CC BY-SA 4.0 & MIT
 
-- Tác giả danh sách tần suất & định nghĩa tiếng Anh: Charles Browne, Brent Culligan, Joseph Phillips ([NGSL 1.2](https://www.newgeneralservicelist.com/new-general-service-list)) và Charles Browne, Brent Culligan ([TSL 1.2](https://www.newgeneralservicelist.com/toeic-service-list)) theo [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
-- Nghĩa tiếng Việt (`meaning_vi`) và từ loại (`pos`): trích xuất từ [Vietnamese Wiktionary](https://vi.wiktionary.org/) qua [Kaikki.org / Wiktextract](https://kaikki.org/) (`CC BY-SA 4.0`) kết hợp biên tập ngữ cảnh TOEIC của DHV (`CC BY-SA 4.0`).
-- Phiên âm Quốc tế tiếng Anh Mỹ (`ipa`): từ [open-dict-data/ipa-dict (`en_US`)](https://github.com/open-dict-data/ipa-dict) theo giấy phép **MIT** ([IPA-MIT-LICENSE.txt](../../frontend/public/toeic/licenses/IPA-MIT-LICENSE.txt)).
-- Bản thông báo, ghi nhận thay đổi và SHA-256 của toàn bộ file nguồn được lưu tại [backend/data/toeic/vendor/ngsl-tsl/LICENSE.md](../../backend/data/toeic/vendor/ngsl-tsl/LICENSE.md) và [frontend/public/toeic/licenses/NGSL-TSL.md](../../frontend/public/toeic/licenses/NGSL-TSL.md).
-- Dữ liệu đã tổng hợp tại `backend/data/toeic/lexicon.json`, bản tải công khai `/toeic/lexicon.json` và [Sổ tay từ vựng song ngữ](SO_TAY_TU_VUNG.md) (`/toeic/so-tay-tu-vung-song-ngu.md`, chia sẻ theo CC BY-SA 4.0): gồm **4.060 từ riêng biệt** (2.809 từ xếp hạng NGSL, 1.250 từ xếp hạng TSL, mục `born` bổ sung không xếp hạng trong bảng định nghĩa TSL và `criteria` xuất hiện ở cả hai bảng định nghĩa), tất cả đều có đầy đủ `ipa`, `pos`, `meaning_vi` và `definitions`. Sáu mục xếp hạng TSL thiếu định nghĩa tiếng Anh trong file XLSX gốc (`by-law`, `café`, `e-book`, `entrée`, `résumé`, `smartphone`) được DHV bổ sung và gắn cờ `adapted_by_dhv: true`.
+- **Ghi nguồn bắt buộc `thichhoc-dict` (`CC BY-SA 4.0`):**
+  > Dữ liệu từ điển: Từ điển Anh–Việt thichhoc.com (thichhoc-dict), giấy phép CC BY-SA 4.0.
+  > https://github.com/thichhoc-org/thichhoc-dict
+  > Nguồn gốc: WordNet 3.1 (Princeton), CMUdict (CMU), Wiktionary.
+  > Đã chỉnh sửa dữ liệu.
+- Tác giả danh sách tần suất & định nghĩa tiếng Anh trọng tâm: Charles Browne, Brent Culligan, Joseph Phillips ([NGSL 1.2](https://www.newgeneralservicelist.com/new-general-service-list)) và Charles Browne, Brent Culligan ([TSL 1.2](https://www.newgeneralservicelist.com/toeic-service-list)) theo [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- Từ điển mở rộng (`143.185` mục từ bổ sung từ `155.139` mục từ theo từ loại, kèm biến thể từ và mục từ ghi nguồn `thichhoc`): [thichhoc-org/thichhoc-dict (`v0.9.0`)](https://github.com/thichhoc-org/thichhoc-dict) theo [CC BY-SA 4.0](../../frontend/public/toeic/licenses/THICHHOC-LICENSE-DATA.md) (kế thừa từ Princeton WordNet 3.1, CMUdict BSD 2-clause và Wiktionary CC BY-SA).
+- Nghĩa tiếng Việt (`meaning_vi`) và từ loại (`pos`) cho 4.060 từ trọng tâm: trích xuất từ [Vietnamese Wiktionary](https://vi.wiktionary.org/) qua [Kaikki.org / Wiktextract](https://kaikki.org/) (`CC BY-SA 4.0`) kết hợp biên tập ngữ cảnh TOEIC của DHV (`CC BY-SA 4.0`).
+- Phiên âm Quốc tế tiếng Anh Mỹ (`ipa`): từ CMUdict (`thichhoc-dict`) và [open-dict-data/ipa-dict (`en_US`)](https://github.com/open-dict-data/ipa-dict) theo giấy phép **MIT** ([IPA-MIT-LICENSE.txt](../../frontend/public/toeic/licenses/IPA-MIT-LICENSE.txt)).
+- Bản thông báo, ghi nhận thay đổi và SHA-256 của toàn bộ file nguồn được lưu tại [backend/data/toeic/vendor/ngsl-tsl/LICENSE.md](../../backend/data/toeic/vendor/ngsl-tsl/LICENSE.md), [THICHHOC-LICENSE-DATA.md](../../backend/data/toeic/vendor/ngsl-tsl/THICHHOC-LICENSE-DATA.md) và [frontend/public/toeic/licenses/NGSL-TSL.md](../../frontend/public/toeic/licenses/NGSL-TSL.md).
+- Dữ liệu đã tổng hợp tại `backend/data/toeic/lexicon.json` + `backend/data/toeic/lexicon_100k.json.gz`, bản tải công khai `/toeic/lexicon.json` + `/toeic/lexicon_100k.json.gz` và [Sổ tay từ vựng song ngữ](SO_TAY_TU_VUNG.md) (`/toeic/so-tay-tu-vung-song-ngu.md`, chia sẻ theo CC BY-SA 4.0): gồm **147.245 mục từ độc lập** (`4.060` từ trọng tâm NGSL + TSL gồm 2.809 từ xếp hạng NGSL, 1.250 từ xếp hạng TSL, mục `born` bổ sung và `criteria` chung + `143.185` mục từ mở rộng từ `thichhoc-dict`), tất cả đều có đầy đủ `ipa`, `pos`, `meaning_vi` và `definitions`. Sáu mục xếp hạng TSL thiếu định nghĩa tiếng Anh trong file XLSX gốc (`by-law`, `café`, `e-book`, `entrée`, `résumé`, `smartphone`) được DHV bổ sung và gắn cờ `adapted_by_dhv: true`.
 
 ## py-fsrs 6.3.2
 
@@ -36,7 +42,7 @@ Xem [phạm vi, kiểm tra và cách tái tạo](MO_RONG_ON_TAP.md). MIT của p
 - Nguồn: https://github.com/open-spaced-repetition/py-fsrs
 - Giấy phép: MIT.
 - Bản thông báo đi kèm gói cài đã được giữ nguyên tại [FSRS-MIT-LICENSE.txt](FSRS-MIT-LICENSE.txt).
-- Phạm vi sử dụng: lên lịch ôn từ trên backend cho cả 200 thẻ tiếng Việt DHV và 4.060 từ NGSL/TSL; `desired_retention=0.9`, tắt fuzzing để lịch có thể kiểm thử nhất quán. Đây không phải tỷ lệ ghi nhớ được bảo đảm cho từng người học.
+- Phạm vi sử dụng: lên lịch ôn từ trên backend cho cả 200 thẻ tiếng Việt DHV và 147.245 mục từ đại từ điển song ngữ; `desired_retention=0.9`, tắt fuzzing để lịch có thể kiểm thử nhất quán. Đây không phải tỷ lệ ghi nhớ được bảo đảm cho từng người học.
 
 ## Tài nguyên dẫn link và các nguồn không nhập
 

@@ -14,7 +14,7 @@ async def test_lexicon_pagination_search_and_private_progress(live):
     assert (await http.get("/api/toeic/lexicon")).status_code == 403
     first = (await http.get("/api/toeic/lexicon?deck=ngsl&limit=30", headers=headers)).json()
     second = (await http.get("/api/toeic/lexicon?deck=ngsl&limit=30&offset=30", headers=headers)).json()
-    assert first["total"] == 2809 and first["word_count"] == 4060
+    assert first["total"] == 2809 and first["word_count"] == 147245
     assert len(first["items"]) == len(second["items"]) == 30
     assert not {w["id"] for w in first["items"]} & {w["id"] for w in second["items"]}
     assert first["items"][0]["term"] == "the" and first["license"] == "CC BY-SA 4.0"
@@ -27,7 +27,7 @@ async def test_lexicon_pagination_search_and_private_progress(live):
     legacy = (await http.get("/api/toeic/vocabulary", headers=headers)).json()
     assert len(legacy) == 200 and all(not w["id"].startswith("lex-") for w in legacy)
     catalog = (await http.get("/api/toeic/catalog", headers=headers)).json()
-    assert catalog["lexicon_count"] == 4060 and catalog["vocabulary_count"] == 200
+    assert catalog["lexicon_count"] == 147245 and catalog["vocabulary_count"] == 200
 
 
 async def test_new_lexicon_review_is_idempotent_private_and_respects_due_date(live, monkeypatch):
@@ -60,7 +60,7 @@ async def test_new_lexicon_review_is_idempotent_private_and_respects_due_date(li
     assert again.status_code == 200 and again.json()["version"] == 2
 
 
-@pytest.mark.parametrize("query", ["limit=51", "limit=0", "offset=-1", "offset=10001", "deck=unknown", "state=unknown", "q=" + "a" * 121])
+@pytest.mark.parametrize("query", ["limit=51", "limit=0", "offset=-1", "offset=200001", "deck=unknown", "state=unknown", "q=" + "a" * 121])
 async def test_lexicon_rejects_unbounded_or_invalid_filters(live, query):
     db, http = live
     _, headers = await student(db)

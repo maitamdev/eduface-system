@@ -1,10 +1,10 @@
-# Sổ Tay & Từ Điển Song Ngữ Anh–Việt TOEIC (NGSL 1.2 + TSL 1.2)
+# Đại Từ Điển Song Ngữ Anh–Việt & Sổ Tay Từ Vựng TOEIC (147.245 Mục Từ)
 
-> **Giấy phép & Ghi nguồn:** Dữ liệu từ vựng trong sổ tay này kết hợp **NGSL 1.2** (Charles Browne, Brent Culligan, Joseph Phillips — `CC BY-SA 4.0`), **TOEIC Service List 1.2** (Charles Browne, Brent Culligan — `CC BY-SA 4.0`), nghĩa tiếng Việt từ **Vietnamese Wiktionary / Kaikki.org** & biên tập ngữ cảnh **DHV English Studio** (`CC BY-SA 4.0`), cùng phiên âm Mỹ từ **open-dict-data/ipa-dict** (`MIT`). Bản tổng hợp được phát hành theo giấy phép [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+> **Giấy phép & Ghi nguồn:** Dữ liệu từ điển song ngữ trên hệ thống kết hợp **NGSL 1.2** (Charles Browne, Brent Culligan, Joseph Phillips — `CC BY-SA 4.0`), **TOEIC Service List 1.2** (Charles Browne, Brent Culligan — `CC BY-SA 4.0`), **Từ điển Anh–Việt thichhoc.com (`thichhoc-dict v0.9.0`, `CC BY-SA 4.0`, nguồn gốc: Princeton WordNet 3.1, CMUdict, Wiktionary)**, nghĩa tiếng Việt từ **Vietnamese Wiktionary / Kaikki.org** & biên tập ngữ cảnh **DHV English Studio** (`CC BY-SA 4.0`), cùng phiên âm Mỹ từ **open-dict-data/ipa-dict** (`MIT`). Bản tổng hợp được phát hành theo giấy phép [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 ## Tổng quan
-- **Tổng số mục từ độc lập trên hệ thống:** `4.060` từ (`2.809` từ nền tảng NGSL + `1.250` từ xếp hạng TSL + `2` mục từ bổ sung TSL, trong đó từ `criteria` xuất hiện ở cả hai bộ).
-- **Đầy đủ 100% thông tin tra cứu:** Từ vựng (`term`), Phiên âm Quốc tế tiếng Anh Mỹ (`IPA`), Từ loại (`POS`), Nghĩa tiếng Việt (`meaning_vi`), Định nghĩa tiếng Anh gốc (`definitions`) và câu ví dụ ngữ cảnh (với nhóm từ trọng tâm).
+- **Tổng số mục từ độc lập trên hệ thống:** `147.245` mục từ (`4.060` từ trọng tâm NGSL 1.2 + TSL 1.2 kết hợp `143.185` mục từ mở rộng từ `thichhoc-dict` v0.9.0).
+- **Đầy đủ 100% thông tin tra cứu:** Từ vựng (`term`), Phiên âm Quốc tế tiếng Anh Mỹ (`IPA`), Từ loại (`POS`), Nghĩa tiếng Việt (`meaning_vi`), Định nghĩa tiếng Anh gốc (`definitions`), các dạng biến thể từ (`inflections`) và câu ví dụ ngữ cảnh (với nhóm từ trọng tâm).
 
 ---
 
@@ -1269,7 +1269,7 @@
 
 ## Phần 2 · 600 Từ vựng Nền tảng Tần suất Cao nhất (NGSL 1.2 Top 600)
 
-*(Trọn bộ 2.809 từ NGSL và 1.252 từ TSL có thể tra cứu trực tiếp theo chữ cái A–Z, từ loại, nghĩa tiếng Việt và ôn thẻ FSRS trong mục **Từ vựng → Sổ tra từ song ngữ 4.060 từ** trên ứng dụng)*
+*(Trọn bộ 147.245 mục từ song ngữ Anh–Việt và Việt–Anh có thể tra cứu trực tiếp theo chữ cái A–Z, từ loại, nghĩa tiếng Việt và ôn thẻ FSRS trong mục **Từ vựng → Đại từ điển Anh–Việt · 147.245 từ** trên ứng dụng)*
 
 | Hạng NGSL | Từ vựng | Phiên âm (IPA) | Từ loại | Nghĩa tiếng Việt | Định nghĩa tiếng Anh (NGSL) |
 |---:|---|---|---|---|---|

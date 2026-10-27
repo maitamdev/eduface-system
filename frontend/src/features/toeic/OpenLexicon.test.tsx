@@ -6,16 +6,17 @@ import type {LexiconCard,LexiconFilters,LexiconPage} from "./api";
 const api=vi.hoisted(()=>({lexicon:vi.fn(),review:vi.fn()}));
 vi.mock("./api",async original=>({...await original<typeof import("./api")>(),toeicApi:api}));
 const word:LexiconCard={id:"lex-test",lesson_id:"open-lexicon",term:"smartphone",ipa:"/ˈsmɑɹtˌfoʊn/",pos:["n"],meaning:"điện thoại thông minh",meaning_vi:"điện thoại thông minh",example:"",version:0,due:null,reviews:0,meaning_language:"en",definitions:[{source_id:"tsl",text:"a mobile phone that runs applications",source_term:"smartphone",adapted_by_dhv:true}],lists:[{id:"tsl",rank:900,supplemental:false}]};
-const page=(items:LexiconCard[]=[word],total=items.length):LexiconPage=>({version:"test",items,total,word_count:4060,offset:0,limit:30,due_count:0,new_count:total,license:"CC BY-SA 4.0",license_url:"https://creativecommons.org/licenses/by-sa/4.0/",sources:[],download_url:"/toeic/lexicon.json",handbook_url:"/toeic/so-tay-tu-vung-song-ngu.md",attribution_url:"/toeic/licenses/NGSL-TSL.md"});
+const page=(items:LexiconCard[]=[word],total=items.length):LexiconPage=>({version:"test",items,total,word_count:147245,offset:0,limit:30,due_count:0,new_count:total,license:"CC BY-SA 4.0",license_url:"https://creativecommons.org/licenses/by-sa/4.0/",sources:[],download_url:"/toeic/lexicon.json",handbook_url:"/toeic/so-tay-tu-vung-song-ngu.md",attribution_url:"/toeic/licenses/NGSL-TSL.md"});
 beforeEach(()=>{api.lexicon.mockReset();api.review.mockReset();api.lexicon.mockResolvedValue(page());});
 afterEach(cleanup);
 
-it("shows IPA and POS, reveals bilingual meanings before rating, and supports Dictionary Book mode",async()=>{
+it("shows IPA, POS, and Vietnamese in the index, reveals card answer before rating, and supports VI-EN & Book modes",async()=>{
  render(<OpenLexicon preview onReviewed={vi.fn()}/>);
  await screen.findByRole("heading",{name:"smartphone"});
  expect(screen.getAllByText("/ˈsmɑɹtˌfoʊn/").length).toBeGreaterThan(0);
+ expect(screen.getByText(/— điện thoại thông minh/)).toBeTruthy();
+ expect(screen.queryByRole("heading",{name:"Nghĩa tiếng Việt"})).toBeNull();
  expect(screen.queryByText(word.definitions[0].text)).toBeNull();
- expect(screen.queryByText("điện thoại thông minh")).toBeNull();
  expect(screen.queryByRole("button",{name:"Nhớ được"})).toBeNull();
  fireEvent.click(screen.getByRole("button",{name:/Hiện định nghĩa tiếng Anh/}));
  expect(screen.getByRole("heading",{name:"Nghĩa tiếng Việt"})).toBeTruthy();
@@ -25,10 +26,13 @@ it("shows IPA and POS, reveals bilingual meanings before rating, and supports Di
  expect(screen.getByText(/định nghĩa do DHV bổ sung/)).toBeTruthy();
  expect(screen.getByRole("button",{name:"Nhớ được"}).hasAttribute("disabled")).toBe(true);
  expect(screen.getByRole("link",{name:/Tải sổ tay từ vựng song ngữ/}).getAttribute("href")).toBe("/toeic/so-tay-tu-vung-song-ngu.md");
- expect(screen.getByRole("link",{name:/Tải dữ liệu từ vựng/}).getAttribute("href")).toBe("/toeic/lexicon.json");
+ expect(screen.getByRole("link",{name:/Tải dữ liệu từ vựng trọng tâm JSON/}).getAttribute("href")).toBe("/toeic/lexicon.json");
+ expect(screen.getByRole("link",{name:/Tải gói 143\.185 từ mở rộng/}).getAttribute("href")).toBe("/toeic/lexicon_100k.json.gz");
+ fireEvent.click(screen.getByRole("button",{name:"Việt → Anh"}));
+ expect(screen.getByRole("heading",{name:"điện thoại thông minh"})).toBeTruthy();
  fireEvent.click(screen.getByRole("button",{name:/Sổ tra từ song ngữ/}));
  expect(screen.getByLabelText("Trang sổ tra từ song ngữ Anh Việt")).toBeTruthy();
- expect(screen.getByText("điện thoại thông minh")).toBeTruthy();
+ expect(screen.getAllByText("điện thoại thông minh").length).toBeGreaterThan(0);
  expect(api.review).not.toHaveBeenCalled();
 });
 

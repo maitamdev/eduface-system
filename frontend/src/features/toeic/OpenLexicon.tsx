@@ -8,6 +8,7 @@ const alphabet = ["all", ..."abcdefghijklmnopqrstuvwxyz".split("")];
 
 export function OpenLexicon({preview, onReviewed}: {preview: boolean; onReviewed: () => void}) {
   const [viewMode, setViewMode] = useState<"flashcard" | "book">("flashcard");
+  const [direction, setDirection] = useState<"en-vi" | "vi-en">("en-vi");
   const [deck, setDeck] = useState<LexiconFilters["deck"]>("all");
   const [pos, setPos] = useState<NonNullable<LexiconFilters["pos"]>>("all");
   const [letter, setLetter] = useState<string>("all");
@@ -100,23 +101,36 @@ export function OpenLexicon({preview, onReviewed}: {preview: boolean; onReviewed
     return <small className={`toeic-status-pill ${tone}`}>{label}</small>;
   }
 
-  return <section className="toeic-lexicon" aria-label="Sổ tra từ và từ điển song ngữ Anh Việt NGSL và TOEIC Service List">
+  function renderListLabel(item: LexiconCard) {
+    return item.lists.map(s => {
+      if (s.id === "thichhoc") return `THICHHOC · Tầng ${s.tier || 4}`;
+      return `${s.id.toUpperCase()}${s.rank ? ` #${s.rank}` : " · bổ sung, chưa xếp hạng"}`;
+    }).join(" / ");
+  }
+
+  return <section className="toeic-lexicon" aria-label="Đại từ điển song ngữ Anh Việt 147.245 từ kèm NGSL và TOEIC Service List">
     <div className="toeic-section-heading">
       <div>
-        <span className="toeic-eyebrow">SỔ TRA TỪ & TỪ ĐIỂN SONG NGỮ ANH–VIỆT · NGSL + TOEIC SERVICE LIST</span>
-        <h2>Từ nền tảng đến ngôn ngữ công việc.</h2>
-        <p>Tra cứu song ngữ Anh–Việt (có hoặc không dấu), xem phiên âm IPA chuẩn Mỹ, lọc theo từ loại hoặc bảng chữ cái A–Z và ôn thẻ nhớ chủ động FSRS.</p>
+        <span className="toeic-eyebrow">ĐẠI TỪ ĐIỂN SONG NGỮ ANH–VIỆT & VIỆT–ANH · 147.245 MỤC TỪ (NGSL + TSL + THICHHOC)</span>
+        <h2>Từ nền tảng đến 147.245 mục từ song ngữ.</h2>
+        <p>Tra cứu hai chiều Anh–Việt và Việt–Anh (có hoặc không dấu), xem nghĩa tiếng Việt trực tiếp kèm phiên âm IPA chuẩn Mỹ, biến thể từ loại, lọc theo chữ cái A–Z và ôn thẻ nhớ chủ động FSRS.</p>
       </div>
-      <div className="toeic-roadmap-mode toeic-lexicon-mode" role="group" aria-label="Chế độ xem sổ từ">
-        <button type="button" aria-pressed={viewMode === "flashcard"} onClick={() => setViewMode("flashcard")}><Layers3 size={16}/>Thẻ lật FSRS</button>
-        <button type="button" aria-pressed={viewMode === "book"} onClick={() => setViewMode("book")}><BookOpen size={16}/>Sổ tra từ song ngữ</button>
+      <div className="toeic-lexicon-header-controls">
+        <div className="toeic-roadmap-mode toeic-lexicon-mode" role="group" aria-label="Chiều hiển thị song ngữ">
+          <button type="button" aria-pressed={direction === "en-vi"} onClick={() => setDirection("en-vi")}>Anh → Việt</button>
+          <button type="button" aria-pressed={direction === "vi-en"} onClick={() => setDirection("vi-en")}>Việt → Anh</button>
+        </div>
+        <div className="toeic-roadmap-mode toeic-lexicon-mode" role="group" aria-label="Chế độ xem sổ từ">
+          <button type="button" aria-pressed={viewMode === "flashcard"} onClick={() => setViewMode("flashcard")}><Layers3 size={16}/>Thẻ lật FSRS</button>
+          <button type="button" aria-pressed={viewMode === "book"} onClick={() => setViewMode("book")}><BookOpen size={16}/>Sổ tra từ song ngữ</button>
+        </div>
       </div>
     </div>
 
     <div className="toeic-vocab-filters toeic-lexicon-filters">
-      <label>Bộ từ<select value={deck} disabled={busy} onChange={e => {setDeck(e.target.value as LexiconFilters["deck"]); setOffset(0);}}><option value="all">NGSL + TOEIC Service List (4.060 từ)</option><option value="ngsl">NGSL · 2.809 từ nền tảng</option><option value="tsl">TSL · 1.250 từ công sở + 2 mục bổ sung</option></select></label>
+      <label>Bộ từ<select value={deck} disabled={busy} onChange={e => {setDeck(e.target.value as LexiconFilters["deck"]); setOffset(0);}}><option value="all">Đại từ điển Anh–Việt (147.245 từ)</option><option value="core">Trọng tâm TOEIC · NGSL + TSL (4.060 từ)</option><option value="ngsl">NGSL · 2.809 từ nền tảng</option><option value="tsl">TSL · 1.250 từ công sở + 2 mục bổ sung</option><option value="thichhoc">Từ điển mở rộng thichhoc (143.185 từ)</option></select></label>
       <label>Từ loại<select value={pos} disabled={busy} onChange={e => {setPos(e.target.value as NonNullable<LexiconFilters["pos"]>); setOffset(0);}}><option value="all">Tất cả từ loại</option><option value="n">Danh từ (Noun)</option><option value="v">Động từ (Verb)</option><option value="adj">Tính từ (Adjective)</option><option value="adv">Trạng từ (Adverb)</option><option value="func">Từ chức năng (Prep / Conj / Pron)</option></select></label>
-      <label>Tìm từ (Anh – Việt) hoặc định nghĩa<input aria-label="Tìm từ hoặc định nghĩa tiếng Anh" value={search} maxLength={120} disabled={busy} onChange={e => setSearch(e.target.value)} placeholder="invoice, hóa đơn, cuộc hẹn, café…" type="search"/></label>
+      <label>Tìm từ (Anh – Việt / Việt – Anh) hoặc định nghĩa<input aria-label="Tìm từ hoặc định nghĩa tiếng Anh" value={search} maxLength={120} disabled={busy} onChange={e => setSearch(e.target.value)} placeholder="invoice, hóa đơn, hợp đồng, lịch trình, café…" type="search"/></label>
       <label>Trạng thái thẻ<select value={state} disabled={busy} onChange={e => {setState(e.target.value as LexiconFilters["state"]); setOffset(0);}}><option value="all">Tất cả</option><option value="due">Đến hạn ôn</option><option value="new">Chưa học</option><option value="learned">Đã bắt đầu học</option></select></label>
     </div>
 
@@ -131,20 +145,28 @@ export function OpenLexicon({preview, onReviewed}: {preview: boolean; onReviewed
 
     {error && <div className="toeic-alert" role="alert">{error}<button disabled={busy} onClick={() => setReload(n => n + 1)}>Tải lại kho từ</button></div>}
     {notice && <p role="status" className="toeic-muted">{notice}</p>}
-    {loading || pendingSearch ? <p role="status">Đang tìm trong sổ từ song ngữ…</p> : data && <>
-      <p className="toeic-muted" role="status">{data.total.toLocaleString("vi-VN")} mục từ khớp bộ lọc · {data.due_count} thẻ đến hạn · {data.new_count} thẻ mới</p>
+    {loading || pendingSearch ? <p role="status">Đang tìm trong đại từ điển 147.245 mục từ…</p> : data && <>
+      <p className="toeic-muted" role="status">{data.total.toLocaleString("vi-VN")} mục từ khớp bộ lọc · {data.due_count} thẻ đến hạn · {data.new_count.toLocaleString("vi-VN")} thẻ mới</p>
 
       {viewMode === "flashcard" ? (
         <div className="toeic-vocab-layout">
           <section className="toeic-flashcard" aria-label="Thẻ từ đang chọn">
             {card ? <>
-              <span className="toeic-eyebrow">{card.lists.map(s => `${s.id.toUpperCase()}${s.rank ? ` #${s.rank}` : " · bổ sung, chưa xếp hạng"}`).join(" / ")}</span>
-              <h3 lang="en">{card.term}</h3>
+              <span className="toeic-eyebrow">{renderListLabel(card)}</span>
+              {direction === "vi-en" ? (
+                <>
+                  <h3>{card.meaning_vi || card.meaning}</h3>
+                  <p className="toeic-vi-headword-sub" lang="en">Từ tiếng Anh: <strong>{card.term}</strong></p>
+                </>
+              ) : (
+                <h3 lang="en">{card.term}</h3>
+              )}
               <div className="toeic-phonetic-row">
                 {card.ipa && <span className="toeic-ipa" aria-label="Phiên âm IPA">{card.ipa}</span>}
                 {renderPosBadges(card)}
                 <button className="toeic-button secondary" onClick={() => speakTerm(card.term)}><Volume2 size={17}/>Nghe từ</button>
               </div>
+              {card.inflections?.length ? <p className="toeic-inflections" lang="en"><small>Biến thể từ: {card.inflections.join(", ")}</small></p> : null}
               {revealed === card.id ? <div className="toeic-card-answer">
                 {(card.meaning_vi || card.meaning) && <div className="toeic-bilingual-vi">
                   <h4>Nghĩa tiếng Việt</h4>
@@ -161,14 +183,24 @@ export function OpenLexicon({preview, onReviewed}: {preview: boolean; onReviewed
             </> : <><h3>{state === "due" ? "Chưa có thẻ đến hạn trong bộ lọc." : "Không có từ khớp bộ lọc."}</h3><p>Đổi danh sách, chữ cái, từ loại hoặc từ khóa để tiếp tục học.</p></>}
           </section>
           <aside className="toeic-word-list">
-            <h3>Mục lục trang này · {items.length} từ</h3>
-            <p>Thứ hạng phản ánh tần suất xuất hiện trong tiếng Anh tổng quát (NGSL) và công sở (TSL).</p>
+            <h3>Mục lục song ngữ trang này · {items.length} từ</h3>
+            <p>Hiển thị trực tiếp từ tiếng Anh, phiên âm IPA và nghĩa tiếng Việt. Bấm vào từ bất kỳ để mở thẻ chi tiết.</p>
             <div>
               {items.map(word => (
                 <button key={word.id} disabled={busy} className={card?.id === word.id ? "active" : ""} aria-pressed={card?.id === word.id} onClick={() => {setSelected(word.id); setRevealed(undefined);}}>
                   <div className="toeic-word-item-main">
-                    <strong lang="en">{word.term}</strong>
-                    {word.ipa && <span className="toeic-word-ipa">{word.ipa}</span>}
+                    {direction === "vi-en" ? (
+                      <>
+                        <strong className="toeic-word-vi-lead">{word.meaning_vi || word.meaning}</strong>
+                        <span className="toeic-word-en-sub" lang="en">→ {word.term} {word.ipa || ""}</span>
+                      </>
+                    ) : (
+                      <>
+                        <strong lang="en">{word.term}</strong>
+                        {word.ipa && <span className="toeic-word-ipa">{word.ipa}</span>}
+                        {(word.meaning_vi || word.meaning) && <span className="toeic-word-vi">— {word.meaning_vi || word.meaning}</span>}
+                      </>
+                    )}
                   </div>
                   <div className="toeic-word-item-meta">
                     {word.pos?.length ? <span className="toeic-word-pos">{word.pos.map(p => posNames[p] || p).join(", ")}</span> : null}
@@ -188,9 +220,16 @@ export function OpenLexicon({preview, onReviewed}: {preview: boolean; onReviewed
                 <article key={word.id} className="toeic-dict-entry">
                   <header className="toeic-dict-entry-header">
                     <div>
-                      <span className="toeic-eyebrow">{word.lists.map(s => `${s.id.toUpperCase()}${s.rank ? ` #${s.rank}` : " · bổ sung"}`).join(" / ")}</span>
+                      <span className="toeic-eyebrow">{renderListLabel(word)}</span>
                       <div className="toeic-dict-title-row">
-                        <h3 lang="en">{word.term}</h3>
+                        {direction === "vi-en" ? (
+                          <>
+                            <h3>{word.meaning_vi || word.meaning}</h3>
+                            <strong lang="en" className="toeic-dict-en-term">{word.term}</strong>
+                          </>
+                        ) : (
+                          <h3 lang="en">{word.term}</h3>
+                        )}
                         {word.ipa && <span className="toeic-ipa">{word.ipa}</span>}
                       </div>
                       {renderPosBadges(word)}
@@ -204,6 +243,7 @@ export function OpenLexicon({preview, onReviewed}: {preview: boolean; onReviewed
                     <div className="toeic-dict-vi">
                       <strong>Nghĩa tiếng Việt:</strong> <span>{word.meaning_vi || word.meaning}</span>
                     </div>
+                    {word.inflections?.length ? <p className="toeic-dict-inflections" lang="en"><small>Biến thể: {word.inflections.join(", ")}</small></p> : null}
                     <div className="toeic-dict-en">
                       {word.definitions.map(d => (
                         <p key={d.source_id} lang="en"><small>{d.source_id.toUpperCase()}:</small> {d.text}</p>
@@ -225,12 +265,14 @@ export function OpenLexicon({preview, onReviewed}: {preview: boolean; onReviewed
       )}
     </>}
     <div className="toeic-note toeic-lexicon-credit">
-      <strong>4.060 mục từ song ngữ Anh–Việt kèm IPA & từ loại, giữ đầy đủ ghi nguồn mở.</strong>
-      <p>Danh sách từ, thứ hạng và định nghĩa tiếng Anh từ <strong>NGSL 1.2</strong> (Charles Browne, Brent Culligan, Joseph Phillips) và <strong>TOEIC Service List 1.2</strong> (Charles Browne, Brent Culligan). Nghĩa tiếng Việt và từ loại từ <strong>Vietnamese Wiktionary / Kaikki.org</strong> & biên tập ngữ cảnh <strong>DHV English Studio</strong> (CC BY-SA 4.0); phiên âm tiếng Anh Mỹ từ <strong>open-dict-data/ipa-dict</strong> (MIT).</p>
-      <p>Dữ liệu và bản điều chỉnh được chia sẻ theo <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> (<a href="/toeic/licenses/NGSL-TSL.md" target="_blank" rel="noopener noreferrer">Xem nguồn, giấy phép và thay đổi</a> · <a href="/toeic/licenses/IPA-MIT-LICENSE.txt" target="_blank" rel="noopener noreferrer">Giấy phép MIT cho IPA</a>).</p>
+      <strong>147.245 mục từ song ngữ Anh–Việt & Việt–Anh kèm IPA, từ loại và biến thể từ — giữ đầy đủ ghi nguồn mở.</strong>
+      <p>Dữ liệu từ điển: <strong>Từ điển Anh–Việt thichhoc.com (thichhoc-dict)</strong>, giấy phép <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> (<a href="https://github.com/thichhoc-org/thichhoc-dict" target="_blank" rel="noopener noreferrer">github.com/thichhoc-org/thichhoc-dict</a>). Nguồn gốc: <strong>WordNet 3.1 (Princeton)</strong>, <strong>CMUdict (CMU)</strong>, <strong>Wiktionary</strong>. Đã chỉnh sửa dữ liệu.</p>
+      <p>Danh sách 4.060 từ trọng tâm, thứ hạng và định nghĩa tiếng Anh từ <strong>NGSL 1.2</strong> (Charles Browne, Brent Culligan, Joseph Phillips) và <strong>TOEIC Service List 1.2</strong> (Charles Browne, Brent Culligan). Nghĩa tiếng Việt bổ sung từ <strong>Vietnamese Wiktionary / Kaikki.org</strong> & biên tập ngữ cảnh <strong>DHV English Studio</strong> (CC BY-SA 4.0); phiên âm tiếng Anh Mỹ từ <strong>CMUdict</strong> & <strong>open-dict-data/ipa-dict</strong> (MIT).</p>
+      <p>Tài liệu giấy phép: <a href="/toeic/licenses/NGSL-TSL.md" target="_blank" rel="noopener noreferrer">Ghi nguồn tổng hợp & thay đổi (CC BY-SA 4.0)</a> · <a href="/toeic/licenses/THICHHOC-LICENSE-DATA.md" target="_blank" rel="noopener noreferrer">Giấy phép dữ liệu thichhoc-dict</a> · <a href="/toeic/licenses/IPA-MIT-LICENSE.txt" target="_blank" rel="noopener noreferrer">Giấy phép MIT cho IPA</a>.</p>
       <div className="toeic-lexicon-downloads">
         <a className="toeic-button secondary" href={data?.handbook_url || "/toeic/so-tay-tu-vung-song-ngu.md"} download><Download size={16}/>Tải sổ tay từ vựng song ngữ (.md)</a>
-        <a className="toeic-button secondary" href="/toeic/lexicon.json" download><Download size={16}/>Tải dữ liệu từ vựng JSON</a>
+        <a className="toeic-button secondary" href="/toeic/lexicon.json" download><Download size={16}/>Tải dữ liệu từ vựng trọng tâm JSON</a>
+        <a className="toeic-button secondary" href="/toeic/lexicon_100k.json.gz" download><Download size={16}/>Tải gói 143.185 từ mở rộng (.json.gz)</a>
       </div>
     </div>
   </section>;

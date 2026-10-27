@@ -59,8 +59,11 @@ assert handbook.count("## Part ") == len(data["topics"])
 assert data["exams"] == json.loads((ROOT / "backend/data/toeic/exam-forms.json").read_text(encoding="utf-8"))
 lex = lexicon()
 assert (ROOT / "backend/data/toeic/lexicon.json").read_bytes() == (ROOT / "frontend/public/toeic/lexicon.json").read_bytes()
+assert (ROOT / "backend/data/toeic/lexicon_100k.json.gz").read_bytes() == (ROOT / "frontend/public/toeic/lexicon_100k.json.gz").read_bytes()
+assert hashlib.sha256((ROOT / "backend/data/toeic/lexicon_100k.json.gz").read_bytes()).hexdigest() == lex["extended_file"]["sha256"]
 assert (ROOT / "backend/data/toeic/vendor/ngsl-tsl/LICENSE.md").read_bytes() == (ROOT / "frontend/public/toeic/licenses/NGSL-TSL.md").read_bytes()
 assert (ROOT / "backend/data/toeic/vendor/ngsl-tsl/IPA-MIT-LICENSE.txt").read_bytes() == (ROOT / "frontend/public/toeic/licenses/IPA-MIT-LICENSE.txt").read_bytes()
+assert (ROOT / "backend/data/toeic/vendor/ngsl-tsl/THICHHOC-LICENSE-DATA.md").read_bytes() == (ROOT / "frontend/public/toeic/licenses/THICHHOC-LICENSE-DATA.md").read_bytes()
 assert (ROOT / "docs/toeic/SO_TAY_TU_VUNG.md").read_bytes() == (ROOT / "frontend/public/toeic/so-tay-tu-vung-song-ngu.md").read_bytes()
 assert preview["lexicon_count"] == lex["word_count"] == len(lex["words"])
 assert len({w["id"] for w in lex["words"]}) == lex["word_count"]

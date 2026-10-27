@@ -299,15 +299,15 @@ async def vocabulary(request: Request, lesson_id: str | None = None, db=Depends(
 
 
 @router.get("/lexicon")
-async def open_lexicon(request: Request, deck: Literal["all", "ngsl", "tsl"] = "all",
+async def open_lexicon(request: Request, deck: Literal["all", "core", "ngsl", "tsl", "thichhoc"] = "all",
                        q: str = Query("", max_length=120), state: Literal["all", "due", "new", "learned"] = "all",
                        pos: Literal["all", "n", "v", "adj", "adv", "func"] = "all",
                        letter: str = Query("all", pattern=r"^(all|[a-zA-Z])$"),
-                       offset: int = Query(0, ge=0, le=10000), limit: int = Query(30, ge=1, le=50), db=Depends(get_db)):
+                       offset: int = Query(0, ge=0, le=200000), limit: int = Query(30, ge=1, le=50), db=Depends(get_db)):
     uid, timestamp = learner(request), now()
     words = search_words(deck, q, pos=pos, letter=letter.lower())
-    ids = [w["id"] for w in words]
-    stored = {d["vocabulary_id"]: d async for d in db.toeic_cards.find({"user_id": uid, "vocabulary_id": {"$in": ids}})} if ids else {}
+    ids = {w["id"] for w in words}
+    stored = {d["vocabulary_id"]: d async for d in db.toeic_cards.find({"user_id": uid}) if d["vocabulary_id"] in ids} if ids else {}
     due = {key for key, value in stored.items() if value["due"] <= timestamp}
     selected = [w for w in words if state == "all" or (state == "due" and w["id"] in due)
                 or (state == "new" and w["id"] not in stored) or (state == "learned" and w["id"] in stored)]
