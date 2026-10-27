@@ -52,7 +52,7 @@ SDK hiện tại có thay đổi phá vỡ tương thích kiểu dữ liệu cũ
 - `DEFAULT_ADMIN_PASSWORD`: tối thiểu 12 ký tự cho bootstrap mới; không ghi đè mật khẩu tài khoản đã có.
 - `SEED_DEMO_ACCOUNTS=false`; production bỏ qua yêu cầu seed demo.
 - `ALLOWED_ORIGINS`: danh sách origin đầy đủ, không wildcard và không chứa path; cấu hình này thay thế defaults cho HTTP và WebSocket.
-- `GOOGLE_CLIENT_ID`: để trống thì tắt Google ở cả backend/frontend. Không dùng client ID mặc định của tác giả.
+- `GOOGLE_CLIENT_ID`: cấu hình riêng cho mỗi triển khai; đặt rõ giá trị rỗng để tắt Google. Riêng dịch vụ đang vận hành `eduface-system.onrender.com` giữ public Client ID đã sử dụng trước nâng cấp trong `backend/data/deployment-public.json`, đối chiếu `RENDER_EXTERNAL_HOSTNAME` do Render cấp. Biến môi trường luôn được ưu tiên; máy local, fork và dịch vụ khác không tự dùng Client ID này. Đây là định danh OAuth công khai, không phải client secret. Xem [biến môi trường Render](https://render.com/docs/environment-variables).
 - Microsoft cần client/tenant do đơn vị cấu hình; chưa thử đăng nhập tenant thật trong lần sửa này.
 - `STORE_ENROLLMENT_PHOTOS=false` mặc định. Khi bật, upload ảnh chạy sau commit, ghi photo_url nếu hồ sơ còn hoạt động; nếu đã xóa thì thêm công việc cleanup. Upload không có hàng đợi retry bền vững; thiếu ảnh không làm mất embedding/hồ sơ đã lưu.
 - `AZURE_STORAGE_CONNECTION_STRING` và container chỉ cần khi lưu/xóa ảnh trên Blob. Worker retry xóa mỗi 60 giây, tối đa 50 job/lượt. Giám sát job pending/attempts; cloud soft-delete/versioning/backups cần policy riêng.

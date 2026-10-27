@@ -5,6 +5,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from functools import lru_cache
+from pathlib import Path
 
 import jwt
 from fastapi import HTTPException
@@ -12,8 +13,28 @@ from fastapi import HTTPException
 
 
 
+def _deployed_google_client_id() -> str:
+    """Preserve DHV's existing public OAuth ID only on its own Render service.
+
+    Use platform-provided environment metadata, never an HTTP Host/Origin header.
+    Other installations must configure their own GOOGLE_CLIENT_ID.
+    """
+    hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip().lower()
+    if not hostname:
+        return ""
+    try:
+        path = Path(__file__).resolve().parents[1] / "data" / "deployment-public.json"
+        deployments = json.loads(path.read_text(encoding="utf-8"))
+        client_id = deployments.get(hostname, {}).get("google_client_id", "")
+        return client_id if isinstance(client_id, str) else ""
+    except (OSError, ValueError, AttributeError):
+        return ""
+
+
 def google_configuration() -> dict:
-    client_id = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
+    # An explicitly configured empty value still disables Google sign-in.
+    configured = os.environ.get("GOOGLE_CLIENT_ID")
+    client_id = (configured if configured is not None else _deployed_google_client_id()).strip()
     if len(client_id) < 15 or " " in client_id:
         return {"enabled": False, "client_id": ""}
     return {"enabled": True, "client_id": client_id}
