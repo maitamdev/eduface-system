@@ -10,7 +10,7 @@ from core.toeic_content import content, PART_COUNTS
 pytestmark = [pytest.mark.asyncio, pytest.mark.skipif(not URI, reason="Local Mongo replica set required")]
 
 
-@pytest.mark.parametrize("exam_id,total,minutes", [("dhv-full-01-v1",200,120),("dhv-listening-01-v1",100,45),("dhv-reading-01-v1",100,75),("dhv-mini-01-v1",50,35)])
+@pytest.mark.parametrize("exam_id,total,minutes", [("dhv-full-01-v1",200,120),("dhv-full-03-v1",200,120),("dhv-listening-01-v1",100,45),("dhv-reading-01-v1",100,75),("dhv-mini-01-v1",50,35)])
 async def test_named_exam_contract_deadline_and_retry(live, exam_id, total, minutes):
     db,http=live
     _,headers=await student(db)

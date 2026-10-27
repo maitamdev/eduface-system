@@ -1,12 +1,14 @@
 # Nguồn nghiên cứu cho TOEIC cùng DHV
 
-## Mở rộng ôn tập v3 · 27/10/2026
+## Mở rộng ôn tập và kho từ mở v4 · 27/10/2026
 
-Bản v3 đã nhập có chọn lọc **399 câu và 10 cảnh AI** từ [TOEIC Question Ocean](https://github.com/kdeppaei/toeic-question-ocean) ở revision `a940bb8b479ef4d06af468015d757041c3d2e457`, theo [MIT](https://github.com/kdeppaei/toeic-question-ocean/blob/a940bb8b479ef4d06af468015d757041c3d2e457/LICENSE). Thêm 60 câu DHV, 38 hướng dẫn dạng bài, 8 mã đề và sổ câu sai. [Báo cáo nguồn, phần loại bỏ, các điều chỉnh và nơi lưu dữ liệu](MO_RONG_ON_TAP.md) mô tả phạm vi hiện tại.
+Bản v4 (`dhv-toeic-2026.10-v4`) đã đối chiếu toàn bộ **1.107 câu** trong 12 gói dữ liệu của [TOEIC Question Ocean](https://github.com/kdeppaei/toeic-question-ocean) ở revision `a940bb8b479ef4d06af468015d757041c3d2e457` theo [MIT](https://github.com/kdeppaei/toeic-question-ocean/blob/a940bb8b479ef4d06af468015d757041c3d2e457/LICENSE): đưa vào sử dụng **1.048 câu** có lời giải tiếng Việt (399 câu ở v3 + 649 câu bổ sung ở v4), loại **59 câu** không đạt yêu cầu, giữ **20 cảnh AI theo MIT** và **5 ảnh chụp theo Pexels License** (ghi nguồn tác giả riêng). Thêm 60 câu DHV, 38 hướng dẫn dạng bài, **9 mã đề cố định** (gồm **3 đề toàn phần 200 câu không trùng ID**) và sổ câu sai.
+
+Sau khi kiểm tra các nguồn đề xuất (`seikaikyo/toeic-practice`, `thu-tram/awesome-toeic`, `riiid/ednet`, `ETS Official Samples`), dự án **không nhập** mã nguồn hay câu hỏi độc quyền của `seikaikyo/toeic-practice` và không biến dữ liệu hành vi `EdNet` (`CC BY-NC 4.0`) thành câu hỏi thi; thay vào đó tích hợp trực tiếp **4.060 từ** từ [NGSL 1.2](https://www.newgeneralservicelist.com/new-general-service-list) và [TOEIC Service List 1.2](https://www.newgeneralservicelist.com/toeic-service-list) theo **CC BY-SA 4.0**, đồng thời bổ sung các liên kết tham khảo chính thức vào mục **Nguồn học**. [Báo cáo nguồn, phần loại bỏ, các điều chỉnh và nơi lưu dữ liệu](MO_RONG_ON_TAP.md) mô tả phạm vi hiện tại.
 
 Đã đối chiếu [IIBC format](https://www.iibc-global.org/english/toeic/test/lr/about/format.html), [ETS preparation](https://www.ets.org/toeic/test-takers/prepare.html), [British Council B1–B2](https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2), [Moodle quiz](https://docs.moodle.org/503/en/Building_Quiz) và [H5P Question Set](https://h5p.org/tutorial-question-set). Moodle/H5P là tham khảo thiết kế, không nhập code. Những nguồn dẫn link không tự động được coi là nguồn cho phép phân phối lại.
 
-Các phần dưới là **lịch sử nghiên cứu của v1/v2**. Các câu “không nhập học liệu/media” trong lịch sử mô tả phiên bản cũ; phạm vi v3 ở trên và CONTENT_LICENSES.md là thông tin hiện hành.
+Các phần dưới là **lịch sử nghiên cứu của v1/v2**. Các câu “không nhập học liệu/media” trong lịch sử mô tả phiên bản cũ; phạm vi v4 ở trên và CONTENT_LICENSES.md là thông tin hiện hành.
 
 ## Bổ sung nghiên cứu cho lộ trình 56 buổi
 

@@ -82,6 +82,7 @@ export async function previewRequest(path: string, init: RequestInit = {}): Prom
     if (route === "/api/toeic/review") return {window:50,count:0,items:[],parts:[]};
     if (route === "/api/toeic/progress") return {target: 650, daily_minutes: 30, lessons: {}, recent: [], active: [], days: [], streak: 0, cards_learned: 0, cards_due: 0};
     if (route === "/api/toeic/vocabulary") return data.vocabulary.map(c => ({...c, version: 0, due: null, reviews: 0}));
+    if (route === "/api/toeic/lexicon") return (await import("@/features/toeic/lexiconPreview")).previewLexicon(url.searchParams);
     if (route.startsWith("/api/toeic/lessons/")) { const id = route.split("/").pop(); const lesson = data.lessons.find(x => x.id === id); if (!lesson) throw new Error("Không tìm thấy bài học"); return {...lesson, vocabulary: data.vocabulary.filter(c => c.lesson_id === id)}; }
     throw new Error("Không có lượt làm bài trong bản xem thử.");
   }

@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
 from core.toeic_content import content, select_questions, PART_COUNTS, study_catalog
+from core.toeic_lexicon import lexicon
 
 data = content()
 audio = {q["audio_id"] for q in data["questions"] if q.get("audio_id")}
@@ -47,7 +48,7 @@ assert preview["curriculum"] == data["curriculum"], "Preview curriculum is stale
 for key, value in study_catalog(data).items():
     assert preview[key] == value, f"Preview {key} are stale"
 assert all("question_ids" not in e for e in preview["exams"])
-vendor = json.loads((ROOT / "backend/data/toeic/vendor/ocean-snapshot.json").read_text(encoding="utf-8"))
+vendor = json.loads((ROOT / "backend/data/toeic/vendor/ocean-complete-snapshot.json").read_text(encoding="utf-8"))
 for asset in vendor["images"]:
     path = ROOT / "frontend/public/toeic/images" / asset["file"]
     assert hashlib.sha256(path.read_bytes()).hexdigest() == asset["sha256"], f"Changed source image: {asset['file']}"
@@ -56,11 +57,18 @@ handbook = (ROOT / "docs/toeic/SO_TAY_DANG_BAI.md").read_text(encoding="utf-8")
 assert handbook == (ROOT / "frontend/public/toeic/so-tay-dang-bai.md").read_text(encoding="utf-8")
 assert handbook.count("## Part ") == len(data["topics"])
 assert data["exams"] == json.loads((ROOT / "backend/data/toeic/exam-forms.json").read_text(encoding="utf-8"))
+lex = lexicon()
+assert (ROOT / "backend/data/toeic/lexicon.json").read_bytes() == (ROOT / "frontend/public/toeic/lexicon.json").read_bytes()
+assert (ROOT / "backend/data/toeic/vendor/ngsl-tsl/LICENSE.md").read_bytes() == (ROOT / "frontend/public/toeic/licenses/NGSL-TSL.md").read_bytes()
+assert preview["lexicon_count"] == lex["word_count"] == len(lex["words"])
+assert len({w["id"] for w in lex["words"]}) == lex["word_count"]
+for source in lex["source_files"]:
+    assert hashlib.sha256((ROOT / "backend/data/toeic/vendor/ngsl-tsl" / source["file"]).read_bytes()).hexdigest() == source["sha256"]
 guide = (ROOT / "docs/toeic/LO_TRINH_CHI_TIET.md").read_text(encoding="utf-8")
 public_guide = (ROOT / "frontend/public/toeic/lo-trinh-dhv.md").read_text(encoding="utf-8")
 assert guide.count("### Buổi ") == len(data["curriculum"]["sessions"])
 assert public_guide.count("### Buổi ") == len(data["curriculum"]["sessions"])
-report = {"lessons": len(data["lessons"]), "questions": len(data["questions"]), "vocabulary": len(data["vocabulary"]),
+report = {"lessons": len(data["lessons"]), "questions": len(data["questions"]), "vocabulary": len(data["vocabulary"]), "lexicon_words": lex["word_count"],
           "topics": len(data["topics"]), "exam_forms": len(data["exams"]),
           "adapted_questions": data["expansion"]["adapted_questions"], "new_original_questions": data["expansion"]["original_questions"],
           "images": len({q["image"] for q in data["questions"] if q.get("image")}),

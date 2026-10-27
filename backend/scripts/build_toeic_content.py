@@ -8,6 +8,7 @@ import hashlib
 from pathlib import Path
 from toeic_curriculum import curriculum, guide_markdown
 from toeic_expansion import expand_course, topic_handbook
+from toeic_source_expansion import expand_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = {"version": "dhv-toeic-2026.10-v1", "notice": "Học liệu tự biên soạn, không phải đề ETS. Mục tiêu 900 là định hướng học, không bảo đảm kết quả. ‘Từ 0’ nghĩa là bắt đầu từ nền tảng; điểm TOEIC L&R chính thức là 10–990. Âm thanh là giọng tổng hợp; Part 1 dùng hình minh họa.", "stages": [
@@ -174,6 +175,7 @@ DATA["sources"].extend([
 ])
 DATA["curriculum"] = curriculum()
 expand_course(DATA)
+expand_sources(DATA)
 
 if __name__ == "__main__":
     import sys
@@ -182,6 +184,7 @@ if __name__ == "__main__":
     validate_content(DATA)
     target = ROOT / "backend/data/toeic/course.json"
     target.write_text(json.dumps(DATA, ensure_ascii=False, indent=2), encoding="utf-8")
+    (target.parent / "exam-forms.json").write_text(json.dumps(DATA["exams"], ensure_ascii=False, indent=2), encoding="utf-8")
     preview = {k: v for k, v in DATA.items() if k not in {"questions", "exams", "topics", "expansion"}}
     preview.update(study_catalog(DATA))
     preview["question_count"] = len(DATA["questions"])

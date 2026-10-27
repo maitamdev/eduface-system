@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictBool
 from pymongo.errors import DuplicateKeyError
 from fsrs import Card, Rating, Scheduler
@@ -12,6 +12,7 @@ from fsrs import Card, Rating, Scheduler
 from core.auth import require_authenticated
 from core.database import get_db, get_write_db, VN_TZ
 from core.toeic_content import content, public_question, select_questions, grade, study_catalog
+from core.toeic_lexicon import lexicon, index as lexicon_index, search_words, card_view
 from core.rate_limit import limiter
 
 router = APIRouter(dependencies=[Depends(require_authenticated)])
@@ -102,6 +103,7 @@ async def catalog():
             "curriculum": data["curriculum"], **study_catalog(data),
             "notice": data["notice"], "question_count": len(data["questions"]),
             "vocabulary_count": len(data["vocabulary"]),
+            "lexicon_count": lexicon()["word_count"],
             "lessons": [{k: v for k, v in lesson.items() if k != "sections"} |
                         {"question_count": sum(q["lesson_id"] == lesson["id"] for q in data["questions"])}
                         for lesson in data["lessons"]]}
@@ -296,10 +298,30 @@ async def vocabulary(request: Request, lesson_id: str | None = None, db=Depends(
     return rows
 
 
+@router.get("/lexicon")
+async def open_lexicon(request: Request, deck: Literal["all", "ngsl", "tsl"] = "all",
+                       q: str = Query("", max_length=120), state: Literal["all", "due", "new", "learned"] = "all",
+                       offset: int = Query(0, ge=0, le=10000), limit: int = Query(30, ge=1, le=50), db=Depends(get_db)):
+    uid, timestamp = learner(request), now()
+    words = search_words(deck, q)
+    ids = [w["id"] for w in words]
+    stored = {d["vocabulary_id"]: d async for d in db.toeic_cards.find({"user_id": uid, "vocabulary_id": {"$in": ids}})} if ids else {}
+    due = {key for key, value in stored.items() if value["due"] <= timestamp}
+    selected = [w for w in words if state == "all" or (state == "due" and w["id"] in due)
+                or (state == "new" and w["id"] not in stored) or (state == "learned" and w["id"] in stored)]
+    if state == "due":
+        selected.sort(key=lambda w: stored[w["id"]]["due"])
+    return {"version": lexicon()["version"], "total": len(selected), "word_count": lexicon()["word_count"],
+            "offset": offset, "limit": limit, "due_count": len(due), "new_count": len(words) - len(stored),
+            "items": [card_view(w, stored.get(w["id"])) for w in selected[offset:offset + limit]],
+            "license": lexicon()["license"], "license_url": lexicon()["license_url"], "sources": lexicon()["sources"],
+            "download_url": "/toeic/lexicon.json", "attribution_url": "/toeic/licenses/NGSL-TSL.md"}
+
+
 @router.post("/vocabulary/{card_id}/review")
 async def review(card_id: str, body: Review, request: Request, db=Depends(get_write_db, scope="function")):
     uid = learner(request)
-    if card_id not in {c["id"] for c in content()["vocabulary"]}:
+    if card_id not in {c["id"] for c in content()["vocabulary"]} and card_id not in lexicon_index():
         raise HTTPException(404, "Không tìm thấy từ vựng.")
     key = f"{uid}:{card_id}"
     previous = await db.toeic_cards.find_one({"_id": key})

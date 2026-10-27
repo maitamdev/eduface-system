@@ -1,19 +1,28 @@
 {
-  "lessons": 20,
-  "questions": 268,
+  "lessons": 27,
+  "questions": 1376,
   "vocabulary": 200,
+  "lexicon_words": 4060,
+  "topics": 38,
+  "exam_forms": 9,
+  "adapted_questions": 1048,
+  "new_original_questions": 60,
+  "images": 33,
+  "curriculum_levels": 4,
+  "curriculum_sessions": 56,
+  "self_checks": 112,
   "by_part": {
-    "5": 54,
-    "2": 32,
-    "7": 79,
-    "1": 8,
-    "3": 42,
-    "4": 33,
-    "6": 20
+    "5": 400,
+    "2": 151,
+    "7": 444,
+    "1": 33,
+    "3": 135,
+    "4": 117,
+    "6": 96
   },
-  "audio_files": 65,
-  "audio_minutes": 17.75,
-  "audio_MB": 34.09,
+  "audio_files": 268,
+  "audio_minutes": 71.44,
+  "audio_MB": 137.17,
   "shortest_audio_seconds": 9.31,
-  "longest_audio_seconds": 36.38
+  "longest_audio_seconds": 36.77
 }

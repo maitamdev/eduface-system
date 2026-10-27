@@ -72,7 +72,7 @@ def test_large_lesson_is_a_manageable_sample_without_splitting_context():
 
 def test_public_catalog_and_active_questions_do_not_reveal_scored_answers():
     public = study_catalog(content())
-    assert len(public["topics"]) == 38 and len(public["exams"]) == 8
+    assert len(public["topics"]) == 38 and len(public["exams"]) == 9
     assert all(t["question_count"] > 0 for t in public["topics"])
     assert all("question_ids" not in e for e in public["exams"])
     evidence = next(q for q in content()["questions"] if q.get("evidence"))

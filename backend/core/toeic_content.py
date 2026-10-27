@@ -132,6 +132,19 @@ def public_question(q, review=False):
     return {k: copy.deepcopy(v) for k, v in q.items() if k not in hidden}
 
 
+def distinct_listening_contexts(groups):
+    """Alternate question sets may share a recording; play that context only once per draw."""
+    seen = set()
+    for group in groups:
+        first = group[0]
+        if first.get("part") in (3, 4) and first.get("transcript"):
+            key = first["part"], " ".join(first["transcript"].split())
+            if key in seen:
+                continue
+            seen.add(key)
+        yield group
+
+
 def choose_groups(questions, count, rng):
     """Subset sum keeps every passage/dialogue intact while meeting section counts."""
     groups = defaultdict(list)
@@ -140,7 +153,7 @@ def choose_groups(questions, count, rng):
     values = list(groups.values())
     rng.shuffle(values)
     combinations = {0: []}
-    for group in values:
+    for group in distinct_listening_contexts(values):
         for size, selected in list(combinations.items())[::-1]:
             target = size + len(group)
             if target <= count and target not in combinations:
@@ -161,7 +174,7 @@ def grouped_practice(bank, question_ids, rng, limit=15):
     values = list(groups.values())
     rng.shuffle(values)
     selected = []
-    for rows in values:
+    for rows in distinct_listening_contexts(values):
         if len(selected) + len(rows) <= limit:
             selected.extend(rows)
     return copy.deepcopy(selected)

@@ -1,0 +1,11 @@
+.toeic-lexicon-filters{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,.7fr)}
+.toeic-lexicon .toeic-flashcard,.toeic-lexicon .toeic-word-list{min-width:0}
+.toeic-lexicon .toeic-flashcard h3{overflow-wrap:anywhere}
+.toeic-lexicon .toeic-card-answer p{font-size:17px;line-height:1.7;text-align:left}
+.toeic-lexicon .toeic-card-answer small{display:block;text-align:left;color:var(--ui-muted);font-size:12px}
+.toeic-lexicon .toeic-word-list>div{max-height:440px}
+.toeic-lexicon-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:18px;font-size:12px}
+.toeic-lexicon-pagination .toeic-button{padding:8px 10px;font-size:12px}
+.toeic-lexicon-credit a:not(.toeic-button){color:var(--toeic-green);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:1000px){.toeic-lexicon-filters{grid-template-columns:1fr 1fr}.toeic-lexicon-filters>label:last-child{grid-column:1/-1}}
+@media(max-width:760px){.toeic-lexicon-filters{grid-template-columns:1fr}.toeic-lexicon .toeic-word-list>div{max-height:280px}.toeic-lexicon .toeic-card-answer p{font-size:16px}}

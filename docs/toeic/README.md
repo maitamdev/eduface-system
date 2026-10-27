@@ -16,28 +16,31 @@ Tính năng nằm trong ứng dụng EduFace hiện có, tại `/toeic`. Tài kh
 
 - **Lộ trình theo buổi:** 4 level, 24 + 12 + 12 + 8 = 56 buổi, giữ khung Level 1–2 của người dùng và nối tới mục tiêu 900. Mỗi buổi có kiến thức, ví dụ, 2 câu tự kiểm tra, nhiệm vụ luyện, bài tập về nhà và nguồn học. Chọn nhịp 2/3/4 buổi mỗi tuần để xem lịch dự kiến; dùng **Tải lộ trình (.md)** để tải bản đầy đủ.
 - **Buổi đã học:** học viên tự đánh dấu, lưu theo tài khoản và có thể bỏ đánh dấu. Đây không phải điểm kiểm tra, không tự tăng streak hay cấp chứng chỉ. Bài tự kiểm tra 2 câu không lưu kết quả lên server; đổi buổi sẽ bắt đầu lại.
-- **Thư viện 20 bài luyện:** vẫn có 5 chặng kỹ năng và các bài hỗ trợ cũ. Làm bài đạt ít nhất 70% để đánh dấu bài luyện hoàn thành; hệ thống giữ tỷ lệ đúng tốt nhất. Nhiều buổi có thể dùng chung một bài hỗ trợ.
-- **Luyện tập:** khảo sát 25 câu/25 phút, bài theo từng Part hoặc 200 câu/120 phút. Part 1–2 chỉ hiện nhãn A/B/C/D trước khi nộp để luyện nghe; Part 3–4 dùng audio chung theo nhóm. Đáp án, giải thích và transcript được mở sau khi nộp.
+- **Thư viện 27 bài luyện & 38 chuyên đề dạng bài:** giữ nguyên 5 chặng kỹ năng (20 bài nền) và thêm 7 bài luyện theo Part cùng 38 hướng dẫn nhận diện dạng bài. Làm bài đạt ít nhất 70% để đánh dấu bài luyện hoàn thành; hệ thống giữ tỷ lệ đúng tốt nhất. Nhiều buổi có thể dùng chung một bài hỗ trợ.
+- **Luyện tập & 9 mã đề cố định:** khảo sát 25 câu/25 phút, bài theo từng Part, luyện theo dạng bài, sổ câu sai (từ 50 lượt nộp gần nhất) và 9 mã đề cố định (gồm **3 đề toàn phần 200 câu/120 phút không trùng ID câu**, 4 đề mini 50 câu/35 phút, 1 đề Listening 100 câu/45 phút, 1 đề Reading 100 câu/75 phút). Part 1–2 chỉ hiện nhãn A/B/C/D trước khi nộp để luyện nghe; Part 3–4 dùng audio chung theo nhóm. Đáp án, giải thích và transcript được mở sau khi nộp.
 - **Tiếp tục bài:** dùng “Lưu & về góc học tập”, vào **Tiến độ → Bài đang làm → Tiếp tục**. Thời gian vẫn chạy khi rời trang. Bài hết hạn được chấm từ đáp án đã lưu trên máy chủ; không chấp nhận thay đáp án sau hạn (có 3 giây đệm cho yêu cầu nộp).
 - **Lưu lỗi:** đáp án trên màn hình vẫn giữ để thử lại. Không đóng tab khi đang báo “Chưa lưu được”. Nếu hai cửa sổ cùng sửa một bài, server chặn bản ghi cũ; nút lấy bản đã lưu sẽ thay bản chưa lưu hiện tại bằng bản trên server.
-- **Từ vựng:** tự nhớ rồi lật thẻ; chọn Học lại/Khó/Nhớ được/Dễ. FSRS lên lịch theo mức nhớ. Từ đến hạn được ưu tiên trước từ mới. Từ chưa đến hạn vẫn xem lại được nhưng không ghi thêm một lượt ôn quá sớm.
+- **Từ vựng (200 thẻ DHV + 4.060 từ Kho từ mở NGSL/TSL):** tự nhớ rồi lật thẻ; chọn Học lại/Khó/Nhớ được/Dễ. FSRS lên lịch theo mức nhớ cho cả bộ thẻ tiếng Việt DHV lẫn Kho từ mở định nghĩa tiếng Anh (NGSL 1.2 + TOEIC Service List 1.2, CC BY-SA 4.0). Từ đến hạn được ưu tiên trước từ mới. Từ chưa đến hạn vẫn xem lại được nhưng không ghi thêm một lượt ôn quá sớm.
 - **Tiến độ:** mục tiêu 350/550/650/750/900, 15/30/45/60 phút mỗi ngày, chuỗi ngày học theo giờ Việt Nam, 20 lượt gần nhất, 90 ngày có hoạt động gần nhất và gợi ý Part cần củng cố.
-- **Nguồn học:** link ETS, IIG, British Council, Cambridge và mã nguồn FSRS, có phân biệt nguồn miễn phí/khóa có phí. Không tự mua hay đăng ký khóa bên ngoài.
+- **Nguồn học:** link ETS, IIG, British Council, Cambridge, TOEIC Question Ocean (MIT), NGSL/TSL (CC BY-SA 4.0), Awesome TOEIC, EdNet và mã nguồn FSRS, có phân biệt nguồn tái sử dụng, nguồn tham khảo và khóa có phí.
 
 ## Phạm vi dữ liệu
 
 | Thành phần | Số lượng |
 |---|---:|
+| Phiên bản học liệu | `dhv-toeic-2026.10-v4` |
 | Level / kế hoạch buổi | 4 / 56 |
 | Câu tự kiểm tra kiến thức (khác ngân hàng chấm điểm) | 112 |
 | Ví dụ và phân tích trong lộ trình | 112 |
 | Thời lượng trong buổi (chưa tính tự học) | 85,5 giờ |
-| Chặng / bài học ngắn | 5 / 20 |
-| Câu hỏi có lời giải | 268 |
-| Part 1 / 2 / 3 / 4 / 5 / 6 / 7 | 8 / 32 / 42 / 33 / 54 / 20 / 79 |
-| Thẻ từ vựng có nghĩa Việt và câu ví dụ | 200 |
-| Audio tổng hợp dựng sẵn | 65 WAV, khoảng 17,75 phút, 34,09 MB |
-| Hình minh họa vector tự tạo | 8 SVG |
+| Chặng / bài trong thư viện / chuyên đề dạng bài | 5 / 27 / 38 |
+| Câu hỏi có chấm điểm và lời giải tiếng Việt | 1.376 |
+| Part 1 / 2 / 3 / 4 / 5 / 6 / 7 | 33 / 151 / 135 / 117 / 400 / 96 / 444 |
+| Mã đề cố định (3 đề toàn phần 200 câu không trùng ID) | 9 |
+| Thẻ từ vựng tiếng Việt DHV có câu ví dụ | 200 |
+| Kho từ mở NGSL 1.2 + TSL 1.2 (định nghĩa tiếng Anh, CC BY-SA 4.0) | 4.060 |
+| Audio tổng hợp dựng sẵn | 268 WAV, khoảng 71,44 phút, 137,17 MB |
+| Hình Part 1 | 33 (8 SVG + 20 JPG AI theo MIT + 5 JPG Pexels) |
 
 Đề 200 câu giữ nguyên nhóm hội thoại/bài đọc và đúng số lượng 6/25/39/30/30/16/54. Đây là **chế độ luyện có hỗ trợ**: audio điều khiển thủ công, nghe lại được, chưa ép 45 phút nghe riêng và 75 phút đọc riêng. Các đề lấy từ cùng ngân hàng nên có thể trùng câu. Bộ học liệu chưa được chuẩn hóa độ khó hoặc hiệu chỉnh thống kê để quy đổi điểm; ứng dụng chỉ báo số câu đúng và tỷ lệ phần trăm.
 
@@ -50,6 +53,7 @@ Lộ trình được biên soạn tại `backend/scripts/toeic_curriculum.py`. B
 Các script dùng đường dẫn dự án, không cần database:
 
 ```powershell
+.\backend\.venv\Scripts\python.exe -X utf8 backend/scripts/import_toeic_lexicon.py
 .\backend\.venv\Scripts\python.exe -X utf8 backend/scripts/build_toeic_content.py
 .\backend\.venv\Scripts\python.exe -X utf8 backend/scripts/build_toeic_images.py
 powershell -NoProfile -ExecutionPolicy Bypass -File backend/scripts/build_toeic_audio.ps1
@@ -58,9 +62,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File backend/scripts/build_toeic_
 
 Tạo audio chỉ cần khi chỉnh transcript: script dùng Windows `System.Speech` với giọng English Desktop và không gọi dịch vụ bên ngoài. Bản audio dựng sẵn chạy trên frontend ở mọi hệ điều hành. Thiết bị không có giọng English Desktop cần cài giọng phù hợp hoặc dùng bản WAV đã có. Nút “Nghe từ” dùng giọng trình duyệt nếu có; bài nghe chính không phụ thuộc chức năng này.
 
-Nguồn biên soạn nằm trong `backend/scripts/build_toeic_content.py`, `toeic_vocabulary.py`, `toeic_questions_basic.py`, `toeic_questions_context.py`. Chỉnh ở các file nguồn rồi chạy build, không sửa riêng JSON sinh ra. Giữ ID bài/từ ổn định khi nội dung còn cùng ý nghĩa; tăng version khi thay đổi đáng kể. Khi thay transcript, dùng audio ID mới nếu cần giữ nguyên lượt luyện cũ: attempt lưu snapshot câu hỏi nhưng file audio là tài nguyên tĩnh theo ID.
+Nguồn biên soạn nằm trong `backend/scripts/build_toeic_content.py`, `toeic_vocabulary.py`, `toeic_questions_basic.py`, `toeic_questions_context.py`, `toeic_topics.py`, `toeic_extra_questions.py`, `toeic_ocean_vi.py`, `toeic_ocean_more_vi.py`, `toeic_expansion.py`, `toeic_source_expansion.py` và `import_toeic_lexicon.py`. Chỉnh ở các file nguồn rồi chạy build, không sửa riêng JSON sinh ra. Giữ ID bài/từ ổn định khi nội dung còn cùng ý nghĩa; tăng version khi thay đổi đáng kể. Khi thay transcript, dùng audio ID mới nếu cần giữ nguyên lượt luyện cũ: attempt lưu snapshot câu hỏi nhưng file audio là tài nguyên tĩnh theo ID.
 
-Mỗi câu có một đáp án đúng; lời giải nên giải thích bằng chứng và bẫy. Part 1–2 phải khớp thứ tự A/B/C/D trong audio. Part 3–4 có nhóm 3 câu; Part 6 có nhóm 4 câu. Mọi phần phải đủ số câu để chọn đề đầy đủ. Script validate kiểm tra nội dung, nhóm, đủ audio/hình, âm thanh không rỗng và 30 cách ghép đề.
+Mỗi câu có một đáp án đúng; lời giải nên giải thích bằng chứng và bẫy. Part 1–2 phải khớp thứ tự A/B/C/D trong audio. Part 3–4 có nhóm 3 câu; Part 6 có nhóm 4 câu. Mọi phần phải đủ số câu để chọn đề đầy đủ. Script validate kiểm tra nội dung, nhóm, đủ audio/hình, âm thanh không rỗng, kho từ mở và 30 cách ghép đề.
 
 ## Kiểm thử
 
@@ -79,8 +83,8 @@ Các integration test tự tạo database tên ngẫu nhiên `eduface_integratio
 
 ## Lưu trữ và API
 
-Trạng thái buổi nằm tại `toeic_profiles.curriculum_completed`. `PUT /api/toeic/curriculum/sessions/{id}` nhận `{ "completed": true/false }`, chỉ ghi theo JWT của người gọi; GET progress trả danh sách ID đã học. Không cần seed hay migration dữ liệu. Catalog bổ sung `curriculum`; frontend có nhánh dự phòng nếu nhận catalog cũ trong lúc triển khai.
+Trạng thái buổi nằm tại `toeic_profiles.curriculum_completed`. `PUT /api/toeic/curriculum/sessions/{id}` nhận `{ "completed": true/false }`, chỉ ghi theo JWT của người gọi; GET progress trả danh sách ID đã học. Không cần seed hay migration dữ liệu. Catalog bổ sung `curriculum`, `topics`, `exams`, `lexicon_count`; frontend có nhánh dự phòng nếu nhận catalog cũ trong lúc triển khai.
 
 Nội dung versioned ở JSON; tiến độ MongoDB nằm trong `toeic_profiles`, `toeic_attempts`, `toeic_cards`, `toeic_activity`. Attempt lưu snapshot câu hỏi để kết quả cũ không bị thay bởi cập nhật nội dung. Mọi truy vấn tiến độ lọc theo JWT user ID; API key dùng chung không được ghi tiến độ cá nhân. Nộp bài và ghi lịch FSRS dùng transaction để tránh ghi dở dang.
 
-API dưới `/api/toeic`: `GET catalog`, `GET lessons/{id}`, `GET progress`, `PUT preferences`, `POST attempts`, `GET attempts/{id}`, `PUT attempts/{id}/answers`, `POST attempts/{id}/submit`, `GET vocabulary`, `POST vocabulary/{id}/review`. Lưu đáp án dùng revision để chặn ghi đè; tạo bài/ôn từ có UUID chống ghi lặp khi thử lại. Không có endpoint trả đáp án bài chưa nộp. Đây là công cụ tự học, không phải hệ thống coi thi chống gian lận.
+API dưới `/api/toeic`: `GET catalog`, `GET lessons/{id}`, `GET progress`, `PUT preferences`, `PUT curriculum/sessions/{id}`, `GET review`, `POST attempts`, `GET attempts/{id}`, `PUT attempts/{id}/answers`, `POST attempts/{id}/submit`, `GET vocabulary`, `GET lexicon`, `POST vocabulary/{id}/review`. Lưu đáp án dùng revision để chặn ghi đè; tạo bài/ôn từ có UUID chống ghi lặp khi thử lại. Không có endpoint trả đáp án bài chưa nộp. Đây là công cụ tự học, không phải hệ thống coi thi chống gian lận.

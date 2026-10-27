@@ -1,6 +1,6 @@
 {
-  "version": "dhv-toeic-2026.10-v3",
-  "notice": "Học liệu DHV tự biên soạn và nội dung MIT từ TOEIC Question Ocean được chọn lọc, bổ sung lời giải tiếng Việt. Không phải đề ETS. Mục tiêu 900 là định hướng, không bảo đảm kết quả. Audio tổng hợp; hình Part 1 là minh họa hoặc cảnh mô phỏng tạo bằng AI. Điểm hiển thị là số câu đúng, không quy đổi điểm TOEIC chính thức.",
+  "version": "dhv-toeic-2026.10-v4",
+  "notice": "Học liệu DHV và câu hỏi MIT từ TOEIC Question Ocean được rà soát, có lời giải tiếng Việt. Không phải đề ETS; mục tiêu 900 không bảo đảm kết quả. Audio tổng hợp; ảnh Part 1 gồm minh họa, cảnh AI và ảnh Pexels ghi nguồn. Kho từ NGSL/TSL dùng định nghĩa tiếng Anh theo CC BY-SA 4.0. Điểm bài luyện là số câu đúng, không quy đổi điểm TOEIC chính thức.",
   "stages": [
     {
       "id": 0,
@@ -190,7 +190,52 @@
       "provider": "Chun-Hsiung Luo / DHV",
       "access": "MIT · có bản ghi nguồn và điều chỉnh",
       "stage": "Ôn dạng bài / đề luyện",
-      "usage": "Đã nhập phần nội dung tự biên soạn được cấp phép MIT, bổ sung lời giải tiếng Việt và loại câu có vấn đề. Ảnh mới là cảnh tạo bằng AI từ nguồn; audio được tạo lại từ transcript. Xem thông báo MIT và ghi nguồn ở chân mục ôn tập."
+      "usage": "Đối chiếu toàn bộ 1107 câu ở revision đã chốt; 1048 câu được dùng sau rà soát, có lời giải tiếng Việt. Loại 59 câu có vấn đề. Ảnh gồm cảnh AI theo MIT và 5 ảnh Pexels có ghi nguồn riêng; audio tổng hợp lại từ transcript."
+    },
+    {
+      "id": "ngsl",
+      "title": "NGSL 1.2 · Từ vựng nền tảng",
+      "url": "https://www.newgeneralservicelist.com/new-general-service-list",
+      "provider": "Browne, Culligan & Phillips",
+      "access": "CC BY-SA 4.0 · từ và định nghĩa tiếng Anh",
+      "stage": "Nền tảng / mọi level",
+      "usage": "Đã nhập 2.809 từ theo bảng tần suất và định nghĩa của tác giả. Tìm kiếm và ôn thẻ trong Kho từ mở; thứ hạng không phải điểm TOEIC."
+    },
+    {
+      "id": "tsl",
+      "title": "TOEIC Service List 1.2 · Từ vựng bổ trợ",
+      "url": "https://www.newgeneralservicelist.com/toeic-service-list",
+      "provider": "Browne & Culligan",
+      "access": "CC BY-SA 4.0 · từ và định nghĩa tiếng Anh",
+      "stage": "Sau nền tảng / ôn TOEIC",
+      "usage": "Đã nhập 1.250 từ xếp hạng, bổ sung các mục chỉ có trong bảng định nghĩa và ghi rõ phần DHV bổ sung. Đây là danh sách từ, không phải đề thi ETS."
+    },
+    {
+      "id": "toeic-practice-reference",
+      "title": "TOEIC Practice · Phạm vi dữ liệu và giấy phép",
+      "url": "https://github.com/seikaikyo/toeic-practice",
+      "provider": "seikaikyo",
+      "access": "Mã và ngân hàng đề: độc quyền · từ vựng có thông báo riêng",
+      "stage": "Tham khảo nguồn",
+      "usage": "Không nhập mã nguồn hoặc ngân hàng câu hỏi độc quyền. Dữ liệu NGSL/TSL dùng trong DHV được lấy trực tiếp từ tác giả theo CC BY-SA 4.0; không coi toàn bộ repository là nguồn mở."
+    },
+    {
+      "id": "awesome-toeic",
+      "title": "Awesome TOEIC · Danh mục tài nguyên",
+      "url": "https://github.com/thu-tram/awesome-toeic",
+      "provider": "thu-tram / cộng đồng",
+      "access": "Liên kết tham khảo tại nguồn",
+      "stage": "Listening & Reading",
+      "usage": "Danh mục giúp tìm website, bài nghe và đề luyện. Không phải một ngân hàng được cấp phép để tải toàn bộ vào DHV; mở nguồn đích để học theo điều kiện của từng nơi."
+    },
+    {
+      "id": "ednet-research",
+      "title": "EdNet · Dữ liệu nghiên cứu hành vi học",
+      "url": "https://github.com/riiid/ednet",
+      "provider": "Riiid",
+      "access": "CC BY-NC 4.0 · mục đích nghiên cứu",
+      "stage": "Tham khảo nghiên cứu",
+      "usage": "Dữ liệu tương tác và metadata không cung cấp đầy đủ đề, lựa chọn và audio. Chưa nhập vào ngân hàng luyện thi; chỉ dẫn nguồn nghiên cứu, không tạo câu hỏi từ metadata."
     }
   ],
   "lessons": [
@@ -756,7 +801,7 @@
         }
       ],
       "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
-      "question_count": 10
+      "question_count": 25
     },
     {
       "id": "lab-p2",
@@ -792,7 +837,7 @@
         }
       ],
       "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
-      "question_count": 78
+      "question_count": 119
     },
     {
       "id": "lab-p3",
@@ -828,7 +873,7 @@
         }
       ],
       "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
-      "question_count": 54
+      "question_count": 93
     },
     {
       "id": "lab-p4",
@@ -860,7 +905,7 @@
         }
       ],
       "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
-      "question_count": 51
+      "question_count": 84
     },
     {
       "id": "lab-p5",
@@ -928,7 +973,7 @@
         }
       ],
       "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
-      "question_count": 142
+      "question_count": 346
     },
     {
       "id": "lab-p6",
@@ -956,7 +1001,7 @@
         }
       ],
       "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
-      "question_count": 20
+      "question_count": 76
     },
     {
       "id": "lab-p7",
@@ -996,7 +1041,7 @@
         }
       ],
       "practice_rule": "Ôn một dạng trong mục Ôn theo dạng, làm bài tối đa 15 câu kèm ngữ cảnh rồi xem lời giải. Nếu luyện cả chuyên đề, mỗi lượt lấy tối đa 30 câu từ ngân hàng và giữ trọn nhóm. Đồng hồ đặt theo số câu; các lượt có thể lặp câu đã học.",
-      "question_count": 104
+      "question_count": 365
     }
   ],
   "vocabulary": [
@@ -8123,6 +8168,7 @@
       }
     ]
   },
+  "lexicon_count": 4060,
   "topics": [
     {
       "id": "p1-actions",
@@ -8151,7 +8197,7 @@
         "format",
         "ets"
       ],
-      "question_count": 13
+      "question_count": 23
     },
     {
       "id": "p1-scene",
@@ -8180,7 +8226,7 @@
         "format",
         "ets"
       ],
-      "question_count": 5
+      "question_count": 10
     },
     {
       "id": "p2-wh",
@@ -8209,7 +8255,7 @@
         "format",
         "ets"
       ],
-      "question_count": 52
+      "question_count": 72
     },
     {
       "id": "p2-yesno",
@@ -8238,7 +8284,7 @@
         "format",
         "ets"
       ],
-      "question_count": 23
+      "question_count": 31
     },
     {
       "id": "p2-choice",
@@ -8267,7 +8313,7 @@
         "format",
         "ets"
       ],
-      "question_count": 6
+      "question_count": 7
     },
     {
       "id": "p2-request",
@@ -8296,7 +8342,7 @@
         "format",
         "ets"
       ],
-      "question_count": 19
+      "question_count": 27
     },
     {
       "id": "p2-indirect",
@@ -8325,7 +8371,7 @@
         "format",
         "ets"
       ],
-      "question_count": 14
+      "question_count": 18
     },
     {
       "id": "p3-overview",
@@ -8354,7 +8400,7 @@
         "format",
         "ets"
       ],
-      "question_count": 10
+      "question_count": 16
     },
     {
       "id": "p3-detail",
@@ -8383,7 +8429,7 @@
         "format",
         "ets"
       ],
-      "question_count": 56
+      "question_count": 72
     },
     {
       "id": "p3-next",
@@ -8412,7 +8458,7 @@
         "format",
         "ets"
       ],
-      "question_count": 25
+      "question_count": 37
     },
     {
       "id": "p3-intent",
@@ -8441,7 +8487,7 @@
         "format",
         "ets"
       ],
-      "question_count": 3
+      "question_count": 8
     },
     {
       "id": "p3-graphic",
@@ -8499,7 +8545,7 @@
         "format",
         "ets"
       ],
-      "question_count": 6
+      "question_count": 16
     },
     {
       "id": "p4-detail",
@@ -8528,7 +8574,7 @@
         "format",
         "ets"
       ],
-      "question_count": 55
+      "question_count": 69
     },
     {
       "id": "p4-action",
@@ -8557,7 +8603,7 @@
         "format",
         "ets"
       ],
-      "question_count": 21
+      "question_count": 30
     },
     {
       "id": "p4-graphic",
@@ -8615,7 +8661,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 19
+      "question_count": 57
     },
     {
       "id": "p5-tense",
@@ -8644,7 +8690,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 11
+      "question_count": 18
     },
     {
       "id": "p5-agreement",
@@ -8673,7 +8719,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 13
+      "question_count": 17
     },
     {
       "id": "p5-passive",
@@ -8702,7 +8748,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 13
+      "question_count": 31
     },
     {
       "id": "p5-pronouns",
@@ -8731,7 +8777,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 10
+      "question_count": 13
     },
     {
       "id": "p5-preposition",
@@ -8760,7 +8806,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 33
+      "question_count": 43
     },
     {
       "id": "p5-conjunction",
@@ -8789,7 +8835,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 17
+      "question_count": 46
     },
     {
       "id": "p5-relative",
@@ -8818,7 +8864,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 18
+      "question_count": 31
     },
     {
       "id": "p5-quantity",
@@ -8847,7 +8893,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 11
+      "question_count": 15
     },
     {
       "id": "p5-infinitive",
@@ -8876,7 +8922,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 11
+      "question_count": 30
     },
     {
       "id": "p5-comparison",
@@ -8905,7 +8951,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 4
+      "question_count": 16
     },
     {
       "id": "p5-vocabulary",
@@ -8934,7 +8980,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 29
+      "question_count": 34
     },
     {
       "id": "p5-advanced",
@@ -8963,7 +9009,7 @@
         "bc-reference",
         "bc-b1"
       ],
-      "question_count": 10
+      "question_count": 52
     },
     {
       "id": "p6-grammar",
@@ -8992,7 +9038,7 @@
         "format",
         "ets"
       ],
-      "question_count": 25
+      "question_count": 67
     },
     {
       "id": "p6-linking",
@@ -9021,7 +9067,7 @@
         "format",
         "ets"
       ],
-      "question_count": 6
+      "question_count": 16
     },
     {
       "id": "p6-insertion",
@@ -9050,7 +9096,7 @@
         "format",
         "ets"
       ],
-      "question_count": 9
+      "question_count": 13
     },
     {
       "id": "p7-purpose",
@@ -9079,7 +9125,7 @@
         "format",
         "ets"
       ],
-      "question_count": 8
+      "question_count": 40
     },
     {
       "id": "p7-detail",
@@ -9108,7 +9154,7 @@
         "format",
         "ets"
       ],
-      "question_count": 147
+      "question_count": 317
     },
     {
       "id": "p7-inference",
@@ -9137,7 +9183,7 @@
         "format",
         "ets"
       ],
-      "question_count": 6
+      "question_count": 22
     },
     {
       "id": "p7-vocabulary",
@@ -9166,7 +9212,7 @@
         "format",
         "ets"
       ],
-      "question_count": 4
+      "question_count": 7
     },
     {
       "id": "p7-cross-reference",
@@ -9195,7 +9241,7 @@
         "format",
         "ets"
       ],
-      "question_count": 14
+      "question_count": 53
     },
     {
       "id": "p7-insertion",
@@ -9224,7 +9270,7 @@
         "format",
         "ets"
       ],
-      "question_count": 4
+      "question_count": 5
     }
   ],
   "exams": [
@@ -9511,8 +9557,47 @@
       ],
       "notice": "Luyện có đồng hồ tổng; audio điều khiển thủ công, nghe lại được. Các bài mini và bài riêng kỹ năng dùng chung ngân hàng với đề toàn phần. Không dự đoán điểm TOEIC.",
       "question_count": 50
+    },
+    {
+      "id": "dhv-full-03-v1",
+      "title": "DHV 03 · Đề toàn phần",
+      "type": "full",
+      "minutes": 120,
+      "description": "200 câu: 100 nghe + 100 đọc. Mã đề thứ ba không trùng ID câu hỏi với DHV 01 và DHV 02; giữ trọn hội thoại và văn bản.",
+      "parts": [
+        {
+          "part": 1,
+          "count": 6
+        },
+        {
+          "part": 2,
+          "count": 25
+        },
+        {
+          "part": 3,
+          "count": 39
+        },
+        {
+          "part": 4,
+          "count": 30
+        },
+        {
+          "part": 5,
+          "count": 30
+        },
+        {
+          "part": 6,
+          "count": 16
+        },
+        {
+          "part": 7,
+          "count": 54
+        }
+      ],
+      "notice": "Đồng hồ tổng 120 phút; audio tổng hợp, điều khiển thủ công và nghe lại được. Đây là đề luyện có hỗ trợ, không phải đề ETS hay dự đoán điểm TOEIC.",
+      "question_count": 200
     }
   ],
-  "question_count": 727,
+  "question_count": 1376,
   "vocabulary_count": 200
 }

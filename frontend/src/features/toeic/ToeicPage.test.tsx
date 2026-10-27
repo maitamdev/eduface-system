@@ -48,7 +48,7 @@ it("filters fixed exam types and starts the chosen code",async()=>{
  render(<ToeicPage/>); await screen.findByText("Học theo buổi, biết rõ việc cần làm.");
  fireEvent.click(screen.getByRole("button",{name:"Luyện tập"}));
  fireEvent.click(screen.getByRole("button",{name:"Đề thi thử"}));
- expect(screen.getAllByRole("article")).toHaveLength(8);
+ expect(screen.getAllByRole("article")).toHaveLength(9);
  fireEvent.change(screen.getByLabelText("Loại đề"),{target:{value:"listening"}});
  expect(screen.getAllByRole("article")).toHaveLength(1);
  expect(screen.getByText("45 phút")).toBeTruthy();

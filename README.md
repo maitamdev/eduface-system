@@ -6,11 +6,11 @@ Bản cập nhật ngày 27/10/2026 đã được push lên `main` và triển k
 
 ## TOEIC cùng DHV
 
-Tab `/toeic` dành cho mọi tài khoản đã đăng nhập: lộ trình 56 buổi, 27 bài, 727 câu có giải thích tiếng Việt, 38 chuyên đề ôn dạng bài, 200 thẻ từ FSRS và 188 đoạn audio có sẵn. Mục Luyện tập gồm ôn theo dạng, 8 mã đề cố định (2 toàn phần, 4 mini, 1 Listening, 1 Reading), sổ câu sai từ 50 lượt nộp gần nhất và luyện từng Part. Có lưu bài đang làm, chấm điểm phía server và tiến độ riêng. Audio điều khiển thủ công, kết quả không quy đổi điểm TOEIC chính thức.
+Tab `/toeic` dành cho mọi tài khoản đã đăng nhập: lộ trình 56 buổi, 27 bài, **1.376 câu có giải thích tiếng Việt**, 38 chuyên đề ôn dạng bài, 200 thẻ từ tiếng Việt DHV, **4.060 từ trong Kho từ mở NGSL + TOEIC Service List (CC BY-SA 4.0)** đều lên lịch ôn bằng FSRS, cùng **268 đoạn audio** và **33 hình** có sẵn. Mục Luyện tập gồm ôn theo dạng, **9 mã đề cố định** (3 đề toàn phần 200 câu không trùng ID câu, 4 mini, 1 Listening, 1 Reading), sổ câu sai từ 50 lượt nộp gần nhất và luyện từng Part. Có lưu bài đang làm, chấm điểm phía server và tiến độ riêng. Audio điều khiển thủ công, kết quả không quy đổi điểm TOEIC chính thức.
 
-459 câu bổ sung gồm 399 câu MIT đã chọn lọc/chuyển thể từ TOEIC Question Ocean và 60 câu DHV mới. Học liệu nằm ở `backend/data/toeic/course.json`, các mã đề ở `backend/data/toeic/exam-forms.json`, media ở `frontend/public/toeic/`. Không cần API AI hoặc seed học liệu vào MongoDB. Xem [hướng dẫn ôn tập, nguồn và cách tái tạo](docs/toeic/MO_RONG_ON_TAP.md), [sổ tay 38 dạng bài](docs/toeic/SO_TAY_DANG_BAI.md) và [thông báo giấy phép](docs/toeic/CONTENT_LICENSES.md).
+1.108 câu bổ sung so với bộ gốc gồm 1.048 câu MIT đã chọn lọc/chuyển thể từ TOEIC Question Ocean (từ 1.107 câu nguồn đã đối chiếu; loại 59 câu không đạt yêu cầu) và 60 câu DHV mới. Học liệu nằm ở `backend/data/toeic/course.json`, các mã đề ở `backend/data/toeic/exam-forms.json`, kho từ mở ở `backend/data/toeic/lexicon.json`, media ở `frontend/public/toeic/`. Không cần API AI hoặc seed học liệu vào MongoDB. Xem [hướng dẫn ôn tập, nguồn và cách tái tạo](docs/toeic/MO_RONG_ON_TAP.md), [sổ tay 38 dạng bài](docs/toeic/SO_TAY_DANG_BAI.md) và [thông báo giấy phép](docs/toeic/CONTENT_LICENSES.md).
 
-Xem [hướng dẫn chạy và mở rộng](docs/toeic/README.md), [nguồn tham khảo và khóa học](docs/toeic/SOURCES.md), [báo cáo bàn giao](docs/toeic/BAO_CAO.md). Đây là học liệu luyện tập tự biên soạn, không phải đề ETS hoặc cam kết đạt 900; audio tổng hợp và hình minh họa được ghi rõ trong ứng dụng.
+Xem [hướng dẫn chạy và mở rộng](docs/toeic/README.md), [nguồn tham khảo và khóa học](docs/toeic/SOURCES.md), [báo cáo bàn giao](docs/toeic/BAO_CAO.md). Đây là học liệu luyện tập tự biên soạn và chuyển thể từ nguồn mở được cấp phép rõ ràng, không phải đề ETS hoặc cam kết đạt 900; audio tổng hợp và nguồn hình minh họa/AI/Pexels được ghi rõ trong ứng dụng.
 
 ## Công nghệ và phạm vi
 
